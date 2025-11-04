@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { UserIcon } from './icons';
+import { UserIcon } from '@/src/components/icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconButton from '@/components/ui/icon-button';
 

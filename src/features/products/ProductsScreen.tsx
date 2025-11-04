@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, Image, Modal } from 'react-native';
 import { mockProducts as initialProducts } from '../../shared/data/mockData';
 import { Product } from '../../shared/types';
-import { PlusIcon } from '../../shared/components/icons';
+import { PlusIcon } from '@/src/components/icons';
 import AddProduct from './components/AddProduct';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconButton from '@/components/ui/icon-button';

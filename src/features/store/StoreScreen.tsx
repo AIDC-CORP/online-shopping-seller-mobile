@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, Image, ImageBackground } from 'react-native';
 import { mockStoreInfo } from '../../shared/data/mockData';
 import { StoreInfo } from '../../shared/types';
-import { PencilIcon } from '../../shared/components/icons';
+import { PencilIcon } from '@/src/components/icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import IconButton from '@/components/ui/icon-button';
 import Button from '@/components/ui/button';

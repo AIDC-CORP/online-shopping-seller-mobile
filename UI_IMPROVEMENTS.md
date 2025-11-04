@@ -1,10 +1,13 @@
 # UI/UX Improvements
 
 ## Summary
+
 All 5 screens have been updated with improved UI/UX based on user feedback.
 
 ## 1. Dashboard Screen ✅
+
 **Changes Made:**
+
 - ✅ Added interactive period selector with 3 options:
   - Hôm nay (Today)
   - Tuần này (This week)
@@ -19,7 +22,9 @@ All 5 screens have been updated with improved UI/UX based on user feedback.
 **Location:** `src/features/dashboard/DashboardScreen.tsx`
 
 ## 2. Orders Screen ✅
+
 **Status:** Already correct - no changes needed
+
 - Buttons already have proper colors:
   - "Từ chối" button uses `danger` variant (red)
   - "Xác nhận" button uses `primary` variant (emerald)
@@ -28,7 +33,9 @@ All 5 screens have been updated with improved UI/UX based on user feedback.
 **Location:** `src/features/orders/OrdersScreen.tsx`
 
 ## 3. Products Screen ✅
+
 **Status:** Already correct - no changes needed
+
 - Floating action button (FAB) already exists at bottom-right
 - Uses `IconButton` with `primary` variant
 - Shows plus icon for adding products
@@ -37,7 +44,9 @@ All 5 screens have been updated with improved UI/UX based on user feedback.
 **Location:** `src/features/products/ProductsScreen.tsx`
 
 ## 4. Store Screen ✅
+
 **Changes Made:**
+
 - ✅ Redesigned layout with better visual hierarchy:
   - Larger cover image (h-48 instead of h-32)
   - Store avatar overlaps cover image with rounded-2xl corners
@@ -52,7 +61,9 @@ All 5 screens have been updated with improved UI/UX based on user feedback.
 **Location:** `src/features/store/StoreScreen.tsx`
 
 ## 5. Login Screen ✅
+
 **Changes Made:**
+
 - ✅ Fixed button color - Button component properly shows white text on emerald background
 - ✅ Added emerald banner at top matching theme:
   - Large "Seller Hub" title in white
@@ -71,7 +82,9 @@ All 5 screens have been updated with improved UI/UX based on user feedback.
 **Location:** `src/features/auth/LoginScreen.tsx`
 
 ## Theme Configuration
+
 All screens now use the consistent emerald theme (`#10b981` / `emerald-500`):
+
 - Primary buttons: emerald-500
 - Active states: emerald-500
 - Accents and highlights: emerald colors
@@ -79,6 +92,7 @@ All screens now use the consistent emerald theme (`#10b981` / `emerald-500`):
 **Location:** `constants/theme-config.ts`, `components/ui/button.tsx`
 
 ## Testing Checklist
+
 - [ ] Dashboard: Test period selector switches between Hôm nay/Tuần này/Tháng này
 - [ ] Dashboard: Verify stat card colors are bolder and more visible
 - [ ] Orders: Confirm "Từ chối" (red) and "Xác nhận" (emerald) buttons are visible
@@ -87,6 +101,7 @@ All screens now use the consistent emerald theme (`#10b981` / `emerald-500`):
 - [ ] Login: Verify white text on emerald button, test form validation
 
 ## Notes
+
 - All changes maintain consistency with the microfrontend architecture
 - Button components (Button, IconButton) are reusable across all screens
 - Theme colors are centralized in `constants/theme-config.ts`

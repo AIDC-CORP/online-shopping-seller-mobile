@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { Product } from '../../../shared/types';
-import { XIcon, CameraIcon } from '../../../shared/components/icons';
+import { XIcon, CameraIcon } from '@/src/components/icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '@/components/ui/button';
 import IconButton from '@/components/ui/icon-button';

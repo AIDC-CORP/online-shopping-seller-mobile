@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import Button from '@/components/ui/button';
+import { useLogin } from './hooks';
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -9,21 +10,27 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  
+  // Sử dụng custom hook
+  const { login, isLoading, error, clearError } = useLogin();
 
   const handleLoginClick = async () => {
-    if (email && password) {
-      setError('');
-      setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        setLoading(false);
-        onLogin();
-      }, 1000);
-    } else {
-      setError('Vui lòng nhập email và mật khẩu.');
+    const success = await login(email, password);
+    
+    if (success) {
+      // Đăng nhập thành công
+      onLogin();
     }
+  };
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (error) clearError(); // Clear error khi user typing
+  };
+
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    if (error) clearError(); // Clear error khi user typing
   };
 
   return (
@@ -61,7 +68,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
                   placeholder="email@example.com"
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={handleEmailChange}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
@@ -73,7 +80,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
                   placeholder="••••••••"
                   value={password}
-                  onChangeText={setPassword}
+                  onChangeText={handlePasswordChange}
                   secureTextEntry
                 />
               </View>
@@ -90,7 +97,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                   variant="primary"
                   size="lg"
                   fullWidth
-                  loading={loading}
+                  loading={isLoading}
                 >
                   Đăng nhập
                 </Button>

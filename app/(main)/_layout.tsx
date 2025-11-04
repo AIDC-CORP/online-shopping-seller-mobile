@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { HomeIcon, PackageIcon, CubeIcon, StoreIcon } from '@/src/shared/components/icons';
-import AppHeader from '@/src/shared/components/AppHeader';
+import { HomeIcon, PackageIcon, CubeIcon, StoreIcon } from '@/src/components/icons';
+import AppHeader from '@/src/components/common/AppHeader';
 
 export default function MainLayout() {
   const handleLogout = () => {

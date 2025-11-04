@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { mockDashboardStats, mockProducts } from '../../shared/data/mockData';
-import { ChartBarIcon, PackageIcon, CheckCircleIcon, XCircleIcon } from '../../shared/components/icons';
+import { ChartBarIcon, PackageIcon, CheckCircleIcon, XCircleIcon } from '@/src/components/icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type PeriodType = 'today' | 'week' | 'month';
