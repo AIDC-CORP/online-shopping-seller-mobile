@@ -1,13 +1,28 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { mockDashboardStats, mockProducts } from '../../shared/data/mockData';
+import { mockDashboardStatsByPeriod } from '../../shared/data/mockData';
 import { ChartBarIcon, PackageIcon, CheckCircleIcon, XCircleIcon } from '@/src/components/icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Product } from '../../shared/types';
+import { RevenueDetailCard } from './components/RevenueDetailCard';
+import { OrdersDetailCard } from './components/OrdersDetailCard';
+import { ProductDetailCard } from './components/ProductDetailCard';
 
 type PeriodType = 'today' | 'week' | 'month';
 
-const StatCard: React.FC<{ title: string; value: string; icon: React.ReactNode; iconBgColor: string; iconColor: string }> = ({ title, value, icon, iconBgColor, iconColor }) => (
-  <View className="bg-white p-4 rounded-xl shadow-sm flex-row items-center space-x-3 flex-1">
+const StatCard: React.FC<{ 
+  title: string; 
+  value: string; 
+  icon: React.ReactNode; 
+  iconBgColor: string; 
+  iconColor: string;
+  onPress?: () => void;
+}> = ({ title, value, icon, iconBgColor, iconColor, onPress }) => (
+  <TouchableOpacity 
+    className="bg-white p-4 rounded-xl shadow-sm flex-row items-center space-x-3 flex-1"
+    onPress={onPress}
+    activeOpacity={0.7}
+  >
     <View className={`p-3 rounded-full ${iconBgColor}`}>
       {icon}
     </View>
@@ -15,16 +30,32 @@ const StatCard: React.FC<{ title: string; value: string; icon: React.ReactNode; 
       <Text className="text-xs text-gray-600 font-medium">{title}</Text>
       <Text className="text-lg font-bold text-gray-900 mt-0.5">{value}</Text>
     </View>
-  </View>
+  </TouchableOpacity>
 );
 
 const DashboardScreen: React.FC = () => {
-  const [stats] = useState(mockDashboardStats);
-  const [topProducts] = useState(mockProducts.slice(0, 4));
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('month');
+  const [showRevenueDetail, setShowRevenueDetail] = useState(false);
+  const [showOrdersDetail, setShowOrdersDetail] = useState<'total' | 'success' | 'cancelled' | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  
+  // Lấy data theo period
+  const currentData = mockDashboardStatsByPeriod[selectedPeriod];
+  const stats = {
+    revenue: currentData.revenue,
+    totalOrders: currentData.totalOrders,
+    successfulOrders: currentData.successfulOrders,
+    cancelledOrders: currentData.cancelledOrders,
+  };
+  const topProducts = currentData.topProducts;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+  };
+
+  const getPeriodText = () => {
+    return selectedPeriod === 'today' ? 'Hôm nay' : 
+           selectedPeriod === 'week' ? 'Tuần này' : 'Tháng này';
   };
 
   const periodOptions: { key: PeriodType; label: string }[] = [
@@ -72,6 +103,7 @@ const DashboardScreen: React.FC = () => {
                    icon={<ChartBarIcon className="h-5 w-5" color="#047857" />} 
                    iconBgColor="bg-emerald-200" 
                    iconColor="#047857"
+                   onPress={() => setShowRevenueDetail(true)}
                  />
                  <StatCard 
                    title="Thành công" 
@@ -79,6 +111,7 @@ const DashboardScreen: React.FC = () => {
                    icon={<CheckCircleIcon className="h-5 w-5" color="#4338ca" />} 
                    iconBgColor="bg-indigo-200" 
                    iconColor="#4338ca"
+                   onPress={() => setShowOrdersDetail('success')}
                  />
               </View>
               <View className="flex-1 space-y-4">
@@ -88,6 +121,7 @@ const DashboardScreen: React.FC = () => {
                   icon={<PackageIcon className="h-5 w-5" color="#1d4ed8" />} 
                   iconBgColor="bg-blue-200" 
                   iconColor="#1d4ed8"
+                  onPress={() => setShowOrdersDetail('total')}
                 />
                 <StatCard 
                   title="Đã hủy" 
@@ -95,6 +129,7 @@ const DashboardScreen: React.FC = () => {
                   icon={<XCircleIcon className="h-5 w-5" color="#b91c1c" />} 
                   iconBgColor="bg-red-200" 
                   iconColor="#b91c1c"
+                  onPress={() => setShowOrdersDetail('cancelled')}
                 />
               </View>
             </View>
@@ -103,20 +138,63 @@ const DashboardScreen: React.FC = () => {
           <View>
             <Text className="text-lg font-bold text-gray-700 mb-4">Sản phẩm bán chạy</Text>
             <View className="space-y-3">
-              {topProducts.map((product) => (
-                <View key={product.id} className="bg-white p-3 rounded-lg shadow-sm flex-row items-center space-x-4">
+              {topProducts.map((product: Product) => (
+                <TouchableOpacity 
+                  key={product.id} 
+                  onPress={() => setSelectedProduct(product)}
+                  className="bg-white p-3 rounded-lg shadow-sm flex-row items-center space-x-4"
+                  activeOpacity={0.7}
+                >
                   <Image source={{ uri: product.imageUrl }} className="w-16 h-16 rounded-md" />
                   <View className="flex-1">
-                    <Text className="font-semibold text-gray-700">{product.name}</Text>
-                    <Text className="text-sm text-gray-500">{formatCurrency(product.price)} / {product.unit}</Text>
+                    <Text className="font-semibold text-gray-800">{product.name}</Text>
+                    <Text className="text-sm text-gray-500 mt-0.5">{formatCurrency(product.price)} / {product.unit}</Text>
+                    <Text className="text-xs text-gray-400 mt-1">Tồn kho: {product.stock} {product.unit}</Text>
                   </View>
-                  <Text className="text-lg font-bold text-emerald-600">{product.stock * 3} <Text className="text-sm font-normal text-gray-500">đã bán</Text></Text>
-                </View>
+                  <View className="items-end">
+                    <Text className="text-lg font-bold text-emerald-600">{product.sold || 0}</Text>
+                    <Text className="text-xs text-gray-500">đã bán</Text>
+                  </View>
+                </TouchableOpacity>
               ))}
             </View>
           </View>
         </View>
       </ScrollView>
+
+      {/* Modals */}
+      {showRevenueDetail && (
+        <RevenueDetailCard
+          revenue={stats.revenue}
+          totalOrders={stats.totalOrders}
+          successfulOrders={stats.successfulOrders}
+          cancelledOrders={stats.cancelledOrders}
+          periodText={getPeriodText()}
+          formatCurrency={formatCurrency}
+          onClose={() => setShowRevenueDetail(false)}
+        />
+      )}
+
+      {showOrdersDetail && (
+        <OrdersDetailCard
+          totalOrders={stats.totalOrders}
+          successfulOrders={stats.successfulOrders}
+          cancelledOrders={stats.cancelledOrders}
+          revenue={stats.revenue}
+          periodText={getPeriodText()}
+          formatCurrency={formatCurrency}
+          onClose={() => setShowOrdersDetail(null)}
+          type={showOrdersDetail}
+        />
+      )}
+
+      {selectedProduct && (
+        <ProductDetailCard
+          product={selectedProduct}
+          formatCurrency={formatCurrency}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </SafeAreaView>
   );
 };

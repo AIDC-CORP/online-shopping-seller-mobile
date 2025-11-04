@@ -23,6 +23,7 @@ export interface Product {
   stock: number;
   unit: string;
   imageUrl: string;
+  sold?: number; // Số lượng đã bán
 }
 
 export interface StoreInfo {

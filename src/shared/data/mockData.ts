@@ -1,12 +1,12 @@
 import { Product, Order, OrderStatus, StoreInfo, DashboardStats } from '../types';
 
 export const mockProducts: Product[] = [
-  { id: 'p1', name: 'Cà chua bi', price: 45000, stock: 50, unit: 'kg', imageUrl: 'https://picsum.photos/seed/tomato/300/200' },
-  { id: 'p2', name: 'Rau xà lách', price: 15000, stock: 100, unit: 'mớ', imageUrl: 'https://picsum.photos/seed/lettuce/300/200' },
-  { id: 'p3', name: 'Thịt bò Úc', price: 250000, stock: 20, unit: 'kg', imageUrl: 'https://picsum.photos/seed/beef/300/200' },
-  { id: 'p4', name: 'Cá hồi Na Uy', price: 450000, stock: 15, unit: 'kg', imageUrl: 'https://picsum.photos/seed/salmon/300/200' },
-  { id: 'p5', name: 'Táo Envy Mỹ', price: 80000, stock: 80, unit: 'kg', imageUrl: 'https://picsum.photos/seed/apple/300/200' },
-  { id: 'p6', name: 'Sữa tươi Dalat Milk', price: 35000, stock: 0, unit: 'hộp', imageUrl: 'https://picsum.photos/seed/milk/300/200' },
+  { id: 'p1', name: 'Cà chua bi', price: 45000, stock: 50, unit: 'kg', imageUrl: 'https://picsum.photos/seed/tomato/300/200', sold: 245 },
+  { id: 'p2', name: 'Rau xà lách', price: 15000, stock: 100, unit: 'mớ', imageUrl: 'https://picsum.photos/seed/lettuce/300/200', sold: 189 },
+  { id: 'p3', name: 'Thịt bò Úc', price: 250000, stock: 20, unit: 'kg', imageUrl: 'https://picsum.photos/seed/beef/300/200', sold: 156 },
+  { id: 'p4', name: 'Cá hồi Na Uy', price: 450000, stock: 15, unit: 'kg', imageUrl: 'https://picsum.photos/seed/salmon/300/200', sold: 98 },
+  { id: 'p5', name: 'Táo Envy Mỹ', price: 80000, stock: 80, unit: 'kg', imageUrl: 'https://picsum.photos/seed/apple/300/200', sold: 234 },
+  { id: 'p6', name: 'Sữa tươi Dalat Milk', price: 35000, stock: 0, unit: 'hộp', imageUrl: 'https://picsum.photos/seed/milk/300/200', sold: 312 },
 ];
 
 export const mockOrders: Order[] = [
@@ -33,4 +33,44 @@ export const mockDashboardStats: DashboardStats = {
   totalOrders: 89,
   successfulOrders: 82,
   cancelledOrders: 7,
+};
+
+// Mock data theo từng period
+export const mockDashboardStatsByPeriod = {
+  today: {
+    revenue: 2450000,
+    totalOrders: 15,
+    successfulOrders: 13,
+    cancelledOrders: 2,
+    topProducts: [
+      { ...mockProducts[5], sold: 12 }, // Sữa tươi
+      { ...mockProducts[0], sold: 8 },  // Cà chua
+      { ...mockProducts[1], sold: 6 },  // Rau xà lách
+      { ...mockProducts[4], sold: 5 },  // Táo
+    ],
+  },
+  week: {
+    revenue: 8750000,
+    totalOrders: 42,
+    successfulOrders: 38,
+    cancelledOrders: 4,
+    topProducts: [
+      { ...mockProducts[5], sold: 45 }, // Sữa tươi
+      { ...mockProducts[0], sold: 38 }, // Cà chua
+      { ...mockProducts[4], sold: 32 }, // Táo
+      { ...mockProducts[1], sold: 28 }, // Rau xà lách
+    ],
+  },
+  month: {
+    revenue: 12540000,
+    totalOrders: 89,
+    successfulOrders: 82,
+    cancelledOrders: 7,
+    topProducts: [
+      { ...mockProducts[5], sold: 156 }, // Sữa tươi
+      { ...mockProducts[0], sold: 125 }, // Cà chua
+      { ...mockProducts[4], sold: 98 },  // Táo
+      { ...mockProducts[2], sold: 76 },  // Thịt bò
+    ],
+  },
 };
