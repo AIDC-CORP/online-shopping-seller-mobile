@@ -62,8 +62,8 @@ const OrderCard: React.FC<{ order: Order }> = ({ order }) => {
       {/* Action Buttons */}
       {order.status === OrderStatus.New && (
         <View className="border-t border-gray-100 pt-3">
-          <View className="flex-row gap-3">
-            <View className="flex-1">
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <View style={{ flex: 1 }}>
               <Button
                 onPress={() => console.log('Reject order', order.id)}
                 variant="danger"
@@ -73,7 +73,7 @@ const OrderCard: React.FC<{ order: Order }> = ({ order }) => {
                 Từ chối
               </Button>
             </View>
-            <View className="flex-1">
+            <View style={{ flex: 1 }}>
               <Button
                 onPress={() => console.log('Accept order', order.id)}
                 variant="primary"
@@ -84,6 +84,20 @@ const OrderCard: React.FC<{ order: Order }> = ({ order }) => {
               </Button>
             </View>
           </View>
+        </View>
+      )}
+
+      {/* Button for Preparing status */}
+      {order.status === OrderStatus.Preparing && (
+        <View className="border-t border-gray-100 pt-3">
+          <Button
+            onPress={() => console.log('Start delivery', order.id)}
+            variant="primary"
+            size="md"
+            fullWidth
+          >
+            Giao hàng
+          </Button>
         </View>
       )}
     </View>
@@ -115,52 +129,74 @@ const OrdersScreen: React.FC = () => {
       </View>
 
       {/* Tab Navigation */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        className="bg-white border-b border-gray-200"
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
-      >
+      <View style={{ backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' }}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
+        >
         {tabs.map((tab) => {
           const count = getOrderCount(tab);
           const isActive = activeTab === tab;
           return (
-            <TouchableOpacity
+            <View
               key={tab}
-              onPress={() => setActiveTab(tab)}
-              className={`px-4 py-2 mr-2 rounded-lg ${
-                isActive ? 'bg-emerald-500' : 'bg-gray-100'
-              }`}
-              style={isActive ? { 
-                shadowColor: '#10b981',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.3,
-                shadowRadius: 4,
-                elevation: 4,
-              } : undefined}
+              style={{
+                marginRight: 8,
+              }}
             >
-              <View className="flex-row items-center">
-                <Text className={`text-sm font-semibold ${
-                  isActive ? 'text-white' : 'text-gray-700'
-                }`}>
+              <TouchableOpacity
+                onPress={() => setActiveTab(tab)}
+                style={{
+                  paddingHorizontal: 16,
+                  paddingVertical: 10,
+                  borderRadius: 8,
+                  backgroundColor: isActive ? '#10b981' : '#f3f4f6',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  shadowColor: isActive ? '#10b981' : 'transparent',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: isActive ? 0.3 : 0,
+                  shadowRadius: 4,
+                  elevation: isActive ? 4 : 0,
+                }}
+              >
+                <Text style={{
+                  fontSize: 14,
+                  fontWeight: '600',
+                  color: isActive ? 'white' : '#374151',
+                  includeFontPadding: false,
+                  textAlignVertical: 'center',
+                }}>
                   {tab}
                 </Text>
                 {count > 0 && (
-                  <View className={`ml-2 px-2 py-0.5 rounded-full ${
-                    isActive ? 'bg-white' : 'bg-emerald-500'
-                  }`}>
-                    <Text className={`text-xs font-bold ${
-                      isActive ? 'text-emerald-600' : 'text-white'
-                    }`}>
+                  <View style={{
+                    marginLeft: 8,
+                    paddingHorizontal: 8,
+                    paddingVertical: 2,
+                    borderRadius: 12,
+                    backgroundColor: isActive ? 'white' : '#10b981',
+                    minWidth: 24,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <Text style={{
+                      fontSize: 12,
+                      fontWeight: 'bold',
+                      color: isActive ? '#10b981' : 'white',
+                      includeFontPadding: false,
+                    }}>
                       {count}
                     </Text>
                   </View>
                 )}
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           );
         })}
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       {/* Orders List */}
       <ScrollView 

@@ -37,10 +37,24 @@ const StoreScreen: React.FC = () => {
         
         {/* Store Profile Section */}
         <View className="px-4 -mt-16">
-          <View className="flex-row items-end gap-4">
+          <View className="flex-row items-end" style={{ gap: 16 }}>
             <Image source={{ uri: storeInfo.avatarUrl }} className="w-28 h-28 rounded-2xl border-4 border-white shadow-lg" />
             <View className="flex-1 pb-2">
-              <Text className="text-2xl font-bold text-white drop-shadow-lg">{storeInfo.name}</Text>
+              <View style={{ 
+                backgroundColor: 'rgba(0, 0, 0, 0.4)', 
+                paddingHorizontal: 12, 
+                paddingVertical: 8, 
+                borderRadius: 12,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.3,
+                shadowRadius: 4,
+                elevation: 3,
+              }}>
+                <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#ffffff' }}>
+                  {storeInfo.name}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
