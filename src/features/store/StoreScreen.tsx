@@ -24,13 +24,15 @@ const StoreScreen: React.FC = () => {
         <ImageBackground source={{ uri: storeInfo.coverImageUrl }} className="w-full h-48" resizeMode="cover">
             <View className="flex-1 bg-black/30 justify-end p-4">
               <View className="self-end">
-                <IconButton
-                  onPress={() => console.log('Edit cover')}
-                  icon={<PencilIcon className="h-5 w-5" color="white" />}
-                  variant="default"
-                  size="sm"
-                  className="bg-black/40"
-                />
+                <IconButton onPress={() => console.log('Edit cover')}>
+                  <View style={{ 
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+                    padding: 8, 
+                    borderRadius: 8 
+                  }}>
+                    <PencilIcon className="h-5 w-5" color="white" />
+                  </View>
+                </IconButton>
               </View>
             </View>
         </ImageBackground>
@@ -63,12 +65,9 @@ const StoreScreen: React.FC = () => {
         <View className="bg-white p-4 rounded-xl shadow-sm mx-4 mt-4">
           <View className="flex-row justify-between items-start mb-2">
             <Text className="text-base font-semibold text-gray-800">Giới thiệu</Text>
-            <IconButton
-              onPress={() => console.log('Edit description')}
-              icon={<PencilIcon className="h-4 w-4" color="#6b7280" />}
-              variant="default"
-              size="sm"
-            />
+            <IconButton onPress={() => console.log('Edit description')}>
+              <PencilIcon className="h-4 w-4" color="#6b7280" />
+            </IconButton>
           </View>
           <Text className="text-sm text-gray-600 leading-5">{storeInfo.description}</Text>
         </View>
@@ -77,12 +76,9 @@ const StoreScreen: React.FC = () => {
         <View className="bg-white p-4 rounded-xl shadow-sm mx-4 mt-4">
           <View className="flex-row justify-between items-center mb-3">
             <Text className="text-base font-semibold text-gray-800">Thông tin cửa hàng</Text>
-            <IconButton
-              onPress={() => console.log('Edit info')}
-              icon={<PencilIcon className="h-4 w-4" color="#6b7280" />}
-              variant="default"
-              size="sm"
-            />
+            <IconButton onPress={() => console.log('Edit info')}>
+              <PencilIcon className="h-4 w-4" color="#6b7280" />
+            </IconButton>
           </View>
           <InfoRow label="📍 Địa chỉ" value={storeInfo.address} />
           <InfoRow label="📞 Số điện thoại" value={storeInfo.phone} />
@@ -90,15 +86,14 @@ const StoreScreen: React.FC = () => {
         </View>
 
         {/* Quick Actions */}
-        <View className="px-4 mt-6 space-y-3">
+        <View style={{ paddingHorizontal: 16, marginTop: 24, gap: 12 }}>
           <Button
             onPress={() => console.log('Edit store settings')}
             variant="secondary"
             size="md"
             fullWidth
-            icon={<PencilIcon className="h-5 w-5" color="white" />}
           >
-            Chỉnh sửa thông tin
+            ✏️ Chỉnh sửa thông tin
           </Button>
           
           <Button

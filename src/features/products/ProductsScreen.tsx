@@ -133,18 +133,38 @@ const ProductDetailModal: React.FC<{
     >
       <SafeAreaView className="flex-1 bg-white">
         {/* Header */}
-        <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-200">
-          <Text className="text-xl font-bold text-gray-800">Chi tiết sản phẩm</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <View style={{ 
+          flexDirection: 'row', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          paddingHorizontal: 16, 
+          paddingVertical: 12,
+          paddingTop: 40,
+          borderBottomWidth: 1,
+          borderBottomColor: '#e5e7eb',
+        }}>
+          <Text 
+            style={{ 
+              fontSize: 18, 
+              fontWeight: 'bold', 
+              color: '#1f2937',
+              flex: 1,
+              marginRight: 12,
+            }}
+            numberOfLines={1}
+          >
+            Chi tiết sản phẩm
+          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             {!isEditing ? (
               <>
                 <TouchableOpacity 
                   onPress={() => setIsEditing(true)}
-                  style={{ paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#3b82f6', borderRadius: 8 }}
+                  style={{ paddingHorizontal: 10, paddingVertical: 6, backgroundColor: '#3b82f6', borderRadius: 8 }}
                 >
-                  <Text style={{ color: 'white', fontWeight: '600', fontSize: 14 }}>✏️ Chỉnh sửa</Text>
+                  <Text style={{ color: 'white', fontWeight: '600', fontSize: 13 }}>✏️</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={onClose}>
+                <TouchableOpacity onPress={onClose} style={{ padding: 4 }}>
                   <XCircleIcon className="h-6 w-6" color="#6B7280" />
                 </TouchableOpacity>
               </>
@@ -152,75 +172,84 @@ const ProductDetailModal: React.FC<{
               <>
                 <TouchableOpacity 
                   onPress={handleCancel}
-                  style={{ paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#6b7280', borderRadius: 8 }}
+                  style={{ paddingHorizontal: 10, paddingVertical: 6, backgroundColor: '#6b7280', borderRadius: 8 }}
                 >
-                  <Text style={{ color: 'white', fontWeight: '600', fontSize: 14 }}>Hủy</Text>
+                  <Text style={{ color: 'white', fontWeight: '600', fontSize: 13 }}>Hủy</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   onPress={handleSave}
-                  style={{ paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#10b981', borderRadius: 8 }}
+                  style={{ paddingHorizontal: 10, paddingVertical: 6, backgroundColor: '#10b981', borderRadius: 8 }}
                 >
-                  <Text style={{ color: 'white', fontWeight: '600', fontSize: 14 }}>💾 Lưu</Text>
+                  <Text style={{ color: 'white', fontWeight: '600', fontSize: 13 }}>Lưu</Text>
                 </TouchableOpacity>
               </>
             )}
           </View>
         </View>
 
-        <ScrollView>
+        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
           {/* Product Image */}
           <Image 
             source={{ uri: product.imageUrl }} 
-            style={{ width: '100%', height: 250 }}
+            style={{ width: '100%', height: 200 }}
             resizeMode="cover"
           />
 
           {/* Content */}
-          <View style={{ padding: 16 }}>
+          <View style={{ paddingHorizontal: 12, paddingVertical: 12 }}>
             {/* Product Name */}
-            <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1f2937', marginBottom: 8 }}>
+            <Text 
+              style={{ 
+                fontSize: 18, 
+                fontWeight: 'bold', 
+                color: '#1f2937', 
+                marginBottom: 10,
+                lineHeight: 24,
+              }}
+              numberOfLines={2}
+            >
               {product.name}
             </Text>
 
             {/* Stock Status Badge */}
-            <View className={`px-4 py-2 rounded-lg self-start mb-4 ${stockStatus.bg}`}>
-              <Text className={`text-sm font-bold ${stockStatus.color}`}>
+            <View className={`px-3 py-1.5 rounded-lg self-start mb-3 ${stockStatus.bg}`}>
+              <Text className={`text-xs font-bold ${stockStatus.color}`} numberOfLines={1}>
                 📦 {stockStatus.text}
               </Text>
             </View>
 
             {/* Price */}
-            <View style={{ backgroundColor: '#d1fae5', borderRadius: 12, padding: 16, marginBottom: 16 }}>
-              <Text style={{ fontSize: 14, color: '#059669', marginBottom: 4 }}>Giá bán</Text>
+            <View style={{ backgroundColor: '#d1fae5', borderRadius: 10, padding: 12, marginBottom: 12 }}>
+              <Text style={{ fontSize: 12, color: '#059669', marginBottom: 4 }}>Giá bán</Text>
               {isEditing ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <TextInput
                     value={editedPrice}
                     onChangeText={setEditedPrice}
                     keyboardType="numeric"
                     style={{
                       flex: 1,
-                      fontSize: 28,
+                      fontSize: 20,
                       fontWeight: 'bold',
                       color: '#047857',
                       backgroundColor: 'white',
-                      borderRadius: 8,
-                      padding: 12,
+                      borderRadius: 6,
+                      padding: 10,
                       borderWidth: 2,
                       borderColor: '#10b981',
                     }}
                     placeholder="Giá"
                   />
-                  <Text style={{ fontSize: 18, color: '#059669' }}>/</Text>
+                  <Text style={{ fontSize: 14, color: '#059669' }}>/</Text>
                   <TextInput
                     value={editedUnit}
                     onChangeText={setEditedUnit}
                     style={{
-                      width: 80,
-                      fontSize: 18,
+                      width: 60,
+                      fontSize: 14,
                       color: '#047857',
                       backgroundColor: 'white',
-                      borderRadius: 8,
+                      borderRadius: 6,
                       padding: 8,
                       borderWidth: 2,
                       borderColor: '#10b981',
@@ -229,11 +258,25 @@ const ProductDetailModal: React.FC<{
                   />
                 </View>
               ) : (
-                <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                  <Text style={{ fontSize: 32, fontWeight: 'bold', color: '#047857' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', maxWidth: '100%' }}>
+                  <Text 
+                    style={{ 
+                      fontSize: 20, 
+                      fontWeight: 'bold', 
+                      color: '#047857',
+                      flexShrink: 1,
+                      maxWidth: '75%',
+                    }}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.7}
+                  >
                     {formatCurrency(currentPrice)}
                   </Text>
-                  <Text style={{ fontSize: 18, color: '#059669', marginLeft: 8 }}>
+                  <Text 
+                    style={{ fontSize: 13, color: '#059669', marginLeft: 4, flexShrink: 0 }}
+                    numberOfLines={1}
+                  >
                     / {currentUnit}
                   </Text>
                 </View>
@@ -241,102 +284,134 @@ const ProductDetailModal: React.FC<{
             </View>
 
             {/* Stats Grid */}
-            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
+            <View style={{ flexDirection: 'row', gap: 10, marginBottom: 12 }}>
               {/* Stock */}
-              <View style={{ flex: 1, backgroundColor: '#f3f4f6', borderRadius: 12, padding: 16 }}>
-                <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Tồn kho</Text>
+              <View style={{ flex: 1, backgroundColor: '#f3f4f6', borderRadius: 10, padding: 10, minWidth: 0 }}>
+                <Text style={{ fontSize: 11, color: '#6b7280', marginBottom: 3 }} numberOfLines={1}>Tồn kho</Text>
                 {isEditing ? (
                   <TextInput
                     value={editedStock}
                     onChangeText={setEditedStock}
                     keyboardType="numeric"
                     style={{
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: 'bold',
                       color: '#1f2937',
                       backgroundColor: 'white',
-                      borderRadius: 8,
-                      padding: 8,
+                      borderRadius: 6,
+                      padding: 6,
                       borderWidth: 2,
                       borderColor: '#3b82f6',
-                      marginBottom: 4,
+                      marginBottom: 3,
                     }}
                     placeholder="Số lượng"
                   />
                 ) : (
-                  <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1f2937' }}>
+                  <Text 
+                    style={{ fontSize: 18, fontWeight: 'bold', color: '#1f2937' }}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.7}
+                  >
                     {currentStock}
                   </Text>
                 )}
-                <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{currentUnit}</Text>
+                <Text style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }} numberOfLines={1}>{currentUnit}</Text>
               </View>
 
               {/* Sold */}
-              <View style={{ flex: 1, backgroundColor: '#f3f4f6', borderRadius: 12, padding: 16 }}>
-                <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>Đã bán</Text>
+              <View style={{ flex: 1, backgroundColor: '#f3f4f6', borderRadius: 10, padding: 10, minWidth: 0 }}>
+                <Text style={{ fontSize: 11, color: '#6b7280', marginBottom: 3 }} numberOfLines={1}>Đã bán</Text>
                 {isEditing ? (
                   <TextInput
                     value={editedSold}
                     onChangeText={setEditedSold}
                     keyboardType="numeric"
                     style={{
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: 'bold',
                       color: '#1f2937',
                       backgroundColor: 'white',
-                      borderRadius: 8,
-                      padding: 8,
+                      borderRadius: 6,
+                      padding: 6,
                       borderWidth: 2,
                       borderColor: '#3b82f6',
-                      marginBottom: 4,
+                      marginBottom: 3,
                     }}
                     placeholder="Đã bán"
                   />
                 ) : (
-                  <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1f2937' }}>
+                  <Text 
+                    style={{ fontSize: 18, fontWeight: 'bold', color: '#1f2937' }}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.7}
+                  >
                     {currentSold}
                   </Text>
                 )}
-                <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{currentUnit}</Text>
+                <Text style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }} numberOfLines={1}>{currentUnit}</Text>
               </View>
             </View>
 
             {/* Revenue */}
             {currentSold > 0 && (
-              <View style={{ backgroundColor: '#f3f4f6', borderRadius: 12, padding: 16, marginBottom: 16 }}>
-                <Text style={{ fontSize: 14, color: '#6b7280', marginBottom: 8 }}>
+              <View style={{ backgroundColor: '#f3f4f6', borderRadius: 10, padding: 12, marginBottom: 12 }}>
+                <Text style={{ fontSize: 11, color: '#6b7280', marginBottom: 6 }} numberOfLines={1}>
                   Doanh thu từ sản phẩm này
                 </Text>
-                <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#1f2937' }}>
+                <Text 
+                  style={{ 
+                    fontSize: 20, 
+                    fontWeight: 'bold', 
+                    color: '#1f2937',
+                  }}
+                  numberOfLines={2}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.6}
+                >
                   {formatCurrency(totalValue)}
                 </Text>
-                <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>
+                <Text 
+                  style={{ fontSize: 10, color: '#6b7280', marginTop: 3 }}
+                  numberOfLines={2}
+                >
                   = {currentSold} {currentUnit} × {formatCurrency(currentPrice)}
                 </Text>
               </View>
             )}
 
             {/* Product Info */}
-            <View style={{ backgroundColor: '#eff6ff', borderRadius: 12, padding: 16, marginBottom: 16 }}>
-              <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#1e40af', marginBottom: 8 }}>
+            <View style={{ backgroundColor: '#eff6ff', borderRadius: 10, padding: 12, marginBottom: 12 }}>
+              <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#1e40af', marginBottom: 6 }}>
                 📊 Thông tin chi tiết
               </Text>
-              <View style={{ gap: 8 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ color: '#1e3a8a', fontSize: 14 }}>ID sản phẩm:</Text>
-                  <Text style={{ color: '#1e3a8a', fontSize: 14, fontWeight: '600' }}>{product.id}</Text>
+              <View style={{ gap: 6 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                  <Text style={{ color: '#1e3a8a', fontSize: 12 }}>ID sản phẩm:</Text>
+                  <Text 
+                    style={{ color: '#1e3a8a', fontSize: 12, fontWeight: '600', flexShrink: 1 }}
+                    numberOfLines={1}
+                  >
+                    {product.id}
+                  </Text>
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ color: '#1e3a8a', fontSize: 14 }}>Đơn vị:</Text>
-                  <Text style={{ color: '#1e3a8a', fontSize: 14, fontWeight: '600' }}>{currentUnit}</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                  <Text style={{ color: '#1e3a8a', fontSize: 12 }}>Đơn vị:</Text>
+                  <Text 
+                    style={{ color: '#1e3a8a', fontSize: 12, fontWeight: '600', flexShrink: 1 }}
+                    numberOfLines={1}
+                  >
+                    {currentUnit}
+                  </Text>
                 </View>
                 {currentStock < 20 && currentStock > 0 && (
-                  <Text style={{ color: '#f59e0b', fontSize: 12, marginTop: 8 }}>
+                  <Text style={{ color: '#f59e0b', fontSize: 11, marginTop: 4, flexWrap: 'wrap' }}>
                     ⚠️ Tồn kho sắp hết, cần nhập thêm hàng!
                   </Text>
                 )}
                 {currentStock === 0 && (
-                  <Text style={{ color: '#ef4444', fontSize: 12, marginTop: 8 }}>
+                  <Text style={{ color: '#ef4444', fontSize: 11, marginTop: 4, flexWrap: 'wrap' }}>
                     🚫 Sản phẩm đã hết hàng!
                   </Text>
                 )}
@@ -348,8 +423,8 @@ const ProductDetailModal: React.FC<{
               onPress={handleDelete}
               style={{
                 backgroundColor: '#fee2e2',
-                borderRadius: 12,
-                padding: 16,
+                borderRadius: 10,
+                padding: 12,
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -358,12 +433,15 @@ const ProductDetailModal: React.FC<{
               }}
               activeOpacity={0.7}
             >
-              <Text style={{ fontSize: 20, marginRight: 8 }}>🗑️</Text>
-              <Text style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                color: '#ef4444',
-              }}>
+              <Text style={{ fontSize: 16, marginRight: 6 }}>🗑️</Text>
+              <Text 
+                style={{
+                  fontSize: 14,
+                  fontWeight: 'bold',
+                  color: '#ef4444',
+                }}
+                numberOfLines={1}
+              >
                 Xóa sản phẩm này
               </Text>
             </TouchableOpacity>

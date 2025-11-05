@@ -28,7 +28,14 @@ const StatCard: React.FC<{
     </View>
     <View className="flex-1">
       <Text className="text-xs text-gray-600 font-medium">{title}</Text>
-      <Text className="text-lg font-bold text-gray-900 mt-0.5">{value}</Text>
+      <Text 
+        className="text-lg font-bold text-gray-900 mt-0.5"
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >
+        {value}
+      </Text>
     </View>
   </TouchableOpacity>
 );
@@ -95,11 +102,11 @@ const DashboardScreen: React.FC = () => {
                 ))}
               </View>
             </View>
-            <View className="flex-row space-x-4">
-              <View className="flex-1 space-y-4">
+            <View style={{ flexDirection: 'row', gap: 16 }}>
+              <View style={{ flex: 1, gap: 16 }}>
                  <StatCard 
                    title="Doanh thu" 
-                   value={formatCurrency(stats.revenue).replace(/\s/g, '')} 
+                   value={formatCurrency(stats.revenue).replace(/\s/g, '').replace('₫', ' ₫')} 
                    icon={<ChartBarIcon className="h-5 w-5" color="#047857" />} 
                    iconBgColor="bg-emerald-200" 
                    iconColor="#047857"
@@ -114,7 +121,7 @@ const DashboardScreen: React.FC = () => {
                    onPress={() => setShowOrdersDetail('success')}
                  />
               </View>
-              <View className="flex-1 space-y-4">
+              <View style={{ flex: 1, gap: 16 }}>
                 <StatCard 
                   title="Tổng đơn" 
                   value={stats.totalOrders.toString()} 
