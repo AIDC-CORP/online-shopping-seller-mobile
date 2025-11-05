@@ -1,12 +1,78 @@
 import { Product, Order, OrderStatus, StoreInfo, DashboardStats } from '../types';
 
 export const mockProducts: Product[] = [
-  { id: 'p1', name: 'Cà chua bi', price: 45000, stock: 50, unit: 'kg', imageUrl: 'https://picsum.photos/seed/tomato/300/200', sold: 245 },
-  { id: 'p2', name: 'Rau xà lách', price: 15000, stock: 100, unit: 'mớ', imageUrl: 'https://picsum.photos/seed/lettuce/300/200', sold: 189 },
-  { id: 'p3', name: 'Thịt bò Úc', price: 250000, stock: 20, unit: 'kg', imageUrl: 'https://picsum.photos/seed/beef/300/200', sold: 156 },
-  { id: 'p4', name: 'Cá hồi Na Uy', price: 450000, stock: 15, unit: 'kg', imageUrl: 'https://picsum.photos/seed/salmon/300/200', sold: 98 },
-  { id: 'p5', name: 'Táo Envy Mỹ', price: 80000, stock: 80, unit: 'kg', imageUrl: 'https://picsum.photos/seed/apple/300/200', sold: 234 },
-  { id: 'p6', name: 'Sữa tươi Dalat Milk', price: 35000, stock: 0, unit: 'hộp', imageUrl: 'https://picsum.photos/seed/milk/300/200', sold: 312 },
+  { 
+    id: 'p1', 
+    name: 'Cà chua bi', 
+    price: 45000, 
+    stock: 50, 
+    unit: 'kg', 
+    imageUrl: 'https://picsum.photos/seed/tomato/300/200', 
+    sold: 245,
+    importDate: '2025-11-03', // 2 days ago
+    expiryDate: '2025-11-07', // 2 days left - URGENT
+    shelfLife: 4
+  },
+  { 
+    id: 'p2', 
+    name: 'Rau xà lách', 
+    price: 15000, 
+    stock: 100, 
+    unit: 'mớ', 
+    imageUrl: 'https://picsum.photos/seed/lettuce/300/200', 
+    sold: 189,
+    importDate: '2025-11-02', // 3 days ago
+    expiryDate: '2025-11-09', // 4 days left - NEAR EXPIRY
+    shelfLife: 7
+  },
+  { 
+    id: 'p3', 
+    name: 'Thịt bò Úc', 
+    price: 250000, 
+    stock: 20, 
+    unit: 'kg', 
+    imageUrl: 'https://picsum.photos/seed/beef/300/200', 
+    sold: 156,
+    importDate: '2025-11-04', // 1 day ago
+    expiryDate: '2025-11-19', // 14 days left - FRESH
+    shelfLife: 15
+  },
+  { 
+    id: 'p4', 
+    name: 'Cá hồi Na Uy', 
+    price: 450000, 
+    stock: 15, 
+    unit: 'kg', 
+    imageUrl: 'https://picsum.photos/seed/salmon/300/200', 
+    sold: 98,
+    importDate: '2025-11-04', // 1 day ago
+    expiryDate: '2025-11-07', // 2 days left - URGENT
+    shelfLife: 3
+  },
+  { 
+    id: 'p5', 
+    name: 'Táo Envy Mỹ', 
+    price: 80000, 
+    stock: 80, 
+    unit: 'kg', 
+    imageUrl: 'https://picsum.photos/seed/apple/300/200', 
+    sold: 234,
+    importDate: '2025-10-25', // 11 days ago
+    expiryDate: '2025-11-20', // 15 days left - FRESH
+    shelfLife: 26
+  },
+  { 
+    id: 'p6', 
+    name: 'Sữa tươi Dalat Milk', 
+    price: 35000, 
+    stock: 0, 
+    unit: 'hộp', 
+    imageUrl: 'https://picsum.photos/seed/milk/300/200', 
+    sold: 312,
+    importDate: '2025-10-30', // 6 days ago (out of stock)
+    expiryDate: '2025-11-10', // Would be 5 days - but stock is 0
+    shelfLife: 11
+  },
 ];
 
 export const mockOrders: Order[] = [

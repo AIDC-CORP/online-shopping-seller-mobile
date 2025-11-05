@@ -24,6 +24,9 @@ export interface Product {
   unit: string;
   imageUrl: string;
   sold?: number; // Số lượng đã bán
+  expiryDate?: string; // Ngày hết hạn (ISO format: YYYY-MM-DD)
+  importDate?: string; // Ngày nhập hàng (ISO format: YYYY-MM-DD)
+  shelfLife?: number; // Thời hạn sử dụng (số ngày)
 }
 
 export interface StoreInfo {
