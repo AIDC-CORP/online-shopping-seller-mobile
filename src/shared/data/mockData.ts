@@ -1,4 +1,4 @@
-import { Product, Order, OrderStatus, StoreInfo, DashboardStats } from '../types';
+import { Product, Order, OrderStatus, StoreInfo, DashboardStats, ChatConversation, Combo, Voucher } from '../types';
 
 export const mockProducts: Product[] = [
   { 
@@ -140,3 +140,286 @@ export const mockDashboardStatsByPeriod = {
     ],
   },
 };
+
+export const mockChatConversations: ChatConversation[] = [
+  {
+    id: 'chat1',
+    customerName: 'Nguyễn Văn A',
+    customerAvatar: 'https://i.pravatar.cc/150?img=1',
+    lastMessage: 'Cửa hàng còn cà chua bi không ạ?',
+    lastMessageTime: '2 phút trước',
+    unreadCount: 2,
+    messages: [
+      {
+        id: 'm1',
+        text: 'Chào shop! Cho mình hỏi cà chua bi còn không ạ?',
+        timestamp: '10:30 AM',
+        isFromSeller: false,
+        isRead: true,
+      },
+      {
+        id: 'm2',
+        text: 'Dạ vẫn còn ạ! Hiện tại shop còn 50kg cà chua bi tươi ngon lắm.',
+        timestamp: '10:31 AM',
+        isFromSeller: true,
+        isRead: true,
+      },
+      {
+        id: 'm3',
+        text: 'Vậy mình đặt 2kg nhé. Giao được không shop?',
+        timestamp: '10:32 AM',
+        isFromSeller: false,
+        isRead: true,
+      },
+      {
+        id: 'm4',
+        text: 'Cửa hàng còn cà chua bi không ạ?',
+        timestamp: '10:35 AM',
+        isFromSeller: false,
+        isRead: false,
+      },
+    ],
+  },
+  {
+    id: 'chat2',
+    customerName: 'Trần Thị B',
+    customerAvatar: 'https://i.pravatar.cc/150?img=5',
+    lastMessage: 'Cảm ơn shop nhiều nhé!',
+    lastMessageTime: '15 phút trước',
+    unreadCount: 0,
+    messages: [
+      {
+        id: 'm5',
+        text: 'Shop ơi, táo Envy còn không ạ?',
+        timestamp: '9:45 AM',
+        isFromSeller: false,
+        isRead: true,
+      },
+      {
+        id: 'm6',
+        text: 'Dạ còn ạ! Táo Envy Mỹ vừa về tươi lắm. Giá 80k/kg ạ.',
+        timestamp: '9:46 AM',
+        isFromSeller: true,
+        isRead: true,
+      },
+      {
+        id: 'm7',
+        text: 'Vậy cho mình 3kg nhé!',
+        timestamp: '9:47 AM',
+        isFromSeller: false,
+        isRead: true,
+      },
+      {
+        id: 'm8',
+        text: 'Dạ được ạ! Shop đang chuẩn bị đơn cho chị.',
+        timestamp: '9:48 AM',
+        isFromSeller: true,
+        isRead: true,
+      },
+      {
+        id: 'm9',
+        text: 'Cảm ơn shop nhiều nhé!',
+        timestamp: '9:50 AM',
+        isFromSeller: false,
+        isRead: true,
+      },
+    ],
+  },
+  {
+    id: 'chat3',
+    customerName: 'Lê Văn C',
+    customerAvatar: 'https://i.pravatar.cc/150?img=3',
+    lastMessage: 'Bạn: Dạ được ạ, shop sẽ giao trong...',
+    lastMessageTime: '1 giờ trước',
+    unreadCount: 0,
+    messages: [
+      {
+        id: 'm10',
+        text: 'Chào shop, mình muốn đặt thịt bò Úc',
+        timestamp: '8:30 AM',
+        isFromSeller: false,
+        isRead: true,
+      },
+      {
+        id: 'm11',
+        text: 'Dạ chào anh! Shop có thịt bò Úc cao cấp, 250k/kg ạ.',
+        timestamp: '8:31 AM',
+        isFromSeller: true,
+        isRead: true,
+      },
+      {
+        id: 'm12',
+        text: 'Cho mình 1kg. Giao chiều nay được không?',
+        timestamp: '8:32 AM',
+        isFromSeller: false,
+        isRead: true,
+      },
+      {
+        id: 'm13',
+        text: 'Dạ được ạ, shop sẽ giao trong khoảng 3-4h chiều nay.',
+        timestamp: '8:33 AM',
+        isFromSeller: true,
+        isRead: true,
+      },
+    ],
+  },
+  {
+    id: 'chat4',
+    customerName: 'Phạm Thị D',
+    customerAvatar: 'https://i.pravatar.cc/150?img=9',
+    lastMessage: 'Shop có giảm giá không ạ?',
+    lastMessageTime: '2 giờ trước',
+    unreadCount: 1,
+    messages: [
+      {
+        id: 'm14',
+        text: 'Cá hồi Na Uy giá bao nhiêu vậy shop?',
+        timestamp: '7:15 AM',
+        isFromSeller: false,
+        isRead: true,
+      },
+      {
+        id: 'm15',
+        text: 'Dạ cá hồi Na Uy đang 450k/kg ạ. Rất tươi ngon luôn.',
+        timestamp: '7:16 AM',
+        isFromSeller: true,
+        isRead: true,
+      },
+      {
+        id: 'm16',
+        text: 'Shop có giảm giá không ạ?',
+        timestamp: '7:20 AM',
+        isFromSeller: false,
+        isRead: false,
+      },
+    ],
+  },
+  {
+    id: 'chat5',
+    customerName: 'Hoàng Văn E',
+    customerAvatar: 'https://i.pravatar.cc/150?img=7',
+    lastMessage: 'Bạn: Dạ shop xin cảm ơn ạ!',
+    lastMessageTime: 'Hôm qua',
+    unreadCount: 0,
+    messages: [
+      {
+        id: 'm17',
+        text: 'Rau xà lách tươi không shop?',
+        timestamp: 'Hôm qua 5:00 PM',
+        isFromSeller: false,
+        isRead: true,
+      },
+      {
+        id: 'm18',
+        text: 'Dạ rất tươi ạ! Vừa nhập sáng nay.',
+        timestamp: 'Hôm qua 5:01 PM',
+        isFromSeller: true,
+        isRead: true,
+      },
+      {
+        id: 'm19',
+        text: 'Tuyệt vời! Shop làm ăn uy tín lắm.',
+        timestamp: 'Hôm qua 5:05 PM',
+        isFromSeller: false,
+        isRead: true,
+      },
+      {
+        id: 'm20',
+        text: 'Dạ shop xin cảm ơn ạ!',
+        timestamp: 'Hôm qua 5:06 PM',
+        isFromSeller: true,
+        isRead: true,
+      },
+    ],
+  },
+];
+
+// Mock Combos
+export const mockCombos: Combo[] = [
+  {
+    id: 'combo1',
+    name: 'Combo Rau Củ Tươi',
+    description: 'Gồm 1kg cà chua bi, 2 mớ rau xà lách và 2kg táo - đầy đủ dinh dưỡng',
+    products: [
+      { productId: 'p1', quantity: 1 }, // 1kg cà chua
+      { productId: 'p2', quantity: 2 }, // 2 mớ xà lách
+      { productId: 'p5', quantity: 2 }, // 2kg táo
+    ],
+    originalPrice: 45000 + (15000 * 2) + (35000 * 2), // 145,000đ
+    comboPrice: 120000,
+    discountPercent: 17, // Giảm 17%
+    imageUrl: 'https://picsum.photos/seed/combo1/300/200',
+    stock: 30,
+    sold: 12,
+    validFrom: '2025-11-01',
+    validUntil: '2025-11-30',
+    createdAt: '2025-11-01T10:00:00Z',
+  },
+  {
+    id: 'combo2',
+    name: 'Combo Thịt & Hải Sản',
+    description: '500g thịt bò Úc + 500g cá hồi Na Uy - cho bữa tiệc sang trọng',
+    products: [
+      { productId: 'p3', quantity: 0.5 }, // 0.5kg thịt bò
+      { productId: 'p4', quantity: 0.5 }, // 0.5kg cá hồi
+    ],
+    originalPrice: (250000 * 0.5) + (450000 * 0.5), // 350,000đ
+    comboPrice: 315000,
+    discountPercent: 10, // Giảm 10%
+    imageUrl: 'https://picsum.photos/seed/combo2/300/200',
+    stock: 15,
+    sold: 8,
+    validFrom: '2025-11-01',
+    validUntil: '2025-12-31',
+    createdAt: '2025-11-02T14:00:00Z',
+  },
+];
+
+// Mock Vouchers
+export const mockVouchers: Voucher[] = [
+  {
+    id: 'voucher1',
+    code: 'FRESH50',
+    description: 'Giảm 50,000đ cho đơn hàng từ 200,000đ',
+    discountType: 'fixed',
+    discountValue: 50000,
+    minOrderValue: 200000,
+    maxDiscount: undefined,
+    usageLimit: 100,
+    usedCount: 45,
+    validFrom: '2025-11-01',
+    validUntil: '2025-11-30',
+    isActive: true,
+    createdAt: '2025-11-01T08:00:00Z',
+  },
+  {
+    id: 'voucher2',
+    code: 'NEWYEAR2025',
+    description: 'Giảm 20% tối đa 100,000đ cho đơn từ 300,000đ',
+    discountType: 'percent',
+    discountValue: 20,
+    minOrderValue: 300000,
+    maxDiscount: 100000,
+    usageLimit: 50,
+    usedCount: 12,
+    validFrom: '2025-12-25',
+    validUntil: '2026-01-05',
+    isActive: true,
+    createdAt: '2025-11-03T09:00:00Z',
+  },
+  {
+    id: 'voucher3',
+    code: 'FREESHIP',
+    description: 'Miễn phí ship cho đơn từ 150,000đ',
+    discountType: 'fixed',
+    discountValue: 30000,
+    minOrderValue: 150000,
+    maxDiscount: undefined,
+    usageLimit: 200,
+    usedCount: 87,
+    validFrom: '2025-11-01',
+    validUntil: '2025-11-15',
+    isActive: true,
+    createdAt: '2025-11-01T10:30:00Z',
+  },
+];

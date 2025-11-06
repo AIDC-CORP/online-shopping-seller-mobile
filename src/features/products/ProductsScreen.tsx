@@ -1,9 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, Image, Modal, TouchableOpacity, ScrollView, TextInput } from 'react-native';
-import { mockProducts as initialProducts } from '../../shared/data/mockData';
-import { Product } from '../../shared/types';
+import { mockProducts as initialProducts, mockCombos as initialCombos, mockVouchers as initialVouchers } from '../../shared/data/mockData';
+import { Product, Combo, Voucher } from '../../shared/types';
 import { PlusIcon, XCircleIcon } from '@/src/components/icons';
 import AddProduct from './components/AddProduct';
+import AddOptionMenu from './components/AddOptionMenu';
+import AddCombo from './components/AddCombo';
+import AddVoucher from './components/AddVoucher';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // List Layout Card Component
@@ -811,6 +814,7 @@ const ProductDetailModal: React.FC<{
 };
 
 type FilterType = 'all' | 'inStock' | 'lowStock' | 'outOfStock';
+type SortType = 'default' | 'expiryDate' | 'stock' | 'price' | 'name' | 'sold';
 
 // Helper function to calculate days until expiry
 const getDaysUntilExpiry = (expiryDate?: string): number | null => {
@@ -824,21 +828,51 @@ const getDaysUntilExpiry = (expiryDate?: string): number | null => {
 
 const ProductsScreen: React.FC = () => {
   const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [combos, setCombos] = useState<Combo[]>(initialCombos);
+  const [vouchers, setVouchers] = useState<Voucher[]>(initialVouchers);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [isAddingCombo, setIsAddingCombo] = useState(false);
+  const [isAddingVoucher, setIsAddingVoucher] = useState(false);
+  const [showAddMenu, setShowAddMenu] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [showRevenueDetail, setShowRevenueDetail] = useState(false);
   const [showInventoryDetail, setShowInventoryDetail] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortType, setSortType] = useState<SortType>('default');
+  const [showSortMenu, setShowSortMenu] = useState(false);
 
-  const handleAddProduct = useCallback((newProductData: Omit<Product, 'id' | 'imageUrl'>) => {
+  const handleAddProduct = useCallback((newProductData: Omit<Product, 'id'>) => {
     const newProduct: Product = {
       id: `p${Date.now()}`,
-      imageUrl: `https://picsum.photos/seed/${newProductData.name}/${Math.random()}/300/200`,
       ...newProductData,
     };
     setProducts(prevProducts => [newProduct, ...prevProducts]);
     setIsAddingProduct(false);
+  }, []);
+
+  const handleAddCombo = useCallback((newComboData: Omit<Combo, 'id' | 'createdAt'>) => {
+    const newCombo: Combo = {
+      id: `combo${Date.now()}`,
+      ...newComboData,
+      createdAt: new Date().toISOString(),
+    };
+    setCombos(prevCombos => [newCombo, ...prevCombos]);
+    setIsAddingCombo(false);
+    alert(`✅ Đã tạo combo "${newCombo.name}" thành công!`);
+  }, []);
+
+  const handleAddVoucher = useCallback((newVoucherData: Omit<Voucher, 'id' | 'usedCount' | 'createdAt'>) => {
+    const newVoucher: Voucher = {
+      id: `voucher${Date.now()}`,
+      ...newVoucherData,
+      usedCount: 0,
+      createdAt: new Date().toISOString(),
+    };
+    setVouchers(prevVouchers => [newVoucher, ...prevVouchers]);
+    setIsAddingVoucher(false);
+    alert(`✅ Đã tạo voucher "${newVoucher.code}" thành công!`);
   }, []);
 
   const handleUpdateProduct = useCallback((productId: string, updates: Partial<Product>) => {
@@ -885,23 +919,58 @@ const ProductsScreen: React.FC = () => {
     .filter(p => (p.sold || 0) > 0)
     .sort((a, b) => (b.price * (b.sold || 0)) - (a.price * (a.sold || 0)));
 
-  // Filter products based on selected filter
-  const filteredProducts = products.filter(product => {
-    switch (filterType) {
-      case 'inStock':
-        return product.stock > 20; // Còn hàng tốt
-      case 'lowStock':
-        return product.stock > 0 && product.stock < 20; // Sắp hết
-      case 'outOfStock':
-        return product.stock === 0; // Hết hàng
+  // Filter & Search & Sort products
+  let filteredProducts = products
+    // 1. Filter by stock status
+    .filter(product => {
+      switch (filterType) {
+        case 'inStock':
+          return product.stock > 20;
+        case 'lowStock':
+          return product.stock > 0 && product.stock < 20;
+        case 'outOfStock':
+          return product.stock === 0;
+        default:
+          return true;
+      }
+    })
+    // 2. Search by name
+    .filter(product => {
+      if (!searchQuery.trim()) return true;
+      return product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+
+  // 3. Sort
+  filteredProducts = [...filteredProducts].sort((a, b) => {
+    switch (sortType) {
+      case 'expiryDate':
+        const daysA = getDaysUntilExpiry(a.expiryDate);
+        const daysB = getDaysUntilExpiry(b.expiryDate);
+        if (daysA === null) return 1;
+        if (daysB === null) return -1;
+        return daysA - daysB; // Ascending: sắp hết hạn lên đầu
+      case 'stock':
+        return a.stock - b.stock; // Ascending: ít hàng lên đầu
+      case 'price':
+        return b.price - a.price; // Descending: giá cao xuống thấp
+      case 'name':
+        return a.name.localeCompare(b.name, 'vi'); // A-Z
+      case 'sold':
+        return (b.sold || 0) - (a.sold || 0); // Descending: bán chạy lên đầu
       default:
-        return true; // Tất cả
+        return 0;
     }
   });
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
   };
+
+  // Count urgent items for badge
+  const urgentItemsCount = products.filter(p => {
+    const daysLeft = getDaysUntilExpiry(p.expiryDate);
+    return p.stock > 0 && daysLeft !== null && daysLeft <= 3;
+  }).length;
 
   return (
     <SafeAreaView edges={['bottom']} className="flex-1 bg-gray-50">
@@ -911,6 +980,123 @@ const ProductsScreen: React.FC = () => {
         borderBottomWidth: 1,
         borderBottomColor: '#e5e7eb',
       }}>
+        {/* Search Bar & Sort */}
+        <View style={{ 
+          flexDirection: 'row', 
+          paddingHorizontal: 12, 
+          paddingTop: 12, 
+          paddingBottom: 8,
+          gap: 8,
+          alignItems: 'center',
+        }}>
+          {/* Search Input */}
+          <View style={{ 
+            flex: 1, 
+            flexDirection: 'row', 
+            alignItems: 'center',
+            backgroundColor: '#f3f4f6',
+            borderRadius: 8,
+            paddingHorizontal: 10,
+            height: 38,
+          }}>
+            <Text style={{ fontSize: 16, color: '#9ca3af', marginRight: 6 }}>🔍</Text>
+            <TextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Tìm sản phẩm..."
+              placeholderTextColor="#9ca3af"
+              style={{
+                flex: 1,
+                fontSize: 14,
+                color: '#1f2937',
+                padding: 0,
+              }}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')} style={{ padding: 4 }}>
+                <Text style={{ fontSize: 16, color: '#6b7280' }}>✕</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Sort Button */}
+          <TouchableOpacity
+            onPress={() => setShowSortMenu(!showSortMenu)}
+            style={{
+              backgroundColor: sortType !== 'default' ? '#dbeafe' : '#f3f4f6',
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+              borderRadius: 8,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 4,
+              height: 38,
+            }}
+          >
+            <Text style={{ fontSize: 16 }}>⇅</Text>
+            <Text style={{ 
+              fontSize: 13, 
+              fontWeight: '600', 
+              color: sortType !== 'default' ? '#2563eb' : '#6b7280',
+            }}>
+              {sortType !== 'default' ? 'ON' : 'Sort'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Sort Menu Dropdown */}
+        {showSortMenu && (
+          <View style={{
+            backgroundColor: 'white',
+            marginHorizontal: 12,
+            marginBottom: 8,
+            borderRadius: 8,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 4,
+          }}>
+            {[
+              { type: 'default' as SortType, label: '🔄 Mặc định', icon: '' },
+              { type: 'expiryDate' as SortType, label: '📅 Sắp hết hạn', icon: '🔴' },
+              { type: 'stock' as SortType, label: '📦 Tồn kho thấp', icon: '⚠️' },
+              { type: 'sold' as SortType, label: '🔥 Bán chạy', icon: '⭐' },
+              { type: 'price' as SortType, label: '💰 Giá cao → thấp', icon: '' },
+              { type: 'name' as SortType, label: '🔤 Tên A-Z', icon: '' },
+            ].map((option, index, array) => (
+              <TouchableOpacity
+                key={option.type}
+                onPress={() => {
+                  setSortType(option.type);
+                  setShowSortMenu(false);
+                }}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 12,
+                  paddingVertical: 10,
+                  borderBottomWidth: index < array.length - 1 ? 1 : 0,
+                  borderBottomColor: '#f3f4f6',
+                  backgroundColor: sortType === option.type ? '#eff6ff' : 'transparent',
+                }}
+              >
+                <Text style={{ 
+                  fontSize: 13, 
+                  color: sortType === option.type ? '#2563eb' : '#1f2937',
+                  fontWeight: sortType === option.type ? '600' : '400',
+                }}>
+                  {option.label}
+                </Text>
+                {sortType === option.type && (
+                  <Text style={{ fontSize: 14, color: '#2563eb' }}>✓</Text>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         {/* Compact Stats Grid - 2 rows */}
         <View style={{ paddingHorizontal: 12, paddingVertical: 10 }}>
           {/* Row 1: Filter Cards */}
@@ -1069,7 +1255,7 @@ const ProductsScreen: React.FC = () => {
               </Text>
             </TouchableOpacity>
 
-            {/* Total Stock - Clickable */}
+            {/* Total Stock - Clickable with Badge */}
             <TouchableOpacity
               onPress={() => setShowInventoryDetail(true)}
               activeOpacity={0.7}
@@ -1080,6 +1266,7 @@ const ProductsScreen: React.FC = () => {
                 borderRadius: 8,
                 borderWidth: 1.5,
                 borderColor: '#bfdbfe',
+                position: 'relative',
               }}
             >
               <Text style={{ 
@@ -1095,6 +1282,32 @@ const ProductsScreen: React.FC = () => {
               >
                 {stats.totalStock}
               </Text>
+              
+              {/* Urgent Badge */}
+              {urgentItemsCount > 0 && (
+                <View style={{
+                  position: 'absolute',
+                  top: -6,
+                  right: -6,
+                  backgroundColor: '#ef4444',
+                  borderRadius: 10,
+                  minWidth: 20,
+                  height: 20,
+                  paddingHorizontal: 5,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderWidth: 2,
+                  borderColor: 'white',
+                }}>
+                  <Text style={{ 
+                    fontSize: 10, 
+                    fontWeight: 'bold', 
+                    color: 'white',
+                  }}>
+                    {urgentItemsCount}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -1150,7 +1363,7 @@ const ProductsScreen: React.FC = () => {
       />
       <View style={{ position: 'absolute', bottom: 24, right: 24, zIndex: 10 }}>
         <TouchableOpacity
-          onPress={() => setIsAddingProduct(true)}
+          onPress={() => setShowAddMenu(true)}
           style={{
             backgroundColor: '#10b981',
             width: 56,
@@ -1170,6 +1383,18 @@ const ProductsScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
+      {/* Add Option Menu */}
+      <AddOptionMenu
+        visible={showAddMenu}
+        onClose={() => setShowAddMenu(false)}
+        onSelectProduct={() => setIsAddingProduct(true)}
+        onSelectCombo={() => setIsAddingCombo(true)}
+        onSelectVoucher={() => setIsAddingVoucher(true)}
+        showProduct={true}
+        showCombo={false}
+        showVoucher={false}
+      />
+
       <Modal
         visible={isAddingProduct}
         animationType="slide"
@@ -1180,6 +1405,21 @@ const ProductsScreen: React.FC = () => {
           onAddProduct={handleAddProduct}
         />
       </Modal>
+
+      {/* Add Combo Modal */}
+      <AddCombo
+        visible={isAddingCombo}
+        onClose={() => setIsAddingCombo(false)}
+        onAddCombo={handleAddCombo}
+        products={products}
+      />
+
+      {/* Add Voucher Modal */}
+      <AddVoucher
+        visible={isAddingVoucher}
+        onClose={() => setIsAddingVoucher(false)}
+        onAddVoucher={handleAddVoucher}
+      />
 
       <ProductDetailModal
         product={selectedProduct}
