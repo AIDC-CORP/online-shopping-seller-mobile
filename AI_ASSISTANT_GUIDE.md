@@ -9,6 +9,7 @@ Tính năng AI Assistant giống như trợ lý ong trong MB Bank - một trợ 
 ### 1. Components
 
 #### AIAssistantBubble (`src/components/ai/AIAssistantBubble.tsx`)
+
 - **Mục đích**: Floating action button có thể kéo thả đi mọi nơi trên màn hình
 - **Tính năng**:
   - ✨ Icon sparkle effect
@@ -36,6 +37,7 @@ Tính năng AI Assistant giống như trợ lý ong trong MB Bank - một trợ 
   - Scale up (1.1x) khi đang kéo
 
 #### AIAssistantChat (`src/components/ai/AIAssistantChat.tsx`)
+
 - **Mục đích**: Full-screen modal cho giao diện chat với AI
 - **Tính năng chính**:
   - Header với avatar AI, title, subtitle
@@ -61,14 +63,16 @@ Tính năng AI Assistant giống như trợ lý ong trong MB Bank - một trợ 
 All AI services are centralized in `src/features/ai/` directory:
 
 #### aiAssistantService (`src/features/ai/aiAssistantService.ts`)
+
 - **Purpose**: Business Q&A and analysis
 - **API**: Google Gemini Pro API
 - **Environment Variable**: `EXPO_PUBLIC_GEMINI_API_KEY`
 - **Interfaces**:
+
   ```typescript
   interface AIMessage {
     id: string;
-    role: 'user' | 'assistant';
+    role: "user" | "assistant";
     content: string;
     timestamp: Date;
   }
@@ -83,6 +87,7 @@ All AI services are centralized in `src/features/ai/` directory:
   ```
 
 - **Methods**:
+
   - `sendMessage(userMessage, context?)`: Gửi tin nhắn tới Gemini API với business context
   - `getHistory()`: Lấy toàn bộ lịch sử chat
   - `clearHistory()`: Xóa lịch sử chat
@@ -94,6 +99,7 @@ All AI services are centralized in `src/features/ai/` directory:
 - Utility methods: getHistory(), clearHistory(), getSuggestedQuestions()
 
 #### productDescriptionService (`src/features/ai/productDescriptionService.ts`)
+
 - **Purpose**: Generate product descriptions, SEO titles, and suggestions
 - **API**: Google Gemini Pro API
 - **Methods**:
@@ -103,10 +109,11 @@ All AI services are centralized in `src/features/ai/` directory:
 - **Fallback**: Mock responses when API key unavailable
 
 #### Configuration (both services):
-  - Temperature: 0.7 (cân bằng creativity và consistency)
-  - maxOutputTokens: 500
-  - topP: 0.8
-  - topK: 40
+
+- Temperature: 0.7 (cân bằng creativity và consistency)
+- maxOutputTokens: 500
+- topP: 0.8
+- topK: 40
 
 - **Mock Response Categories**:
   1. Business analysis (doanh thu, lợi nhuận, tăng trưởng)
@@ -160,36 +167,34 @@ const [showAIChat, setShowAIChat] = useState(false);
 
 // Business context calculation
 const businessContext: BusinessContext = useMemo(() => {
-    const totalRevenue = mockOrders
-        .filter(order => order.status === OrderStatus.Completed)
-        .reduce((sum, order) => sum + order.total, 0);
+  const totalRevenue = mockOrders
+    .filter((order) => order.status === OrderStatus.Completed)
+    .reduce((sum, order) => sum + order.total, 0);
 
-    const lowStockCount = mockProducts.filter(p => p.stock < 10).length;
-    const topProducts = mockProducts.slice(0, 3).map(p => p.name);
+  const lowStockCount = mockProducts.filter((p) => p.stock < 10).length;
+  const topProducts = mockProducts.slice(0, 3).map((p) => p.name);
 
-    return {
-        totalProducts: mockProducts.length,
-        totalRevenue,
-        totalOrders: mockOrders.length,
-        lowStockProducts: lowStockCount,
-        topProducts,
-    };
+  return {
+    totalProducts: mockProducts.length,
+    totalRevenue,
+    totalOrders: mockOrders.length,
+    lowStockProducts: lowStockCount,
+    topProducts,
+  };
 }, []);
 
 // Wrap Navigator + AI Assistant in Fragment
 return (
-    <>
-        <Tab.Navigator>
-            {/* Your tabs */}
-        </Tab.Navigator>
-        
-        <AIAssistantBubble onPress={() => setShowAIChat(true)} />
-        <AIAssistantChat
-            visible={showAIChat}
-            onClose={() => setShowAIChat(false)}
-            businessContext={businessContext}
-        />
-    </>
+  <>
+    <Tab.Navigator>{/* Your tabs */}</Tab.Navigator>
+
+    <AIAssistantBubble onPress={() => setShowAIChat(true)} />
+    <AIAssistantChat
+      visible={showAIChat}
+      onClose={() => setShowAIChat(false)}
+      businessContext={businessContext}
+    />
+  </>
 );
 ```
 
@@ -198,11 +203,13 @@ return (
 ### 1. Cài đặt Gemini API Key
 
 Thêm vào file `.env`:
+
 ```bash
 EXPO_PUBLIC_GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
 **Lấy API key**:
+
 1. Truy cập https://makersuite.google.com/app/apikey
 2. Tạo API key mới
 3. Copy và paste vào `.env`
@@ -210,6 +217,7 @@ EXPO_PUBLIC_GEMINI_API_KEY=your_gemini_api_key_here
 ### 2. Dependencies
 
 Tất cả dependencies đã có sẵn trong project:
+
 - `react-native` - Core framework
 - `expo-router` - Navigation
 - `react-native-safe-area-context` - Safe area handling
@@ -226,6 +234,7 @@ Không cần install thêm package nào.
 ### 2. Gửi câu hỏi
 
 **Cách 1: Chọn câu hỏi gợi ý**
+
 - Khi mở chat lần đầu, sẽ có 6 câu hỏi gợi ý:
   - Phân tích doanh thu của tôi
   - Sản phẩm nào bán chạy nhất?
@@ -235,12 +244,14 @@ Không cần install thêm package nào.
   - Làm sao để quản lý kho hiệu quả?
 
 **Cách 2: Nhập câu hỏi tự do**
+
 - Gõ câu hỏi vào ô input ở dưới cùng
 - Nhấn nút 📤 để gửi
 
 ### 3. Business Context
 
 AI tự động nhận context về business:
+
 - **Tổng sản phẩm**: Số lượng products trong kho
 - **Doanh thu**: Tổng revenue từ các đơn hàng đã hoàn thành
 - **Đơn hàng**: Tổng số orders
@@ -248,6 +259,7 @@ AI tự động nhận context về business:
 - **Top sản phẩm**: 3 sản phẩm bán chạy nhất (tên)
 
 Context này được hiển thị ở banner xanh dưới header:
+
 ```
 📊 45 sản phẩm • 💰 25,450,000₫ • 📦 123 đơn hàng
 ```
@@ -261,6 +273,7 @@ Context này được hiển thị ở banner xanh dưới header:
 ## Ví dụ Chat Flow
 
 ### Example 1: Phân tích doanh thu
+
 ```
 👤 User: Phân tích doanh thu của tôi
 
@@ -276,6 +289,7 @@ Gợi ý:
 ```
 
 ### Example 2: Marketing Strategy
+
 ```
 👤 User: Chiến lược marketing hiệu quả cho shop nhỏ
 
@@ -307,6 +321,7 @@ Gợi ý:
 ### Khi không có API Key
 
 Service tự động chuyển sang **Mock Response Mode**:
+
 - Phân tích tin nhắn của user
 - Match với 6 categories (business, product, marketing, pricing, orders, greetings)
 - Trả về câu trả lời pre-defined phù hợp
@@ -315,6 +330,7 @@ Service tự động chuyển sang **Mock Response Mode**:
 ### Mock Response Quality
 
 Mock responses được thiết kế để:
+
 - Contextual: Dựa trên keywords trong câu hỏi
 - Actionable: Cung cấp gợi ý cụ thể
 - Vietnamese: Hoàn toàn tiếng Việt tự nhiên
@@ -341,12 +357,12 @@ getSuggestedQuestions(): string[] {
 ```typescript
 private getMockResponse(userMessage: string): string {
   const message = userMessage.toLowerCase();
-  
+
   // Thêm category mới
   if (message.includes('keyword1') || message.includes('keyword2')) {
     return 'Response cho category mới...';
   }
-  
+
   // ... existing categories
 }
 ```
@@ -371,10 +387,12 @@ PHONG CÁCH TRẢ LỜI:
 ```typescript
 // AIAssistantBubble.tsx
 // Thay đổi initial position
-const pan = useRef(new Animated.ValueXY({ 
-  x: SCREEN_WIDTH - BUBBLE_SIZE - 20,  // Default: right side
-  y: SCREEN_HEIGHT - BUBBLE_SIZE - 90  // Default: bottom
-})).current;
+const pan = useRef(
+  new Animated.ValueXY({
+    x: SCREEN_WIDTH - BUBBLE_SIZE - 20, // Default: right side
+    y: SCREEN_HEIGHT - BUBBLE_SIZE - 90, // Default: bottom
+  })
+).current;
 
 // Đổi sang vị trí khác:
 // Top-left: { x: 20, y: 60 }
@@ -406,6 +424,7 @@ const newX = finalX; // Keep current position
 ```
 
 ### 5. Thay đổi màu sắc bubble:
+
 ```typescript
 // AIAssistantBubble.tsx
 backgroundColor: '#34d399', // emerald-400 (current - nhạt hơn banner)
@@ -419,6 +438,7 @@ shadowColor: '#10b981', // emerald-500 (màu shadow match với theme)
 ```
 
 #### Màu tin nhắn:
+
 ```typescript
 // AIAssistantChat.tsx
 userBubble: {
@@ -438,7 +458,7 @@ const businessContext: BusinessContext = useMemo(() => {
   // TODO: Replace với API calls
   const { data: products } = useProducts();
   const { data: orders } = useOrders();
-  
+
   return {
     totalProducts: products.length,
     totalRevenue: calculateRevenue(orders),
@@ -454,6 +474,7 @@ const businessContext: BusinessContext = useMemo(() => {
 **Triệu chứng**: AI luôn trả về mock responses
 
 **Giải pháp**:
+
 ```bash
 # Check .env file
 cat .env | grep GEMINI
@@ -469,16 +490,20 @@ npx expo prebuild --clean
 
 **Triệu chứng**: Không nhấn được bubble, bị trùng với nút Add
 
-**Giải pháp**: 
+**Giải pháp**:
+
 - ✅ **Kéo thả bubble** sang vị trí khác trên màn hình
 - Bubble tự động snap to edge (trái hoặc phải)
 - Default position có thể tùy chỉnh trong code:
+
 ```typescript
 // AIAssistantBubble.tsx
-const pan = useRef(new Animated.ValueXY({ 
-  x: SCREEN_WIDTH - BUBBLE_SIZE - 20,  // Change X position
-  y: SCREEN_HEIGHT - BUBBLE_SIZE - 90  // Change Y position
-})).current;
+const pan = useRef(
+  new Animated.ValueXY({
+    x: SCREEN_WIDTH - BUBBLE_SIZE - 20, // Change X position
+    y: SCREEN_HEIGHT - BUBBLE_SIZE - 90, // Change Y position
+  })
+).current;
 ```
 
 ### 3. Chat không tự động scroll
@@ -486,6 +511,7 @@ const pan = useRef(new Animated.ValueXY({
 **Triệu chứng**: Phải scroll thủ công để xem tin nhắn mới
 
 **Giải pháp**: Đã implement trong `useEffect`:
+
 ```typescript
 useEffect(() => {
   if (messages.length > 0 && flatListRef.current) {
@@ -501,6 +527,7 @@ useEffect(() => {
 **Triệu chứng**: Gõ text bị che bởi keyboard
 
 **Giải pháp**: Đã có `KeyboardAvoidingView` với platform-specific behavior:
+
 ```typescript
 <KeyboardAvoidingView
   behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -513,6 +540,7 @@ useEffect(() => {
 **Triệu chứng**: AI không nhớ câu hỏi trước
 
 **Giải pháp**: Service đã lưu last 5 messages:
+
 ```typescript
 private buildConversationContext(): string {
   const recentMessages = this.conversationHistory.slice(-5);
@@ -539,11 +567,11 @@ try {
   // Show user-friendly error message
   const errorMessage: AIMessage = {
     id: Date.now().toString(),
-    role: 'assistant',
-    content: 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau.',
+    role: "assistant",
+    content: "Xin lỗi, có lỗi xảy ra. Vui lòng thử lại sau.",
     timestamp: new Date(),
   };
-  setMessages(prev => [...prev, errorMessage]);
+  setMessages((prev) => [...prev, errorMessage]);
 }
 ```
 
@@ -566,31 +594,37 @@ try {
 ### Phase 2 Features:
 
 1. **Voice Input**
+
    - Speech-to-text với expo-speech
    - Voice commands cho quick actions
 
 2. **Quick Actions**
+
    - "Tạo combo mới"
    - "Xem báo cáo doanh thu"
    - "Kiểm tra sản phẩm sắp hết"
    - Navigation shortcuts
 
 3. **Rich Formatting**
+
    - Markdown support trong messages
    - Tables cho data analysis
    - Charts/graphs integration
 
 4. **Personalization**
+
    - Learn seller's preferences
    - Custom suggested questions based on usage
    - AI remembers seller's business patterns
 
 5. **Proactive Insights**
+
    - Push notifications với AI insights
    - "Sản phẩm X đang bán chậm, gợi ý giảm giá"
    - "Doanh thu tuần này tăng 20%, đây là lý do..."
 
 6. **Multi-language Support**
+
    - English
    - Chinese
    - Auto-detect language
@@ -605,9 +639,11 @@ try {
 ### aiAssistantService
 
 #### `sendMessage(userMessage: string, context?: BusinessContext): Promise<string>`
+
 Gửi tin nhắn tới AI và nhận response.
 
 **Parameters:**
+
 - `userMessage`: Câu hỏi của user
 - `context` (optional): Business metrics cho context-aware response
 
@@ -618,6 +654,7 @@ Gửi tin nhắn tới AI và nhận response.
 ---
 
 #### `getHistory(): AIMessage[]`
+
 Lấy toàn bộ lịch sử conversation.
 
 **Returns:** Array of AIMessage objects
@@ -625,11 +662,13 @@ Lấy toàn bộ lịch sử conversation.
 ---
 
 #### `clearHistory(): void`
+
 Xóa toàn bộ lịch sử conversation.
 
 ---
 
 #### `getSuggestedQuestions(): string[]`
+
 Lấy danh sách câu hỏi gợi ý.
 
 **Returns:** Array of 6 suggested question strings
@@ -639,6 +678,7 @@ Lấy danh sách câu hỏi gợi ý.
 ## Conclusion
 
 AI Assistant là tính năng mạnh mẽ giúp sellers:
+
 - 📊 Phân tích business nhanh chóng
 - 💡 Nhận gợi ý chiến lược thông minh
 - ⚡ Tiết kiệm thời gian ra quyết định

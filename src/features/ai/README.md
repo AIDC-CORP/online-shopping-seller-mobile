@@ -5,6 +5,7 @@ Tất cả AI services sử dụng Google Gemini API được tập trung tại 
 ## Services
 
 ### 1. aiAssistantService.ts
+
 **Business Q&A Assistant** - Trợ lý AI cho seller
 
 - Chat với AI về business insights
@@ -14,16 +15,18 @@ Tất cả AI services sử dụng Google Gemini API được tập trung tại 
 - Mock responses khi offline
 
 **Usage:**
+
 ```typescript
-import aiAssistantService from '@/src/features/ai/aiAssistantService';
+import aiAssistantService from "@/src/features/ai/aiAssistantService";
 
 const response = await aiAssistantService.sendMessage(
-  'Phân tích doanh thu của tôi',
+  "Phân tích doanh thu của tôi",
   businessContext
 );
 ```
 
 ### 2. productDescriptionService.ts
+
 **Product Description Generator** - Tạo mô tả sản phẩm tự động
 
 - Generate product descriptions
@@ -32,23 +35,26 @@ const response = await aiAssistantService.sendMessage(
 - Fallback to mock data khi offline
 
 **Usage:**
+
 ```typescript
-import productDescriptionService from '@/src/features/ai/productDescriptionService';
+import productDescriptionService from "@/src/features/ai/productDescriptionService";
 
 // Generate description
 const desc = await productDescriptionService.generateProductDescription(
-  'iPhone 15 Pro', 
-  'Điện thoại'
+  "iPhone 15 Pro",
+  "Điện thoại"
 );
 
 // Generate SEO title
 const title = await productDescriptionService.generateSEOTitle(
-  'iPhone 15 Pro',
-  'Điện thoại'
+  "iPhone 15 Pro",
+  "Điện thoại"
 );
 
 // Get suggestions
-const suggestions = await productDescriptionService.generateProductSuggestions('smartphone');
+const suggestions = await productDescriptionService.generateProductSuggestions(
+  "smartphone"
+);
 ```
 
 ## Configuration
@@ -65,6 +71,7 @@ Get API key: https://makersuite.google.com/app/apikey
 ## Offline Support
 
 Tất cả services đều có fallback responses khi:
+
 - Không có API key
 - Network error
 - API rate limit
@@ -73,17 +80,18 @@ Tất cả services đều có fallback responses khi:
 
 ```typescript
 // Import từ index
-import { 
-  aiAssistantService, 
+import {
+  aiAssistantService,
   productDescriptionService,
   AIMessage,
-  BusinessContext 
-} from '@/src/features/ai';
+  BusinessContext,
+} from "@/src/features/ai";
 ```
 
 ## Migration Note
 
 ✅ **Di chuyển từ `src/services/`** (Nov 2025)
-- Old: `src/services/geminiService.ts` 
+
+- Old: `src/services/geminiService.ts`
 - New: `src/features/ai/productDescriptionService.ts`
 - Enhanced với thêm methods và better structure

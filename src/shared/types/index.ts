@@ -79,6 +79,14 @@ export interface StoreInfo {
   description: string;
   coverImageUrl: string;
   avatarUrl: string;
+  email?: string;
+  website?: string;
+  paymentMethods?: string;
+  shippingPolicy?: string;
+  returnPolicy?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
 }
 
 export interface DashboardStats {

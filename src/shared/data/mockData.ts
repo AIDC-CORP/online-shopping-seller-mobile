@@ -423,3 +423,182 @@ export const mockVouchers: Voucher[] = [
     createdAt: '2025-11-01T10:30:00Z',
   },
 ];
+
+// Mock Store Reviews
+export const mockStoreReviews = [
+  {
+    id: 'r1',
+    customerName: 'Nguyễn Văn A',
+    customerAvatar: 'https://i.pravatar.cc/150?img=1',
+    rating: 5,
+    comment: 'Sản phẩm rất tươi ngon, giao hàng nhanh. Sẽ ủng hộ tiếp!',
+    timestamp: '2 ngày trước',
+    productName: 'Cà chua bi',
+    images: ['https://picsum.photos/seed/review1/200/200'],
+  },
+  {
+    id: 'r2',
+    customerName: 'Trần Thị B',
+    customerAvatar: 'https://i.pravatar.cc/150?img=5',
+    rating: 5,
+    comment: 'Táo rất ngon, giá cả hợp lý. Shop nhiệt tình!',
+    timestamp: '3 ngày trước',
+    productName: 'Táo Envy Mỹ',
+  },
+  {
+    id: 'r3',
+    customerName: 'Lê Văn C',
+    customerAvatar: 'https://i.pravatar.cc/150?img=3',
+    rating: 4,
+    comment: 'Thịt bò chất lượng tốt, đóng gói cẩn thận.',
+    timestamp: '5 ngày trước',
+    productName: 'Thịt bò Úc',
+  },
+  {
+    id: 'r4',
+    customerName: 'Phạm Thị D',
+    customerAvatar: 'https://i.pravatar.cc/150?img=9',
+    rating: 5,
+    comment: 'Cá hồi tươi ngon, ship nhanh. Rất hài lòng!',
+    timestamp: '1 tuần trước',
+    productName: 'Cá hồi Na Uy',
+    images: ['https://picsum.photos/seed/review4a/200/200', 'https://picsum.photos/seed/review4b/200/200'],
+  },
+  {
+    id: 'r5',
+    customerName: 'Hoàng Văn E',
+    customerAvatar: 'https://i.pravatar.cc/150?img=7',
+    rating: 5,
+    comment: 'Shop uy tín, sản phẩm tươi sạch. Rất đáng tin cậy!',
+    timestamp: '1 tuần trước',
+    productName: 'Rau xà lách',
+  },
+];
+
+// Mock Store Followers
+export const mockStoreFollowers = [
+  {
+    id: 'f1',
+    customerName: 'Nguyễn Văn A',
+    customerAvatar: 'https://i.pravatar.cc/150?img=1',
+    followedAt: '2025-10-15',
+    totalOrders: 12,
+    totalSpent: 2450000,
+  },
+  {
+    id: 'f2',
+    customerName: 'Trần Thị B',
+    customerAvatar: 'https://i.pravatar.cc/150?img=5',
+    followedAt: '2025-10-20',
+    totalOrders: 8,
+    totalSpent: 1850000,
+  },
+  {
+    id: 'f3',
+    customerName: 'Lê Văn C',
+    customerAvatar: 'https://i.pravatar.cc/150?img=3',
+    followedAt: '2025-10-25',
+    totalOrders: 15,
+    totalSpent: 3200000,
+  },
+  {
+    id: 'f4',
+    customerName: 'Phạm Thị D',
+    customerAvatar: 'https://i.pravatar.cc/150?img=9',
+    followedAt: '2025-11-01',
+    totalOrders: 5,
+    totalSpent: 950000,
+  },
+  {
+    id: 'f5',
+    customerName: 'Hoàng Văn E',
+    customerAvatar: 'https://i.pravatar.cc/150?img=7',
+    followedAt: '2025-11-02',
+    totalOrders: 3,
+    totalSpent: 620000,
+  },
+];
+
+export const mockStoreStats = {
+  averageRating: 4.8,
+  totalReviews: 156,
+  totalFollowers: 1247,
+  totalProducts: 45,
+  rating5Stars: 125,
+  rating4Stars: 24,
+  rating3Stars: 5,
+  rating2Stars: 1,
+  rating1Star: 1,
+};
+
+// Mock Store Analytics
+export const mockStoreAnalytics = {
+  overview: {
+    totalRevenue: 45800000,
+    totalOrders: 342,
+    averageOrderValue: 133918,
+    conversionRate: 3.2,
+    viewsToday: 1245,
+    viewsThisWeek: 8763,
+    viewsThisMonth: 32456,
+  },
+  revenueByPeriod: {
+    today: 2450000,
+    yesterday: 1980000,
+    thisWeek: 12340000,
+    lastWeek: 10250000,
+    thisMonth: 45800000,
+    lastMonth: 38500000,
+  },
+  topSellingProducts: [
+    { id: 'p1', name: 'Cà chua bi', sold: 245, revenue: 11025000 },
+    { id: 'p5', name: 'Táo Envy Mỹ', sold: 234, revenue: 18720000 },
+    { id: 'p2', name: 'Rau xà lách', sold: 189, revenue: 2835000 },
+    { id: 'p3', name: 'Thịt bò Úc', sold: 156, revenue: 39000000 },
+    { id: 'p4', name: 'Cá hồi Na Uy', sold: 98, revenue: 44100000 },
+  ],
+  customerDemographics: {
+    newCustomers: 89,
+    returningCustomers: 253,
+    totalCustomers: 342,
+    averageLifetimeValue: 2450000,
+  },
+  ordersByStatus: {
+    new: 15,
+    preparing: 8,
+    delivering: 12,
+    completed: 298,
+    cancelled: 9,
+  },
+  trafficSources: {
+    direct: 45,
+    social: 32,
+    search: 18,
+    referral: 5,
+  },
+  peakHours: [
+    { hour: '7-8', orders: 12 },
+    { hour: '8-9', orders: 18 },
+    { hour: '9-10', orders: 25 },
+    { hour: '10-11', orders: 22 },
+    { hour: '11-12', orders: 15 },
+    { hour: '17-18', orders: 28 },
+    { hour: '18-19', orders: 35 },
+    { hour: '19-20', orders: 42 },
+    { hour: '20-21', orders: 30 },
+  ],
+};
+
+// Mock Share Store Data
+export const mockShareStoreData = {
+  storeUrl: 'https://greenfarm.shop/store/greenfarm',
+  qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://greenfarm.shop/store/greenfarm',
+  shortUrl: 'gfarm.vn/shop',
+  socialShareText: '🌿 Ghé thăm cửa hàng GreenFarm - Thực phẩm sạch, an toàn cho gia đình bạn! 🥬🍅',
+  shareStats: {
+    totalShares: 234,
+    facebookShares: 145,
+    zaloShares: 67,
+    otherShares: 22,
+  },
+};
