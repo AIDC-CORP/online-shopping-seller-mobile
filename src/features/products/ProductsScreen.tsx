@@ -8,6 +8,7 @@ import AddOptionMenu from './components/AddOptionMenu';
 import AddCombo from './components/AddCombo';
 import AddVoucher from './components/AddVoucher';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import PromotionsScreen from '../promotions/PromotionsScreen';
 
 // List Layout Card Component
 const ProductListCard: React.FC<{ 
@@ -49,95 +50,141 @@ const ProductListCard: React.FC<{
     <View style={{
       backgroundColor: 'white',
       marginHorizontal: 12,
-      marginVertical: 6,
-      borderRadius: 12,
+      marginVertical: 4,
+      borderRadius: 8,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.08,
+      shadowRadius: 2,
+      elevation: 2,
     }}>
-      <TouchableOpacity 
-        onPress={onPress}
-        activeOpacity={0.7}
-        style={{ flexDirection: 'row', padding: 12 }}
-      >
-        {/* Product Image */}
-        <Image 
-          source={{ uri: item.imageUrl }} 
-          style={{ 
-            width: 90, 
-            height: 90, 
-            borderRadius: 8,
-            backgroundColor: '#f3f4f6'
-          }}
-          resizeMode="cover"
-        />
+      <View style={{ flexDirection: 'row', padding: 8, alignItems: 'flex-start' }}>
+        {/* Product Image - Left */}
+        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+          <Image 
+            source={{ uri: item.imageUrl }} 
+            style={{ 
+              width: 60, 
+              height: 60, 
+              borderRadius: 6,
+              backgroundColor: '#f3f4f6'
+            }}
+            resizeMode="cover"
+          />
+        </TouchableOpacity>
 
-        {/* Product Info */}
-        <View style={{ flex: 1, marginLeft: 12, justifyContent: 'space-between' }}>
-          {/* Name & Menu */}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <Text 
-              style={{ 
-                fontSize: 15, 
-                fontWeight: '700', 
-                color: '#1f2937',
-                flex: 1,
-                marginRight: 8,
-                lineHeight: 20,
-              }}
-              numberOfLines={2}
-            >
-              {item.name}
-            </Text>
-            <TouchableOpacity 
-              onPress={() => setShowMenu(!showMenu)}
-              style={{ padding: 4 }}
-            >
-              <Text style={{ fontSize: 20, color: '#6b7280' }}>⋮</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Price */}
-          <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: 4 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#10b981' }}>
-              {formatCurrency(item.price)}
-            </Text>
-            <Text style={{ fontSize: 13, color: '#6b7280', marginLeft: 4 }}>
-              /{item.unit}
-            </Text>
-          </View>
-
-          {/* Stock & Sold */}
-          <View style={{ flexDirection: 'row', gap: 12, marginTop: 6 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ fontSize: 12, color: '#6b7280' }}>📦 </Text>
-              <Text style={{ fontSize: 12, color: '#4b5563', fontWeight: '600' }}>
-                Tồn: {item.stock}
+        {/* Product Info - Right */}
+        <TouchableOpacity 
+          onPress={onPress}
+          activeOpacity={0.7}
+          style={{ flex: 1, marginLeft: 10 }}
+        >
+          {/* Header: Tên sản phẩm + Menu */}
+          <View style={{ position: 'relative' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <Text 
+                style={{ 
+                  fontSize: 14, 
+                  fontWeight: '700', 
+                  color: '#1f2937',
+                  lineHeight: 16,
+                  flex: 1,
+                  marginRight: 6,
+                }}
+                numberOfLines={1}
+              >
+                {item.name}
               </Text>
+              <TouchableOpacity 
+                onPress={() => setShowMenu(!showMenu)}
+                style={{ padding: 2 }}
+              >
+                <Text style={{ fontSize: 18, color: '#6b7280' }}>⋮</Text>
+              </TouchableOpacity>
             </View>
-            {item.sold !== undefined && (
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontSize: 12, color: '#10b981' }}>✓ </Text>
-                <Text style={{ fontSize: 12, color: '#059669', fontWeight: '600' }}>
-                  Đã bán: {item.sold}
-                </Text>
+
+            {/* Quick Actions Menu */}
+            {showMenu && (
+              <View style={{
+                position: 'absolute',
+                top: 24,
+                right: 0,
+                backgroundColor: 'white',
+                borderRadius: 8,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+                paddingVertical: 4,
+                minWidth: 120,
+                zIndex: 1000,
+              }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowMenu(false);
+                    onEdit();
+                  }}
+                  style={{
+                    paddingVertical: 10,
+                    paddingHorizontal: 12,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 12, color: '#3b82f6', fontWeight: '500' }}>✏️ Chỉnh sửa</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowMenu(false);
+                    onDelete();
+                  }}
+                  style={{
+                    paddingVertical: 10,
+                    paddingHorizontal: 12,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 12, color: '#ef4444', fontWeight: '500' }}>🗑️ Xóa</Text>
+                </TouchableOpacity>
               </View>
             )}
           </View>
 
-          {/* Badges Row */}
-          <View style={{ flexDirection: 'row', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+          {/* 2. Giá */}
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', marginTop: -5 }}>
+            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#10b981' }}>
+              {formatCurrency(item.price)}
+            </Text>
+            <Text style={{ fontSize: 11, color: '#6b7280', marginLeft: 2 }}>
+              /{item.unit}
+            </Text>
+          </View>
+
+          {/* 3. Thông tin cơ bản - Stock & Sold */}
+          <View style={{ flexDirection: 'row', gap: 10, marginTop: 2 }}>
+            <Text style={{ fontSize: 11, color: '#4b5563', fontWeight: '600' }}>
+              📦 Tồn: {item.stock}
+            </Text>
+            {item.sold !== undefined && (
+              <Text style={{ fontSize: 11, color: '#059669', fontWeight: '600' }}>
+                ✓ Bán: {item.sold}
+              </Text>
+            )}
+          </View>
+
+          {/* 4. Thông tin chi tiết - Badges */}
+          <View style={{ flexDirection: 'row', gap: 4, marginTop: 3, flexWrap: 'wrap' }}>
             {/* Stock Status Badge */}
             <View style={{
               backgroundColor: stockStatus.bg,
-              paddingHorizontal: 8,
-              paddingVertical: 4,
-              borderRadius: 6,
+              paddingHorizontal: 6,
+              paddingVertical: 2,
+              borderRadius: 4,
             }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: stockStatus.color }}>
-                {stockStatus.text}
+              <Text style={{ fontSize: 10, fontWeight: '700', color: stockStatus.color }}>
+                {stockStatus.icon}
               </Text>
             </View>
 
@@ -150,14 +197,14 @@ const ProductListCard: React.FC<{
               if (daysLeft <= 3) {
                 badgeConfig = {
                   icon: '🔴',
-                  text: `${daysLeft} ngày`,
+                  text: `${daysLeft}d`,
                   bg: '#fee2e2',
                   color: '#dc2626'
                 };
               } else if (daysLeft <= 7) {
                 badgeConfig = {
                   icon: '🟡',
-                  text: `${daysLeft} ngày`,
+                  text: `${daysLeft}d`,
                   bg: '#fef3c7',
                   color: '#d97706'
                 };
@@ -166,7 +213,7 @@ const ProductListCard: React.FC<{
                 if (daysLeft >= 14) return null;
                 badgeConfig = {
                   icon: '🟢',
-                  text: `${daysLeft} ngày`,
+                  text: `${daysLeft}d`,
                   bg: '#d1fae5',
                   color: '#059669'
                 };
@@ -175,135 +222,20 @@ const ProductListCard: React.FC<{
               return (
                 <View style={{
                   backgroundColor: badgeConfig.bg,
-                  paddingHorizontal: 8,
-                  paddingVertical: 4,
-                  borderRadius: 6,
+                  paddingHorizontal: 6,
+                  paddingVertical: 2,
+                  borderRadius: 4,
                 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '700', color: badgeConfig.color }}>
+                  <Text style={{ fontSize: 10, fontWeight: '700', color: badgeConfig.color }}>
                     {badgeConfig.icon} {badgeConfig.text}
                   </Text>
                 </View>
               );
             })()}
           </View>
-        </View>
-      </TouchableOpacity>
-
-      {/* Quick Actions */}
-      <View style={{
-        flexDirection: 'row',
-        borderTopWidth: 1,
-        borderTopColor: '#f3f4f6',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        gap: 8,
-      }}>
-        <TouchableOpacity
-          onPress={onEdit}
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#eff6ff',
-            paddingVertical: 8,
-            borderRadius: 8,
-            gap: 6,
-          }}
-          activeOpacity={0.7}
-        >
-          <Text style={{ fontSize: 14 }}>✏️</Text>
-          <Text style={{ fontSize: 13, fontWeight: '600', color: '#3b82f6' }}>
-            Sửa
-          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={onPress}
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#f0fdf4',
-            paddingVertical: 8,
-            borderRadius: 8,
-            gap: 6,
-          }}
-          activeOpacity={0.7}
-        >
-          <Text style={{ fontSize: 14 }}>📋</Text>
-          <Text style={{ fontSize: 13, fontWeight: '600', color: '#10b981' }}>
-            Chi tiết
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={onDelete}
-          style={{
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            backgroundColor: '#fef2f2',
-            borderRadius: 8,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-          activeOpacity={0.7}
-        >
-          <Text style={{ fontSize: 16 }}>🗑️</Text>
-        </TouchableOpacity>
       </View>
-
-      {/* Dropdown Menu */}
-      {showMenu && (
-        <View style={{
-          position: 'absolute',
-          top: 50,
-          right: 12,
-          backgroundColor: 'white',
-          borderRadius: 8,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.2,
-          shadowRadius: 8,
-          elevation: 8,
-          minWidth: 150,
-          zIndex: 1000,
-        }}>
-          <TouchableOpacity
-            onPress={() => {
-              setShowMenu(false);
-              onEdit();
-            }}
-            style={{ 
-              padding: 12, 
-              borderBottomWidth: 1, 
-              borderBottomColor: '#f3f4f6',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            <Text style={{ fontSize: 14 }}>✏️</Text>
-            <Text style={{ fontSize: 14, color: '#1f2937' }}>Chỉnh sửa</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setShowMenu(false);
-              onDelete();
-            }}
-            style={{ 
-              padding: 12,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            <Text style={{ fontSize: 14 }}>🗑️</Text>
-            <Text style={{ fontSize: 14, color: '#ef4444' }}>Xóa</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 };
@@ -827,9 +759,10 @@ const getDaysUntilExpiry = (expiryDate?: string): number | null => {
 };
 
 const ProductsScreen: React.FC = () => {
+  // Main tab toggle between Products and Promotions
+  const [activeMainTab, setActiveMainTab] = useState<'products' | 'promotions'>('products');
+  
   const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [combos, setCombos] = useState<Combo[]>(initialCombos);
-  const [vouchers, setVouchers] = useState<Voucher[]>(initialVouchers);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [isAddingCombo, setIsAddingCombo] = useState(false);
   const [isAddingVoucher, setIsAddingVoucher] = useState(false);
@@ -853,26 +786,13 @@ const ProductsScreen: React.FC = () => {
   }, []);
 
   const handleAddCombo = useCallback((newComboData: Omit<Combo, 'id' | 'createdAt'>) => {
-    const newCombo: Combo = {
-      id: `combo${Date.now()}`,
-      ...newComboData,
-      createdAt: new Date().toISOString(),
-    };
-    setCombos(prevCombos => [newCombo, ...prevCombos]);
     setIsAddingCombo(false);
-    alert(`✅ Đã tạo combo "${newCombo.name}" thành công!`);
+    alert(`✅ Đã tạo combo "${newComboData.name}" thành công!`);
   }, []);
 
   const handleAddVoucher = useCallback((newVoucherData: Omit<Voucher, 'id' | 'usedCount' | 'createdAt'>) => {
-    const newVoucher: Voucher = {
-      id: `voucher${Date.now()}`,
-      ...newVoucherData,
-      usedCount: 0,
-      createdAt: new Date().toISOString(),
-    };
-    setVouchers(prevVouchers => [newVoucher, ...prevVouchers]);
     setIsAddingVoucher(false);
-    alert(`✅ Đã tạo voucher "${newVoucher.code}" thành công!`);
+    alert(`✅ Đã tạo voucher "${newVoucherData.code}" thành công!`);
   }, []);
 
   const handleUpdateProduct = useCallback((productId: string, updates: Partial<Product>) => {
@@ -974,8 +894,59 @@ const ProductsScreen: React.FC = () => {
 
   return (
     <SafeAreaView edges={['bottom']} className="flex-1 bg-gray-50">
-      {/* Stats Header with Horizontal Scroll */}
+      {/* Main Tab Toggle Header */}
       <View style={{
+        backgroundColor: 'white',
+        flexDirection: 'row',
+        borderBottomWidth: 2,
+        borderBottomColor: '#f3f4f6',
+      }}>
+        <TouchableOpacity
+          onPress={() => setActiveMainTab('products')}
+          style={{
+            flex: 1,
+            paddingVertical: 16,
+            alignItems: 'center',
+            borderBottomWidth: 3,
+            borderBottomColor: activeMainTab === 'products' ? '#10b981' : 'transparent',
+            backgroundColor: activeMainTab === 'products' ? '#ecfdf5' : 'white',
+          }}
+        >
+          <Text style={{
+            fontSize: 16,
+            fontWeight: '700',
+            color: activeMainTab === 'products' ? '#10b981' : '#6b7280',
+          }}>
+            📦 Sản phẩm
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setActiveMainTab('promotions')}
+          style={{
+            flex: 1,
+            paddingVertical: 16,
+            alignItems: 'center',
+            borderBottomWidth: 3,
+            borderBottomColor: activeMainTab === 'promotions' ? '#10b981' : 'transparent',
+            backgroundColor: activeMainTab === 'promotions' ? '#ecfdf5' : 'white',
+          }}
+        >
+          <Text style={{
+            fontSize: 16,
+            fontWeight: '700',
+            color: activeMainTab === 'promotions' ? '#10b981' : '#6b7280',
+          }}>
+            🎁 Giảm giá
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Conditional Content */}
+      {activeMainTab === 'products' ? (
+        <>
+          {/* Stats Header with Horizontal Scroll */}
+          <View style={{
         backgroundColor: 'white',
         borderBottomWidth: 1,
         borderBottomColor: '#e5e7eb',
@@ -1104,7 +1075,7 @@ const ProductsScreen: React.FC = () => {
             {/* Total Products */}
             <TouchableOpacity
               onPress={() => setFilterType('all')}
-              activeOpacity={0.7}
+              activeOpacity={0.5}
               style={{
                 flex: 1,
                 backgroundColor: filterType === 'all' ? '#2563eb' : '#eff6ff',
@@ -1112,20 +1083,23 @@ const ProductsScreen: React.FC = () => {
                 borderRadius: 8,
                 borderWidth: 1.5,
                 borderColor: filterType === 'all' ? '#1e40af' : '#dbeafe',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Text style={{ 
-                fontSize: 10, 
+                fontSize: 9, 
                 color: filterType === 'all' ? '#ffffff' : '#3b82f6', 
-                marginBottom: 2,
-                fontWeight: '600'
+                fontWeight: '600',
+                marginRight: 4,
               }}>
-                Tổng
+                Tổng hàng
               </Text>
               <Text style={{ 
-                fontSize: 18, 
+                fontSize: 11, 
                 fontWeight: 'bold', 
-                color: filterType === 'all' ? '#ffffff' : '#1e40af'
+                color: filterType === 'all' ? '#ffffff' : '#1e40af',
               }}>
                 {stats.total}
               </Text>
@@ -1142,20 +1116,23 @@ const ProductsScreen: React.FC = () => {
                 borderRadius: 8,
                 borderWidth: 1.5,
                 borderColor: filterType === 'inStock' ? '#047857' : '#a7f3d0',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Text style={{ 
-                fontSize: 10, 
+                fontSize: 9, 
                 color: filterType === 'inStock' ? '#ffffff' : '#059669', 
-                marginBottom: 2,
-                fontWeight: '600'
+                fontWeight: '600',
+                marginRight: 4,
               }}>
-                Còn
+                Còn hàng
               </Text>
               <Text style={{ 
-                fontSize: 18, 
+                fontSize: 11, 
                 fontWeight: 'bold', 
-                color: filterType === 'inStock' ? '#ffffff' : '#047857'
+                color: filterType === 'inStock' ? '#ffffff' : '#047857',
               }}>
                 {stats.inStock}
               </Text>
@@ -1172,20 +1149,23 @@ const ProductsScreen: React.FC = () => {
                 borderRadius: 8,
                 borderWidth: 1.5,
                 borderColor: filterType === 'lowStock' ? '#b45309' : '#fde68a',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Text style={{ 
-                fontSize: 10, 
+                fontSize: 9, 
                 color: filterType === 'lowStock' ? '#ffffff' : '#d97706', 
-                marginBottom: 2,
-                fontWeight: '600'
+                fontWeight: '600',
+                marginRight: 4,
               }}>
-                ⚠️ Sắp
+                ⚠️ Sắp hết
               </Text>
               <Text style={{ 
-                fontSize: 18, 
+                fontSize: 11, 
                 fontWeight: 'bold', 
-                color: filterType === 'lowStock' ? '#ffffff' : '#b45309'
+                color: filterType === 'lowStock' ? '#ffffff' : '#b45309',
               }}>
                 {stats.lowStock}
               </Text>
@@ -1202,20 +1182,23 @@ const ProductsScreen: React.FC = () => {
                 borderRadius: 8,
                 borderWidth: 1.5,
                 borderColor: filterType === 'outOfStock' ? '#b91c1c' : '#fecaca',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               <Text style={{ 
-                fontSize: 10, 
+                fontSize: 9, 
                 color: filterType === 'outOfStock' ? '#ffffff' : '#dc2626', 
-                marginBottom: 2,
-                fontWeight: '600'
+                fontWeight: '600',
+                marginRight: 4,
               }}>
-                ❌ Hết
+                ❌ Hết hàng
               </Text>
               <Text style={{ 
-                fontSize: 18, 
+                fontSize: 11, 
                 fontWeight: 'bold', 
-                color: filterType === 'outOfStock' ? '#ffffff' : '#b91c1c'
+                color: filterType === 'outOfStock' ? '#ffffff' : '#b91c1c',
               }}>
                 {stats.outOfStock}
               </Text>
@@ -1223,7 +1206,7 @@ const ProductsScreen: React.FC = () => {
           </View>
 
           {/* Row 2: Revenue & Stock */}
-          <View style={{ flexDirection: 'row', gap: 8 }}>
+          <View style={{ flexDirection: 'row', gap: 8,height: 50}}>
             {/* Total Revenue - Clickable */}
             <TouchableOpacity
               onPress={() => setShowRevenueDetail(true)}
@@ -2147,6 +2130,11 @@ const ProductsScreen: React.FC = () => {
           </ScrollView>
         </SafeAreaView>
       </Modal>
+        </>
+      ) : (
+        /* Promotions Screen */
+        <PromotionsScreen />
+      )}
     </SafeAreaView>
   );
 };

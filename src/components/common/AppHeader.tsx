@@ -4,6 +4,7 @@ import { UserIcon, XCircleIcon } from '@/src/components/icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '@/components/ui/button';
 import { useRouter } from 'expo-router';
+import ProfileScreen from '@/src/features/profile/ProfileScreen';
 
 interface AppHeaderProps {
   onLogout: () => void;
@@ -216,6 +217,7 @@ const NotificationModal: React.FC<{
 const AppHeader: React.FC<AppHeaderProps> = ({ onLogout }) => {
   const router = useRouter();
   const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
 
   // Get unread notification count
@@ -247,6 +249,16 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onLogout }) => {
           </View>
           
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            {/* Store Button */}
+            <TouchableOpacity 
+              onPress={() => router.push('/store')}
+              style={{ 
+                padding: 8,
+              }}
+            >
+              <Text style={{ fontSize: 24 }}>🏪</Text>
+            </TouchableOpacity>
+
             {/* Notification Button */}
             <TouchableOpacity 
               onPress={() => setShowNotificationModal(true)}
@@ -285,7 +297,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onLogout }) => {
 
             {/* User Button */}
             <TouchableOpacity
-              onPress={onLogout}
+              onPress={() => setShowProfileModal(true)}
               style={{
                 backgroundColor: 'rgba(255,255,255,0.2)',
                 padding: 10,
@@ -305,6 +317,13 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onLogout }) => {
         notifications={notifications}
         onNotificationPress={handleNotificationPress}
         onMarkAllRead={handleMarkAllRead}
+      />
+
+      {/* Profile Modal */}
+      <ProfileScreen
+        visible={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        onLogout={onLogout}
       />
     </>
   );

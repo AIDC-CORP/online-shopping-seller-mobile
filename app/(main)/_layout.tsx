@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React, { useState, useMemo } from 'react';
-import { HomeIcon, PackageIcon, CubeIcon, StoreIcon, ChatIcon, GiftIcon } from '@/src/components/icons';
+import { HomeIcon, PackageIcon, CubeIcon, StoreIcon, ChatIcon, GiftIcon, WalletIcon } from '@/src/components/icons';
 import AppHeader from '@/src/components/common/AppHeader';
 import { mockChatConversations, mockProducts, mockOrders } from '@/src/shared/data/mockData';
 import { OrderStatus } from '@/src/shared/types';
@@ -79,10 +79,10 @@ export default function MainLayout() {
           }}
         />
         <Tabs.Screen
-          name="promotions"
+          name="wallet"
           options={{
-            title: 'Giảm giá',
-            tabBarIcon: ({ color }) => <GiftIcon className="h-6 w-6" color={color} />,
+            title: 'Ví',
+            tabBarIcon: ({ color }) => <WalletIcon className="h-6 w-6" color={color} />,
           }}
         />
         <Tabs.Screen
@@ -93,11 +93,17 @@ export default function MainLayout() {
             tabBarBadge: totalUnread > 0 ? totalUnread : undefined,
           }}
         />
+        {/* Hidden tabs - accessible from header/other screens */}
+        <Tabs.Screen
+          name="promotions"
+          options={{
+            href: null, // Hide from tab bar
+          }}
+        />
         <Tabs.Screen
           name="store"
           options={{
-            title: 'Cửa hàng',
-            tabBarIcon: ({ color }) => <StoreIcon className="h-6 w-6" color={color} />,
+            href: null, // Hide from tab bar - accessible from header
           }}
         />
         {/* Hide chat detail from tab bar - it's a nested screen */}
