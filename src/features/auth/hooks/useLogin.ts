@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import mockApiService from '@/src/services/mockApiService';
 
 interface UseLoginResult {
   login: (email: string, password: string) => Promise<boolean>;
@@ -49,15 +48,18 @@ export const useLogin = (): UseLoginResult => {
     setError('');
 
     try {
-      const response = await mockApiService.login(email, password);
+      // Mock login - simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (response.success) {
-        // Có thể lưu token vào AsyncStorage ở đây
-        // await AsyncStorage.setItem('authToken', response.data.token);
+      // For demo purposes, accept any valid email/password
+      // In production, replace with actual API call
+      if (email && password) {
+        // Success - could save token to AsyncStorage here
+        // await AsyncStorage.setItem('authToken', 'mock-token');
         setIsLoading(false);
         return true;
       } else {
-        setError(response.error || 'Đăng nhập thất bại');
+        setError('Đăng nhập thất bại');
         setIsLoading(false);
         return false;
       }

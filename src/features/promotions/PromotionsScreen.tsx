@@ -436,7 +436,7 @@ const PromotionsScreen = () => {
       >
         <View style={{ padding: 16, paddingTop: 10 }}>
           <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1f2937', marginBottom: 4 }}>
-            🎁 Khuyến Mãi
+             Giảm Giá
           </Text>
           <Text style={{ fontSize: 14, color: '#6b7280' }}>
             Quản lý combos, vouchers và flash sales
@@ -449,27 +449,27 @@ const PromotionsScreen = () => {
         style={{
           backgroundColor: 'white',
           paddingHorizontal: 16,
-          paddingVertical: 12,
+          paddingVertical: 10,
           borderBottomWidth: 1,
           borderBottomColor: '#e5e7eb',
         }}
       >
-        <View style={{ flexDirection: 'row', gap: 16 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 2 }}>Combos</Text>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#10b981' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 18 }}>
+            <Text style={{ fontSize: 13, color: '#6b7280', marginRight: 6 }}>Combos:</Text>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#10b981' }}>
               {activeCombos}
             </Text>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 2 }}>Vouchers</Text>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#3b82f6' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={{ fontSize: 13, color: '#6b7280', marginRight: 6 }}>Vouchers:</Text>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#3b82f6' }}>
               {activeVouchers}
             </Text>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 2 }}>Flash Sales</Text>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#f59e0b' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={{ fontSize: 13, color: '#6b7280', marginRight: 6 }}>Flash Sales:</Text>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#f59e0b', marginRight: 6}}>
               0
             </Text>
           </View>
