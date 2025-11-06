@@ -87,7 +87,7 @@ const ProfileScreen: React.FC<ProfileModalProps> = ({ visible, onClose, onLogout
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <View style={{ 
             flex: 1, 
-            marginTop: 60, 
+            marginTop: 50, 
             backgroundColor: 'white', 
             borderTopLeftRadius: 24, 
             borderTopRightRadius: 24 

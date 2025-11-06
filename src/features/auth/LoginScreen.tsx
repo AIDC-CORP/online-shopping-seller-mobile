@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import Button from '@/components/ui/button';
 import { useLogin } from './hooks';
+import { useAuth } from '@/src/context/AuthContext';
+import { useRouter } from 'expo-router';
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -10,16 +12,27 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
+  const { setUser } = useAuth();
   
   // Sử dụng custom hook
   const { login, isLoading, error, clearError } = useLogin();
 
   const handleLoginClick = async () => {
-    const success = await login(email, password);
+    const user = await login(email, password);
     
-    if (success) {
-      // Đăng nhập thành công
-      onLogin();
+    if (user) {
+      // Lưu user vào context
+      setUser(user);
+      
+      // Check if user needs to complete setup
+      if (!user.isSetupCompleted) {
+        // Redirect to setup screen
+        router.replace('/setup');
+      } else {
+        // Redirect to main dashboard
+        onLogin();
+      }
     }
   };
 

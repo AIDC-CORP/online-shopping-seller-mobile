@@ -134,8 +134,8 @@ const AIAssistantChat: React.FC<AIAssistantChatProps> = ({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-        {/* Header */}
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        {/* Header - with manual top padding */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Text style={styles.headerIcon}>✨</Text>
@@ -241,7 +241,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    paddingTop: 50,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
