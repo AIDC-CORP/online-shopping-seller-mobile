@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Image, ImageBackground, TouchableOpacity, Switch, Modal, TextInput, Alert, Share } from 'react-native';
-import { mockStoreInfo, mockStoreStats, mockStoreReviews, mockStoreFollowers, mockStoreAnalytics, mockShareStoreData } from '../../shared/data/mockData';
-import { StoreInfo } from '../../shared/types';
+import { mockStoreInfo, mockStoreStats, mockStoreReviews, mockStoreFollowers, mockStoreAnalytics, mockShareStoreData } from '../../../shared/data/mockData';
+import { StoreInfo } from '../../../shared/types';
 import { PencilIcon } from '@/src/components/icons';
 import IconButton from '@/components/ui/icon-button';
 import Button from '@/components/ui/button';

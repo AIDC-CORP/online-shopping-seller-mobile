@@ -4,7 +4,7 @@ import { UserIcon, XCircleIcon } from '@/src/components/icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '@/components/ui/button';
 import { useRouter } from 'expo-router';
-import ProfileScreen from '@/src/features/profile/ProfileScreen';
+import { ProfileScreen } from '@/src/features/profile';
 
 interface AppHeaderProps {
   onLogout: () => void;

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
-import { mockChatConversations } from '../../shared/data/mockData';
-import { ChatConversation } from '../../shared/types';
+import { mockChatConversations } from '../../../shared/data/mockData';
+import { ChatConversation } from '../../../shared/types';
 
 const ChatScreen: React.FC = () => {
   const router = useRouter();

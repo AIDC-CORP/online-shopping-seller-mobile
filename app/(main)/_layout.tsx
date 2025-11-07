@@ -88,7 +88,7 @@ export default function MainLayout() {
         <Tabs.Screen
           name="wallet"
           options={{
-            title: 'Ví',
+            title: 'Tài chính',
             tabBarIcon: ({ color }) => <WalletIcon className="h-6 w-6" color={color} />,
           }}
         />

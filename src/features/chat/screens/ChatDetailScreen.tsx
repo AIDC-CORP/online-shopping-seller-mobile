@@ -198,9 +198,9 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
       style={{ flex: 1, backgroundColor: 'white' }}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 110 : 100}
     >
       <View style={{ flex: 1 }}>
         {/* Header */}

@@ -1,3 +1,3 @@
-import StoreScreen from '@/src/features/store/StoreScreen';
+import { StoreScreen } from '@/src/features/store';
 
 export default StoreScreen;

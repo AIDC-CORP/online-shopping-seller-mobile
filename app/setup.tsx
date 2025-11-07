@@ -1,6 +1,6 @@
-import SetupScreen from '@/src/features/setup/SetupScreen';
+import { SetupScreen } from '@/src/features/setup';
 import { useRouter } from 'expo-router';
-import type { SetupData } from '@/src/features/setup/SetupScreen';
+import type { SetupData } from '@/src/features/setup/screens/SetupScreen';
 
 export default function Setup() {
   const router = useRouter();
