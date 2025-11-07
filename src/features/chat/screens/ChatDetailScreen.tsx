@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Image, ScrollView, Animated } from 'react-native';
-import { ChatConversation, Message } from '../../shared/types';
-import { mockChatConversations } from '../../shared/data/mockData';
+import { ChatConversation, Message } from '../../../shared/types';
+import { mockChatConversations } from '../../../shared/data/mockData';
 import * as ImagePicker from 'expo-image-picker';
 
 interface ChatDetailScreenProps {
