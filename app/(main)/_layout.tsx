@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React, { useState, useMemo } from 'react';
-import { HomeIcon, PackageIcon, CubeIcon, StoreIcon, ChatIcon, GiftIcon, WalletIcon } from '@/src/components/icons';
+import { HomeIcon, PackageIcon, CubeIcon, StoreIcon, ChatIcon, GiftIcon, WalletIcon, TruckIcon } from '@/src/components/icons';
 import AppHeader from '@/src/components/common/AppHeader';
 import { mockChatConversations, mockProducts, mockOrders } from '@/src/shared/data/mockData';
 import { OrderStatus } from '@/src/shared/types';
@@ -76,6 +76,13 @@ export default function MainLayout() {
           options={{
             title: 'Sản phẩm',
             tabBarIcon: ({ color }) => <CubeIcon className="h-6 w-6" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="delivery"
+          options={{
+            title: 'Giao hàng',
+            tabBarIcon: ({ color }) => <TruckIcon className="h-6 w-6" color={color} />,
           }}
         />
         <Tabs.Screen

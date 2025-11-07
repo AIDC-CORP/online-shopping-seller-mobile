@@ -113,3 +113,95 @@ export interface ChatConversation {
   unreadCount: number;
   messages: Message[];
 }
+
+// Delivery Management Types
+export enum DeliveryStatus {
+  Pending = 'Chờ lấy hàng',
+  PickedUp = 'Đã lấy hàng',
+  InTransit = 'Đang vận chuyển',
+  Delivering = 'Đang giao',
+  Delivered = 'Đã giao',
+  Failed = 'Giao thất bại',
+  Returned = 'Đã hoàn',
+}
+
+export enum DeliveryPartner {
+  GrabExpress = 'GrabExpress',
+  GoJek = 'GoJek',
+  Ninja = 'Ninja Van',
+  GHTK = 'GHTK',
+  GHN = 'Giao Hàng Nhanh',
+  ViettelPost = 'Viettel Post',
+  JT = 'J&T Express',
+  SelfDelivery = 'Tự giao hàng',
+}
+
+export interface DeliveryLocation {
+  address: string;
+  ward?: string;
+  district: string;
+  city: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+}
+
+export interface DeliveryDriver {
+  id: string;
+  name: string;
+  phone: string;
+  vehicleType: string; // 'motorbike' | 'car' | 'bicycle'
+  vehicleNumber?: string;
+  rating?: number;
+  avatar?: string;
+}
+
+export interface Delivery {
+  id: string;
+  orderId: string;
+  trackingNumber: string;
+  partner: DeliveryPartner;
+  status: DeliveryStatus;
+  
+  // Customer info
+  customerName: string;
+  customerPhone: string;
+  deliveryAddress: DeliveryLocation;
+  
+  // Driver info (if assigned)
+  driver?: DeliveryDriver;
+  
+  // Pricing
+  shippingFee: number;
+  codAmount?: number; // Cash on Delivery amount
+  
+  // Timestamps
+  createdAt: string;
+  pickedUpAt?: string;
+  estimatedDeliveryTime?: string;
+  deliveredAt?: string;
+  
+  // Package info
+  weight?: number; // kg
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
+  };
+  
+  // Additional info
+  notes?: string;
+  failureReason?: string;
+  proofOfDelivery?: string; // URL to image
+  
+  // Tracking history
+  trackingHistory: DeliveryTrackingPoint[];
+}
+
+export interface DeliveryTrackingPoint {
+  status: DeliveryStatus;
+  timestamp: string;
+  location?: string;
+  note?: string;
+}

@@ -893,7 +893,7 @@ const ProductsScreen: React.FC = () => {
   }).length;
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gray-50">
       {/* Main Tab Toggle Header */}
       <View style={{
         backgroundColor: 'white',
@@ -2135,7 +2135,7 @@ const ProductsScreen: React.FC = () => {
         /* Promotions Screen */
         <PromotionsScreen />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, TextInput } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { mockChatConversations } from '../../shared/data/mockData';
 import { ChatConversation } from '../../shared/types';
@@ -134,7 +133,7 @@ const ChatScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gray-50">
       {/* Header */}
       <View
         style={{
@@ -204,7 +203,7 @@ const ChatScreen: React.FC = () => {
         data={filteredConversations}
         renderItem={renderConversation}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom: 110 }}
         ListEmptyComponent={
           <View style={{ padding: 40, alignItems: 'center' }}>
             <Text style={{ fontSize: 48, marginBottom: 12 }}>💬</Text>
@@ -214,7 +213,7 @@ const ChatScreen: React.FC = () => {
           </View>
         }
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

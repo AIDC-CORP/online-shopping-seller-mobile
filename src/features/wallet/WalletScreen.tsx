@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 
 // Mock wallet data
 const mockWalletData = {
@@ -34,8 +33,8 @@ const WalletScreen: React.FC = () => {
   });
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-gray-50">
-      <ScrollView>
+    <View className="flex-1 bg-gray-50">
+      <ScrollView contentContainerStyle={{ paddingBottom: 110 }}>
         {/* Balance Card */}
         <View style={{
           backgroundColor: '#10b981',
@@ -254,7 +253,7 @@ const WalletScreen: React.FC = () => {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

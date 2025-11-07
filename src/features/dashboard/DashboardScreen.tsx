@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { mockDashboardStatsByPeriod } from '../../shared/data/mockData';
 import { ChartBarIcon, PackageIcon, CheckCircleIcon, XCircleIcon } from '@/src/components/icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Product } from '../../shared/types';
 import { RevenueDetailCard } from './components/RevenueDetailCard';
 import { OrdersDetailCard } from './components/OrdersDetailCard';
@@ -72,8 +71,8 @@ const DashboardScreen: React.FC = () => {
   ];
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-gray-50/50">
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 20 }}>
+    <View className="flex-1 bg-gray-50/50">
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 110 }}>
         <View className="space-y-6">
           <Text className="text-2xl font-bold text-gray-800">Lên kế hoạch bán hàng</Text>
 
@@ -202,7 +201,7 @@ const DashboardScreen: React.FC = () => {
           onClose={() => setSelectedProduct(null)}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

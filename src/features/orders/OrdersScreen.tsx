@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { mockOrders } from '../../shared/data/mockData';
 import { Order, OrderStatus } from '../../shared/types';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '@/components/ui/button';
 import { XCircleIcon, UserIcon } from '@/src/components/icons';
 
@@ -656,7 +655,7 @@ const OrdersScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gray-50">
       {/* Header */}
       <View className="bg-white px-4 py-3 border-b border-gray-200">
         <Text className="text-xl font-bold text-gray-800">Đơn hàng</Text>
@@ -734,7 +733,7 @@ const OrdersScreen: React.FC = () => {
 
       {/* Orders List */}
       <ScrollView 
-        contentContainerStyle={{ padding: 16 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
       >
         {filteredOrders.length > 0 ? (
@@ -780,7 +779,7 @@ const OrdersScreen: React.FC = () => {
           setShowDetailModal(true);
         }}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
