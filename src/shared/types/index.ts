@@ -119,30 +119,14 @@ export enum DeliveryStatus {
   Pending = 'Chờ lấy hàng',
   PickedUp = 'Đã lấy hàng',
   InTransit = 'Đang vận chuyển',
-<<<<<<< HEAD
-  OutForDelivery = 'Đang giao hàng',
-  Delivered = 'Đã giao thành công',
-  Failed = 'Giao thất bại',
-  Cancelled = 'Đã hủy',
-=======
   Delivering = 'Đang giao',
   Delivered = 'Đã giao',
   Failed = 'Giao thất bại',
   Returned = 'Đã hoàn',
->>>>>>> delivery
 }
 
 export enum DeliveryPartner {
   GrabExpress = 'GrabExpress',
-<<<<<<< HEAD
-  Gojek = 'Gojek',
-  JT = 'J&T Express',
-  NinjaDan = 'Ninja Van',
-  Shopee = 'Shopee Express',
-  Viettel = 'Viettel Post',
-  GHTK = 'GHTK',
-  BestExpress = 'Best Express',
-=======
   GoJek = 'GoJek',
   Ninja = 'Ninja Van',
   GHTK = 'GHTK',
@@ -150,28 +134,10 @@ export enum DeliveryPartner {
   ViettelPost = 'Viettel Post',
   JT = 'J&T Express',
   SelfDelivery = 'Tự giao hàng',
->>>>>>> delivery
 }
 
 export interface DeliveryLocation {
   address: string;
-<<<<<<< HEAD
-  lat: number;
-  lng: number;
-}
-
-export interface DeliveryDriver {
-  name: string;
-  phone: string;
-  vehicleNumber?: string;
-}
-
-export interface DeliveryTrackingPoint {
-  timestamp: string;
-  status: DeliveryStatus;
-  location?: string;
-  note?: string;
-=======
   ward?: string;
   district: string;
   city: string;
@@ -189,35 +155,11 @@ export interface DeliveryDriver {
   vehicleNumber?: string;
   rating?: number;
   avatar?: string;
->>>>>>> delivery
 }
 
 export interface Delivery {
   id: string;
   orderId: string;
-<<<<<<< HEAD
-  customerName: string;
-  customerPhone: string;
-  status: DeliveryStatus;
-  partner: DeliveryPartner;
-  pickupLocation: DeliveryLocation;
-  deliveryLocation: DeliveryLocation;
-  driver?: DeliveryDriver;
-  trackingNumber: string;
-  estimatedDelivery: string;
-  actualDelivery?: string;
-  isCOD: boolean;
-  codAmount?: number;
-  deliveryFee: number;
-  trackingHistory: DeliveryTrackingPoint[];
-  proofOfDelivery?: {
-    imageUrl: string;
-    signature?: string;
-    receiverName: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-=======
   trackingNumber: string;
   partner: DeliveryPartner;
   status: DeliveryStatus;
@@ -262,5 +204,4 @@ export interface DeliveryTrackingPoint {
   timestamp: string;
   location?: string;
   note?: string;
->>>>>>> delivery
 }

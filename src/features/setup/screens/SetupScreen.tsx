@@ -630,36 +630,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete }) => {
           elevation: 5
         }}>
           <View style={{ flexDirection: 'row', gap: 12 }}>
-<<<<<<< HEAD
             {currentStep > 1 && (
-=======
-          {currentStep > 1 && (
-            <View style={{ flex: 1 }}>
-              <Button
-                onPress={handleBack}
-                variant="secondary"
-                size="md"
-                fullWidth
-              >
-                ← Quay lại
-              </Button>
-            </View>
-          )}
-          
-          {currentStep < 3 ? (
-            <View style={{ flex: 1 }}>
-              <Button
-                onPress={handleNext}
-                variant="primary"
-                size="md"
-                fullWidth
-              >
-                Tiếp tục →
-              </Button>
-            </View>
-          ) : (
-            <>
->>>>>>> delivery
               <View style={{ flex: 1 }}>
                 <Button
                   onPress={handleBack}
@@ -709,10 +680,6 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete }) => {
             )}
           </View>
         </View>
-<<<<<<< HEAD
-=======
-      </View>
->>>>>>> delivery
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
