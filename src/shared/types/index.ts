@@ -113,3 +113,70 @@ export interface ChatConversation {
   unreadCount: number;
   messages: Message[];
 }
+
+// Delivery Management Types
+export enum DeliveryStatus {
+  Pending = 'Chờ lấy hàng',
+  PickedUp = 'Đã lấy hàng',
+  InTransit = 'Đang vận chuyển',
+  OutForDelivery = 'Đang giao hàng',
+  Delivered = 'Đã giao thành công',
+  Failed = 'Giao thất bại',
+  Cancelled = 'Đã hủy',
+}
+
+export enum DeliveryPartner {
+  GrabExpress = 'GrabExpress',
+  Gojek = 'Gojek',
+  JT = 'J&T Express',
+  NinjaDan = 'Ninja Van',
+  Shopee = 'Shopee Express',
+  Viettel = 'Viettel Post',
+  GHTK = 'GHTK',
+  BestExpress = 'Best Express',
+}
+
+export interface DeliveryLocation {
+  address: string;
+  lat: number;
+  lng: number;
+}
+
+export interface DeliveryDriver {
+  name: string;
+  phone: string;
+  vehicleNumber?: string;
+}
+
+export interface DeliveryTrackingPoint {
+  timestamp: string;
+  status: DeliveryStatus;
+  location?: string;
+  note?: string;
+}
+
+export interface Delivery {
+  id: string;
+  orderId: string;
+  customerName: string;
+  customerPhone: string;
+  status: DeliveryStatus;
+  partner: DeliveryPartner;
+  pickupLocation: DeliveryLocation;
+  deliveryLocation: DeliveryLocation;
+  driver?: DeliveryDriver;
+  trackingNumber: string;
+  estimatedDelivery: string;
+  actualDelivery?: string;
+  isCOD: boolean;
+  codAmount?: number;
+  deliveryFee: number;
+  trackingHistory: DeliveryTrackingPoint[];
+  proofOfDelivery?: {
+    imageUrl: string;
+    signature?: string;
+    receiverName: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}

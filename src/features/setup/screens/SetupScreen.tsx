@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Image, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraIcon, XCircleIcon } from '@/src/components/icons';
 import Button from '@/components/ui/button';
@@ -592,77 +592,83 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
-      {renderProgressBar()}
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={0}
+      >
+        {renderProgressBar()}
 
-      <View style={{ flex: 1 }}>
-        {currentStep === 1 && renderStep1()}
-        {currentStep === 2 && renderStep2()}
-        {currentStep === 3 && renderStep3()}
-      </View>
+        <View style={{ flex: 1 }}>
+          {currentStep === 1 && renderStep1()}
+          {currentStep === 2 && renderStep2()}
+          {currentStep === 3 && renderStep3()}
+        </View>
 
-      {/* Navigation Buttons */}
-      <View style={{ 
-        padding: 24, 
-        backgroundColor: 'white',
-        borderTopWidth: 1,
-        borderTopColor: '#e5e7eb',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 5
-      }}>
-        <View style={{ flexDirection: 'row', gap: 12 }}>
-          {currentStep > 1 && (
-            <View style={{ flex: 1 }}>
-              <Button
-                onPress={handleBack}
-                variant="secondary"
-                size="md"
-                fullWidth
-              >
-                ← Quay lại
-              </Button>
-            </View>
-          )}
-          
-          {currentStep < 3 ? (
-            <View style={{ flex: 1 }}>
-              <Button
-                onPress={handleNext}
-                variant="primary"
-                size="md"
-                fullWidth
-              >
-                Tiếp tục →
-              </Button>
-            </View>
-          ) : (
-            <>
+        {/* Navigation Buttons */}
+        <View style={{ 
+          padding: 24, 
+          backgroundColor: 'white',
+          borderTopWidth: 1,
+          borderTopColor: '#e5e7eb',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 4,
+          elevation: 5
+        }}>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            {currentStep > 1 && (
               <View style={{ flex: 1 }}>
                 <Button
-                  onPress={handleSkip}
+                  onPress={handleBack}
                   variant="secondary"
                   size="md"
                   fullWidth
                 >
-                  Bỏ qua
+                  ← Quay lại
                 </Button>
               </View>
+            )}
+            
+            {currentStep < 3 ? (
               <View style={{ flex: 1 }}>
                 <Button
-                  onPress={handleComplete}
+                  onPress={handleNext}
                   variant="primary"
                   size="md"
                   fullWidth
                 >
-                  Hoàn tất ✓
+                  Tiếp tục →
                 </Button>
               </View>
-            </>
-          )}
+            ) : (
+              <>
+                <View style={{ flex: 1 }}>
+                  <Button
+                    onPress={handleSkip}
+                    variant="secondary"
+                    size="md"
+                    fullWidth
+                  >
+                    Bỏ qua
+                  </Button>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Button
+                    onPress={handleComplete}
+                    variant="primary"
+                    size="md"
+                    fullWidth
+                  >
+                    Hoàn tất ✓
+                  </Button>
+                </View>
+              </>
+            )}
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
