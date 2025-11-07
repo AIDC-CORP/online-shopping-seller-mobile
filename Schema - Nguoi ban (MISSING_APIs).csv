@@ -1,0 +1,463 @@
+ID (User Story),Feature (Tính năng),Giao thức,Endpoint (Phương thức & Đường dẫn),Đầu vào (Input),Đầu ra (Output),Ghi chú
+SS-014,Đăng ký tài khoản người bán,HTTPS,POST /seller/auth/register,"Body:
+{
+  ""email"": ""string"",
+  ""password"": ""string"",
+  ""phone"": ""string"",
+  ""storeName"": ""string"",
+  ""storeType"": ""individual"" | ""company"",
+  ""businessLicense"": ""string"" (optional),
+  ""taxCode"": ""string"" (optional)
+}","{
+  ""success"": true,
+  ""message"": ""Registration submitted for review"",
+  ""applicationId"": ""string"",
+  ""status"": ""pending_verification""
+}",Đăng ký tài khoản seller mới - US-101
+,Gửi giấy tờ xác minh,HTTPS,POST /seller/verification/submit,"Auth: Bearer Token
+
+Content-Type: multipart/form-data
+
+Body:
+- businessLicense (File): Giấy phép kinh doanh
+- idCard (File): CMND/CCCD
+- taxDocument (File): Giấy tờ thuế (optional)
+- additionalDocs (File[]): Giấy tờ bổ sung","{
+  ""success"": true,
+  ""verificationId"": ""string"",
+  ""status"": ""under_review"",
+  ""estimatedReviewTime"": ""string""
+}",Gửi giấy tờ xác minh - US-101
+,Kiểm tra trạng thái xác minh,HTTPS,GET /seller/verification/status,"Auth: Bearer Token","{
+  ""verificationId"": ""string"",
+  ""status"": ""pending"" | ""under_review"" | ""approved"" | ""rejected"",
+  ""submittedAt"": ""string (ISO 8601)"",
+  ""reviewedAt"": ""string (ISO 8601)"" (optional),
+  ""rejectionReason"": ""string"" (optional),
+  ""requiredActions"": [""string""] (optional)
+}",Kiểm tra trạng thái xét duyệt - US-101
+,Gửi lại giấy tờ sau khi bị từ chối,HTTPS,PUT /seller/verification/resubmit,"Auth: Bearer Token
+
+Content-Type: multipart/form-data
+
+Body:
+- updatedDocuments (File[])
+- notes (string): Ghi chú bổ sung","{
+  ""success"": true,
+  ""verificationId"": ""string"",
+  ""status"": ""under_review"",
+  ""resubmittedAt"": ""string (ISO 8601)""
+}",Gửi lại sau khi bị từ chối - US-101
+SS-015,Xem danh sách yêu cầu hoàn trả,HTTPS,GET /seller/returns,"Auth: Bearer Token
+
+Query Params:
+- status (string): ""pending"" | ""approved"" | ""rejected"" | ""processing"" | ""completed""
+- page (number)
+- limit (number)
+- startDate (string ISO 8601)
+- endDate (string ISO 8601)","{
+  ""data"": [
+    {
+      ""id"": ""string"",
+      ""orderId"": ""string"",
+      ""customerId"": ""string"",
+      ""customerName"": ""string"",
+      ""reason"": ""string"",
+      ""status"": ""string"",
+      ""amount"": ""number"",
+      ""items"": [
+        {
+          ""productId"": ""string"",
+          ""productName"": ""string"",
+          ""quantity"": ""number""
+        }
+      ],
+      ""evidence"": [""string""],
+      ""createdAt"": ""string (ISO 8601)""
+    }
+  ],
+  ""pagination"": {...}
+}",Quản lý hoàn trả - UC-S08
+,Xem chi tiết yêu cầu hoàn trả,HTTPS,GET /seller/returns/{id},"Auth: Bearer Token
+
+Path: id (string)","{
+  ""id"": ""string"",
+  ""orderId"": ""string"",
+  ""orderDetails"": {...},
+  ""customer"": {
+    ""id"": ""string"",
+    ""name"": ""string"",
+    ""phone"": ""string""
+  },
+  ""returnReason"": ""string"",
+  ""returnType"": ""refund"" | ""exchange"",
+  ""items"": [...],
+  ""evidenceImages"": [""string""],
+  ""status"": ""string"",
+  ""timeline"": [
+    {
+      ""action"": ""string"",
+      ""timestamp"": ""string (ISO 8601)"",
+      ""note"": ""string""
+    }
+  ]
+}",Chi tiết yêu cầu hoàn trả - UC-S08
+,Chấp nhận hoàn trả,HTTPS,POST /seller/returns/{id}/approve,"Auth: Bearer Token
+
+Path: id (string)
+
+Body:
+{
+  ""refundMethod"": ""original_payment"" | ""store_credit"",
+  ""refundAmount"": ""number"",
+  ""note"": ""string"" (optional)
+}","{
+  ""success"": true,
+  ""return"": {
+    ""id"": ""string"",
+    ""status"": ""approved"",
+    ""refundAmount"": ""number"",
+    ""processedAt"": ""string (ISO 8601)""
+  }
+}",Chấp nhận yêu cầu hoàn trả - UC-S08
+,Từ chối hoàn trả,HTTPS,POST /seller/returns/{id}/reject,"Auth: Bearer Token
+
+Path: id (string)
+
+Body:
+{
+  ""reason"": ""string"",
+  ""evidenceUrls"": [""string""] (optional)
+}","{
+  ""success"": true,
+  ""return"": {
+    ""id"": ""string"",
+    ""status"": ""rejected"",
+    ""rejectionReason"": ""string"",
+    ""rejectedAt"": ""string (ISO 8601)""
+  }
+}",Từ chối hoàn trả - UC-S08
+SS-016,Xem danh sách khiếu nại,HTTPS,GET /seller/complaints,"Auth: Bearer Token
+
+Query Params:
+- status (string): ""new"" | ""in_progress"" | ""resolved"" | ""escalated""
+- severity (string): ""low"" | ""medium"" | ""high""
+- page (number)
+- limit (number)","{
+  ""data"": [
+    {
+      ""id"": ""string"",
+      ""orderId"": ""string"",
+      ""customerId"": ""string"",
+      ""customerName"": ""string"",
+      ""complaintType"": ""quality"" | ""delivery"" | ""service"" | ""other"",
+      ""subject"": ""string"",
+      ""severity"": ""string"",
+      ""status"": ""string"",
+      ""createdAt"": ""string (ISO 8601)"",
+      ""deadline"": ""string (ISO 8601)""
+    }
+  ],
+  ""pagination"": {...}
+}",Quản lý khiếu nại - UC-S08
+,Xem chi tiết khiếu nại,HTTPS,GET /seller/complaints/{id},"Auth: Bearer Token
+
+Path: id (string)","{
+  ""id"": ""string"",
+  ""orderId"": ""string"",
+  ""order"": {...},
+  ""customer"": {...},
+  ""complaintType"": ""string"",
+  ""subject"": ""string"",
+  ""description"": ""string"",
+  ""evidence"": [""string""],
+  ""severity"": ""string"",
+  ""status"": ""string"",
+  ""messages"": [
+    {
+      ""senderId"": ""string"",
+      ""senderType"": ""customer"" | ""seller"" | ""admin"",
+      ""message"": ""string"",
+      ""timestamp"": ""string (ISO 8601)""
+    }
+  ],
+  ""resolution"": ""string"" (optional)
+}",Chi tiết khiếu nại - UC-S08
+,Phản hồi khiếu nại,HTTPS,POST /seller/complaints/{id}/respond,"Auth: Bearer Token
+
+Path: id (string)
+
+Body:
+{
+  ""message"": ""string"",
+  ""proposedSolution"": ""string"" (optional)
+}","{
+  ""success"": true,
+  ""complaint"": {
+    ""id"": ""string"",
+    ""status"": ""in_progress"",
+    ""lastResponseAt"": ""string (ISO 8601)""
+  }
+}",Phản hồi khiếu nại - UC-S08
+,Giải quyết khiếu nại,HTTPS,POST /seller/complaints/{id}/resolve,"Auth: Bearer Token
+
+Path: id (string)
+
+Body:
+{
+  ""resolution"": ""string"",
+  ""compensationType"": ""refund"" | ""discount"" | ""voucher"" | ""none"",
+  ""compensationAmount"": ""number"" (optional)
+}","{
+  ""success"": true,
+  ""complaint"": {
+    ""id"": ""string"",
+    ""status"": ""resolved"",
+    ""resolution"": ""string"",
+    ""resolvedAt"": ""string (ISO 8601)""
+  }
+}",Đánh dấu đã giải quyết - UC-S08
+SS-017,Xem danh sách vùng giao hàng,HTTPS,GET /seller/shipping/zones,"Auth: Bearer Token","{
+  ""data"": [
+    {
+      ""id"": ""string"",
+      ""name"": ""string"",
+      ""type"": ""district"" | ""radius"" | ""custom"",
+      ""areas"": [""string""],
+      ""maxDistance"": ""number"" (km),
+      ""baseFee"": ""number"",
+      ""additionalFeePerKm"": ""number"",
+      ""minOrderForFreeShip"": ""number"",
+      ""isActive"": ""boolean"",
+      ""estimatedDeliveryTime"": ""string""
+    }
+  ]
+}",Quản lý vùng giao hàng - UC-S11
+,Thêm vùng giao hàng mới,HTTPS,POST /seller/shipping/zones,"Auth: Bearer Token
+
+Body:
+{
+  ""name"": ""string"",
+  ""type"": ""district"" | ""radius"" | ""custom"",
+  ""areas"": [""string""],
+  ""maxDistance"": ""number"",
+  ""baseFee"": ""number"",
+  ""additionalFeePerKm"": ""number"",
+  ""minOrderForFreeShip"": ""number"",
+  ""estimatedDeliveryTime"": ""string""
+}","{
+  ""success"": true,
+  ""zone"": {
+    ""id"": ""string"",
+    ""name"": ""string"",
+    ""isActive"": true,
+    ""createdAt"": ""string (ISO 8601)""
+  }
+}",Tạo vùng giao hàng - UC-S11
+,Cập nhật vùng giao hàng,HTTPS,PUT /seller/shipping/zones/{id},"Auth: Bearer Token
+
+Path: id (string)
+
+Body: (Partial Zone)
+{...}","{
+  ""success"": true,
+  ""zone"": {...}
+}",Cập nhật vùng - UC-S11
+,Xóa vùng giao hàng,HTTPS,DELETE /seller/shipping/zones/{id},"Auth: Bearer Token
+
+Path: id (string)","{
+  ""success"": true
+}",Xóa vùng - UC-S11
+,Kiểm tra phí ship cho địa chỉ,HTTPS,POST /seller/shipping/calculate,"Auth: Bearer Token
+
+Body:
+{
+  ""address"": ""string"",
+  ""district"": ""string"",
+  ""city"": ""string"",
+  ""coordinates"": {
+    ""lat"": ""number"",
+    ""lng"": ""number""
+  }
+}","{
+  ""canDeliver"": ""boolean"",
+  ""zoneId"": ""string"",
+  ""zoneName"": ""string"",
+  ""shippingFee"": ""number"",
+  ""estimatedTime"": ""string"",
+  ""freeShipThreshold"": ""number""
+}",Tính phí ship - UC-S11
+SS-018,Cập nhật giá vốn sản phẩm,HTTPS,PATCH /seller/products/{id}/cost,"Auth: Bearer Token
+
+Path: id (string)
+
+Body:
+{
+  ""costPrice"": ""number"",
+  ""shippingCost"": ""number"",
+  ""packagingCost"": ""number"",
+  ""otherCosts"": ""number""
+}","{
+  ""success"": true,
+  ""product"": {
+    ""id"": ""string"",
+    ""costPrice"": ""number"",
+    ""sellingPrice"": ""number"",
+    ""profit"": ""number"",
+    ""profitMargin"": ""number"" (%)
+  }
+}",Cập nhật giá vốn - UC-S12
+,Xem phân tích lợi nhuận sản phẩm,HTTPS,GET /seller/products/{id}/profit-analysis,"Auth: Bearer Token
+
+Path: id (string)
+
+Query Params:
+- startDate (string ISO 8601)
+- endDate (string ISO 8601)","{
+  ""productId"": ""string"",
+  ""productName"": ""string"",
+  ""costPrice"": ""number"",
+  ""sellingPrice"": ""number"",
+  ""totalSold"": ""number"",
+  ""revenue"": ""number"",
+  ""totalCost"": ""number"",
+  ""profit"": ""number"",
+  ""profitMargin"": ""number"" (%),
+  ""breakdown"": {
+    ""productCost"": ""number"",
+    ""shippingCost"": ""number"",
+    ""platformFee"": ""number"",
+    ""otherCosts"": ""number""
+  }
+}",Phân tích lợi nhuận chi tiết - UC-S12
+,Xem tổng quan lợi nhuận cửa hàng,HTTPS,GET /seller/reports/profit-overview,"Auth: Bearer Token
+
+Query Params:
+- startDate (string ISO 8601)
+- endDate (string ISO 8601)
+- groupBy (string): ""day"" | ""week"" | ""month""","{
+  ""totalRevenue"": ""number"",
+  ""totalCost"": ""number"",
+  ""grossProfit"": ""number"",
+  ""netProfit"": ""number"",
+  ""profitMargin"": ""number"" (%),
+  ""breakdown"": {
+    ""productCosts"": ""number"",
+    ""shippingCosts"": ""number"",
+    ""platformFees"": ""number"",
+    ""marketingCosts"": ""number"",
+    ""otherExpenses"": ""number""
+  },
+  ""timeline"": [
+    {
+      ""period"": ""string"",
+      ""revenue"": ""number"",
+      ""profit"": ""number""
+    }
+  ]
+}",Tổng quan lợi nhuận - UC-S12
+SS-019,Lấy danh sách tồn kho tổng quan,HTTPS,GET /seller/inventory,"Auth: Bearer Token
+
+Query Params:
+- status (string): ""in_stock"" | ""low_stock"" | ""out_of_stock""
+- category (string)
+- page (number)
+- limit (number)","{
+  ""data"": [
+    {
+      ""productId"": ""string"",
+      ""productName"": ""string"",
+      ""sku"": ""string"",
+      ""currentStock"": ""number"",
+      ""reservedStock"": ""number"",
+      ""availableStock"": ""number"",
+      ""minStockLevel"": ""number"",
+      ""status"": ""string"",
+      ""lastUpdated"": ""string (ISO 8601)""
+    }
+  ],
+  ""summary"": {
+    ""totalProducts"": ""number"",
+    ""inStock"": ""number"",
+    ""lowStock"": ""number"",
+    ""outOfStock"": ""number""
+  },
+  ""pagination"": {...}
+}",Tồn kho tổng quan - US-104
+,Cập nhật cảnh báo tồn kho thấp,HTTPS,PUT /seller/inventory/alert-settings,"Auth: Bearer Token
+
+Body:
+{
+  ""productId"": ""string"",
+  ""minStockLevel"": ""number"",
+  ""enableAlert"": ""boolean""
+}","{
+  ""success"": true,
+  ""settings"": {
+    ""productId"": ""string"",
+    ""minStockLevel"": ""number"",
+    ""enableAlert"": ""boolean""
+  }
+}",Cài đặt cảnh báo tồn kho - US-104
+SS-020,Tạo combo/package sản phẩm,HTTPS,POST /seller/combos,"Auth: Bearer Token
+
+Body:
+{
+  ""name"": ""string"",
+  ""description"": ""string"",
+  ""products"": [
+    {
+      ""productId"": ""string"",
+      ""quantity"": ""number""
+    }
+  ],
+  ""comboPrice"": ""number"",
+  ""discountPercentage"": ""number"",
+  ""imageUrl"": ""string"",
+  ""startDate"": ""string (ISO 8601)"",
+  ""endDate"": ""string (ISO 8601)"",
+  ""maxQuantity"": ""number"" (optional)
+}","{
+  ""success"": true,
+  ""combo"": {
+    ""id"": ""string"",
+    ""name"": ""string"",
+    ""originalPrice"": ""number"",
+    ""comboPrice"": ""number"",
+    ""savings"": ""number"",
+    ""status"": ""active"",
+    ""createdAt"": ""string (ISO 8601)""
+  }
+}",Tạo combo suất ăn - UC-S04
+,Xem danh sách combo,HTTPS,GET /seller/combos,"Auth: Bearer Token
+
+Query Params:
+- status (string): ""active"" | ""expired"" | ""draft""
+- page (number)
+- limit (number)","{
+  ""data"": [
+    {
+      ""id"": ""string"",
+      ""name"": ""string"",
+      ""products"": [...],
+      ""comboPrice"": ""number"",
+      ""sold"": ""number"",
+      ""status"": ""string""
+    }
+  ],
+  ""pagination"": {...}
+}",Danh sách combo - UC-S04
+,Cập nhật combo,HTTPS,PUT /seller/combos/{id},"Auth: Bearer Token
+
+Path: id (string)
+
+Body: (Partial Combo)
+{...}","{
+  ""success"": true,
+  ""combo"": {...}
+}",Cập nhật combo - UC-S04
+,Xóa combo,HTTPS,DELETE /seller/combos/{id},"Auth: Bearer Token
+
+Path: id (string)","{
+  ""success"": true
+}",Xóa combo - UC-S04

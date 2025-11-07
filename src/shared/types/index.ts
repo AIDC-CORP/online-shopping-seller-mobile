@@ -24,6 +24,51 @@ export interface Product {
   unit: string;
   imageUrl: string;
   sold?: number; // Số lượng đã bán
+  expiryDate?: string; // Ngày hết hạn (ISO format: YYYY-MM-DD)
+  importDate?: string; // Ngày nhập hàng (ISO format: YYYY-MM-DD)
+  shelfLife?: number; // Thời hạn sử dụng (số ngày)
+  // Combo & Discount fields
+  isCombo?: boolean; // Có phải là combo không
+  comboProducts?: string[]; // Array of product IDs trong combo
+  originalPrice?: number; // Giá gốc (trước khi giảm hoặc combo)
+  discountPercent?: number; // % giảm giá
+}
+
+export interface ComboProduct {
+  productId: string;
+  quantity: number; // Số lượng sản phẩm trong combo (VD: 2kg táo)
+}
+
+export interface Combo {
+  id: string;
+  name: string;
+  description: string;
+  products: ComboProduct[]; // Danh sách sản phẩm với số lượng
+  originalPrice: number; // Tổng giá gốc các sản phẩm
+  comboPrice: number; // Giá combo sau giảm
+  discountPercent: number; // % giảm giá
+  imageUrl: string;
+  stock: number; // Số lượng combo có sẵn
+  sold?: number; // Số combo đã bán
+  validFrom?: string; // Ngày bắt đầu
+  validUntil?: string; // Ngày kết thúc
+  createdAt: string;
+}
+
+export interface Voucher {
+  id: string;
+  code: string; // Mã voucher (VD: FRESH50)
+  description: string; // Mô tả voucher
+  discountType: 'percent' | 'fixed'; // Loại giảm: % hoặc số tiền cố định
+  discountValue: number; // Giá trị giảm (VD: 20 = 20% hoặc 20000đ)
+  minOrderValue?: number; // Giá trị đơn hàng tối thiểu
+  maxDiscount?: number; // Giảm tối đa (chỉ cho %)
+  usageLimit: number; // Số lần sử dụng tối đa
+  usedCount: number; // Đã sử dụng bao nhiêu lần
+  validFrom: string; // Ngày bắt đầu
+  validUntil: string; // Ngày hết hạn
+  isActive: boolean; // Có đang active không
+  createdAt: string;
 }
 
 export interface StoreInfo {
@@ -34,6 +79,14 @@ export interface StoreInfo {
   description: string;
   coverImageUrl: string;
   avatarUrl: string;
+  email?: string;
+  website?: string;
+  paymentMethods?: string;
+  shippingPolicy?: string;
+  returnPolicy?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
 }
 
 export interface DashboardStats {
@@ -41,4 +94,173 @@ export interface DashboardStats {
   totalOrders: number;
   successfulOrders: number;
   cancelledOrders: number;
+}
+
+export interface Message {
+  id: string;
+  text: string;
+  timestamp: string;
+  isFromSeller: boolean;
+  isRead: boolean;
+}
+
+export interface ChatConversation {
+  id: string;
+  customerName: string;
+  customerAvatar?: string;
+  lastMessage: string;
+  lastMessageTime: string;
+  unreadCount: number;
+  messages: Message[];
+}
+
+// Delivery Management Types
+export enum DeliveryStatus {
+  Pending = 'Chờ lấy hàng',
+  PickedUp = 'Đã lấy hàng',
+  InTransit = 'Đang vận chuyển',
+<<<<<<< HEAD
+  OutForDelivery = 'Đang giao hàng',
+  Delivered = 'Đã giao thành công',
+  Failed = 'Giao thất bại',
+  Cancelled = 'Đã hủy',
+=======
+  Delivering = 'Đang giao',
+  Delivered = 'Đã giao',
+  Failed = 'Giao thất bại',
+  Returned = 'Đã hoàn',
+>>>>>>> delivery
+}
+
+export enum DeliveryPartner {
+  GrabExpress = 'GrabExpress',
+<<<<<<< HEAD
+  Gojek = 'Gojek',
+  JT = 'J&T Express',
+  NinjaDan = 'Ninja Van',
+  Shopee = 'Shopee Express',
+  Viettel = 'Viettel Post',
+  GHTK = 'GHTK',
+  BestExpress = 'Best Express',
+=======
+  GoJek = 'GoJek',
+  Ninja = 'Ninja Van',
+  GHTK = 'GHTK',
+  GHN = 'Giao Hàng Nhanh',
+  ViettelPost = 'Viettel Post',
+  JT = 'J&T Express',
+  SelfDelivery = 'Tự giao hàng',
+>>>>>>> delivery
+}
+
+export interface DeliveryLocation {
+  address: string;
+<<<<<<< HEAD
+  lat: number;
+  lng: number;
+}
+
+export interface DeliveryDriver {
+  name: string;
+  phone: string;
+  vehicleNumber?: string;
+}
+
+export interface DeliveryTrackingPoint {
+  timestamp: string;
+  status: DeliveryStatus;
+  location?: string;
+  note?: string;
+=======
+  ward?: string;
+  district: string;
+  city: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+}
+
+export interface DeliveryDriver {
+  id: string;
+  name: string;
+  phone: string;
+  vehicleType: string; // 'motorbike' | 'car' | 'bicycle'
+  vehicleNumber?: string;
+  rating?: number;
+  avatar?: string;
+>>>>>>> delivery
+}
+
+export interface Delivery {
+  id: string;
+  orderId: string;
+<<<<<<< HEAD
+  customerName: string;
+  customerPhone: string;
+  status: DeliveryStatus;
+  partner: DeliveryPartner;
+  pickupLocation: DeliveryLocation;
+  deliveryLocation: DeliveryLocation;
+  driver?: DeliveryDriver;
+  trackingNumber: string;
+  estimatedDelivery: string;
+  actualDelivery?: string;
+  isCOD: boolean;
+  codAmount?: number;
+  deliveryFee: number;
+  trackingHistory: DeliveryTrackingPoint[];
+  proofOfDelivery?: {
+    imageUrl: string;
+    signature?: string;
+    receiverName: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+=======
+  trackingNumber: string;
+  partner: DeliveryPartner;
+  status: DeliveryStatus;
+  
+  // Customer info
+  customerName: string;
+  customerPhone: string;
+  deliveryAddress: DeliveryLocation;
+  
+  // Driver info (if assigned)
+  driver?: DeliveryDriver;
+  
+  // Pricing
+  shippingFee: number;
+  codAmount?: number; // Cash on Delivery amount
+  
+  // Timestamps
+  createdAt: string;
+  pickedUpAt?: string;
+  estimatedDeliveryTime?: string;
+  deliveredAt?: string;
+  
+  // Package info
+  weight?: number; // kg
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
+  };
+  
+  // Additional info
+  notes?: string;
+  failureReason?: string;
+  proofOfDelivery?: string; // URL to image
+  
+  // Tracking history
+  trackingHistory: DeliveryTrackingPoint[];
+}
+
+export interface DeliveryTrackingPoint {
+  status: DeliveryStatus;
+  timestamp: string;
+  location?: string;
+  note?: string;
+>>>>>>> delivery
 }

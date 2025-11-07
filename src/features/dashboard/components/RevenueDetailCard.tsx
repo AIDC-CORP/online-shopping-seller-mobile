@@ -12,6 +12,35 @@ interface RevenueDetailCardProps {
   onClose: () => void;
 }
 
+// Mini bar chart component
+const MiniBarChart: React.FC<{ data: number[] }> = ({ data }) => {
+  const maxValue = Math.max(...data);
+  
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: 60, gap: 4 }}>
+      {data.map((value, index) => {
+        const height = (value / maxValue) * 60;
+        return (
+          <View key={index} style={{ flex: 1, alignItems: 'center' }}>
+            <View
+              style={{
+                width: '100%',
+                height: height || 5,
+                backgroundColor: '#10b981',
+                borderRadius: 4,
+                opacity: 0.8,
+              }}
+            />
+            <Text style={{ fontSize: 9, color: '#6b7280', marginTop: 4 }}>
+              T{index + 1}
+            </Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+};
+
 export const RevenueDetailCard: React.FC<RevenueDetailCardProps> = ({
   revenue,
   totalOrders,
@@ -23,6 +52,28 @@ export const RevenueDetailCard: React.FC<RevenueDetailCardProps> = ({
 }) => {
   const avgPerOrder = Math.round(revenue / totalOrders);
   const successRate = Math.round((successfulOrders / totalOrders) * 100);
+  
+  // Mock data cho biểu đồ 7 ngày
+  const weeklyRevenue = [12500000, 15300000, 18200000, 14800000, 21000000, 19500000, 24600000];
+  
+  // Tính % so với kỳ trước (mock)
+  const previousRevenue = revenue * 0.85; // Giả sử kỳ trước thấp hơn 15%
+  const changePercent = Math.round(((revenue - previousRevenue) / previousRevenue) * 100);
+  const isIncrease = changePercent > 0;
+  
+  // Top sản phẩm đóng góp doanh thu (mock)
+  const topProducts = [
+    { name: 'iPhone 12 Pro Max', revenue: revenue * 0.35 },
+    { name: 'AirPods Pro', revenue: revenue * 0.25 },
+    { name: 'MacBook Air M2', revenue: revenue * 0.20 },
+  ];
+  
+  // Phương thức thanh toán (mock)
+  const paymentMethods = [
+    { name: 'COD', icon: '💵', percent: 45, color: '#10b981' },
+    { name: 'Chuyển khoản', icon: '🏦', percent: 35, color: '#3b82f6' },
+    { name: 'Ví điện tử', icon: '💳', percent: 20, color: '#8b5cf6' },
+  ];
 
   return (
     <View className="absolute inset-0 bg-black/50 justify-center items-center px-4 z-50">
@@ -51,6 +102,100 @@ export const RevenueDetailCard: React.FC<RevenueDetailCardProps> = ({
           <View className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-5 mb-4 shadow-md">
             <Text className="text-emerald-500 text-sm font-medium mb-1">Tổng doanh thu</Text>
             <Text className="text-black text-4xl font-extrabold">{formatCurrency(revenue)}</Text>
+            
+            {/* So sánh kỳ trước */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 6 }}>
+              <View style={{ 
+                backgroundColor: isIncrease ? '#dcfce7' : '#fee2e2',
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+                borderRadius: 6,
+              }}>
+                <Text style={{ 
+                  color: isIncrease ? '#16a34a' : '#dc2626',
+                  fontSize: 12,
+                  fontWeight: '700',
+                }}>
+                  {isIncrease ? '↑' : '↓'} {Math.abs(changePercent)}%
+                </Text>
+              </View>
+              <Text style={{ color: '#6b7280', fontSize: 12 }}>
+                so với kỳ trước
+              </Text>
+            </View>
+          </View>
+
+          {/* Biểu đồ doanh thu 7 ngày */}
+          <View className="bg-white rounded-xl p-4 mb-4 border border-gray-200">
+            <Text className="text-gray-700 font-semibold mb-3 text-sm">📊 Doanh thu 7 ngày qua</Text>
+            <MiniBarChart data={weeklyRevenue} />
+          </View>
+
+          {/* Top sản phẩm */}
+          <View className="bg-white rounded-xl p-4 mb-4 border border-gray-200">
+            <Text className="text-gray-700 font-semibold mb-3 text-sm">🏆 Top sản phẩm đóng góp</Text>
+            <View style={{ gap: 10 }}>
+              {topProducts.map((product, index) => (
+                <View key={index} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                  <View style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 12,
+                    backgroundColor: index === 0 ? '#fbbf24' : index === 1 ? '#d1d5db' : '#c2410c',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <Text style={{ color: 'white', fontSize: 11, fontWeight: '700' }}>
+                      {index + 1}
+                    </Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#1f2937' }} numberOfLines={1}>
+                      {product.name}
+                    </Text>
+                    <Text style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>
+                      {formatCurrency(product.revenue)} ({Math.round((product.revenue / revenue) * 100)}%)
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* Phương thức thanh toán */}
+          <View className="bg-white rounded-xl p-4 mb-4 border border-gray-200">
+            <Text className="text-gray-700 font-semibold mb-3 text-sm">💰 Phương thức thanh toán</Text>
+            <View style={{ gap: 10 }}>
+              {paymentMethods.map((method, index) => (
+                <View key={index}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <Text style={{ fontSize: 16 }}>{method.icon}</Text>
+                      <Text style={{ fontSize: 13, color: '#4b5563', fontWeight: '500' }}>
+                        {method.name}
+                      </Text>
+                    </View>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: method.color }}>
+                      {method.percent}%
+                    </Text>
+                  </View>
+                  {/* Progress bar */}
+                  <View style={{ 
+                    height: 6, 
+                    backgroundColor: '#f3f4f6', 
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                  }}>
+                    <View style={{
+                      height: 6,
+                      width: `${method.percent}%`,
+                      backgroundColor: method.color,
+                      borderRadius: 3,
+                    }} />
+                  </View>
+                </View>
+              ))}
+            </View>
           </View>
 
           {/* Stats Grid */}

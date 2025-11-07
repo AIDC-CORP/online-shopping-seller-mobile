@@ -1,8 +1,14 @@
 import { useState } from 'react';
-import mockApiService from '@/src/services/mockApiService';
+
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  isSetupCompleted: boolean;
+}
 
 interface UseLoginResult {
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<User | null>;
   isLoading: boolean;
   error: string;
   clearError: () => void;
@@ -25,46 +31,55 @@ export const useLogin = (): UseLoginResult => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<User | null> => {
     // Validate input
     if (!email || !password) {
       setError('Vui lòng nhập email và mật khẩu');
-      return false;
+      return null;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Email không hợp lệ');
-      return false;
+      return null;
     }
 
     // Password validation (minimum 6 characters)
     if (password.length < 6) {
       setError('Mật khẩu phải có ít nhất 6 ký tự');
-      return false;
+      return null;
     }
 
     setIsLoading(true);
     setError('');
 
     try {
-      const response = await mockApiService.login(email, password);
+      // Mock login - simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (response.success) {
-        // Có thể lưu token vào AsyncStorage ở đây
-        // await AsyncStorage.setItem('authToken', response.data.token);
-        setIsLoading(false);
-        return true;
-      } else {
-        setError(response.error || 'Đăng nhập thất bại');
-        setIsLoading(false);
-        return false;
-      }
+      // Mock: Check if user needs setup based on email
+      // Email with "new" = needs setup, otherwise already setup
+      const needsSetup = email.includes('new');
+      
+      // Mock user data from API
+      const user: User = {
+        id: 'u1',
+        email: email,
+        name: 'Người bán mới',
+        isSetupCompleted: !needsSetup, // false if email contains "new"
+      };
+      
+      // Success - could save token to AsyncStorage here
+      // await AsyncStorage.setItem('authToken', 'mock-token');
+      // await AsyncStorage.setItem('userId', user.id);
+      
+      setIsLoading(false);
+      return user;
     } catch (err: any) {
       setError(err?.message || 'Có lỗi xảy ra, vui lòng thử lại');
       setIsLoading(false);
-      return false;
+      return null;
     }
   };
 

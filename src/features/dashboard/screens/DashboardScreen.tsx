@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { mockDashboardStatsByPeriod } from '../../shared/data/mockData';
+import { mockDashboardStatsByPeriod } from '../../../shared/data/mockData';
 import { ChartBarIcon, PackageIcon, CheckCircleIcon, XCircleIcon } from '@/src/components/icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Product } from '../../shared/types';
-import { RevenueDetailCard } from './components/RevenueDetailCard';
-import { OrdersDetailCard } from './components/OrdersDetailCard';
-import { ProductDetailCard } from './components/ProductDetailCard';
+import { Product } from '../../../shared/types';
+import { RevenueDetailCard } from '../components/RevenueDetailCard';
+import { OrdersDetailCard } from '../components/OrdersDetailCard';
+import { ProductDetailCard } from '../components/ProductDetailCard';
 
 type PeriodType = 'today' | 'week' | 'month';
 
@@ -28,7 +27,14 @@ const StatCard: React.FC<{
     </View>
     <View className="flex-1">
       <Text className="text-xs text-gray-600 font-medium">{title}</Text>
-      <Text className="text-lg font-bold text-gray-900 mt-0.5">{value}</Text>
+      <Text 
+        className="text-lg font-bold text-gray-900 mt-0.5"
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >
+        {value}
+      </Text>
     </View>
   </TouchableOpacity>
 );
@@ -65,8 +71,8 @@ const DashboardScreen: React.FC = () => {
   ];
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-gray-50/50">
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 20 }}>
+    <View className="flex-1 bg-gray-50/50">
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 110 }}>
         <View className="space-y-6">
           <Text className="text-2xl font-bold text-gray-800">Lên kế hoạch bán hàng</Text>
 
@@ -95,11 +101,11 @@ const DashboardScreen: React.FC = () => {
                 ))}
               </View>
             </View>
-            <View className="flex-row space-x-4">
-              <View className="flex-1 space-y-4">
+            <View style={{ flexDirection: 'row', gap: 16 }}>
+              <View style={{ flex: 1, gap: 16 }}>
                  <StatCard 
                    title="Doanh thu" 
-                   value={formatCurrency(stats.revenue).replace(/\s/g, '')} 
+                   value={formatCurrency(stats.revenue).replace(/\s/g, '').replace('₫', ' ₫')} 
                    icon={<ChartBarIcon className="h-5 w-5" color="#047857" />} 
                    iconBgColor="bg-emerald-200" 
                    iconColor="#047857"
@@ -114,7 +120,7 @@ const DashboardScreen: React.FC = () => {
                    onPress={() => setShowOrdersDetail('success')}
                  />
               </View>
-              <View className="flex-1 space-y-4">
+              <View style={{ flex: 1, gap: 16 }}>
                 <StatCard 
                   title="Tổng đơn" 
                   value={stats.totalOrders.toString()} 
@@ -195,7 +201,7 @@ const DashboardScreen: React.FC = () => {
           onClose={() => setSelectedProduct(null)}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
