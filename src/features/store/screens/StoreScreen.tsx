@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, Image, ImageBackground, TouchableOpacity, Switch, Modal, TextInput, Alert, Share } from 'react-native';
-import { mockStoreInfo, mockStoreStats, mockStoreReviews, mockStoreFollowers, mockStoreAnalytics, mockShareStoreData } from '../../shared/data/mockData';
-import { StoreInfo } from '../../shared/types';
+import { mockStoreInfo, mockStoreStats, mockStoreReviews, mockStoreFollowers, mockStoreAnalytics, mockShareStoreData } from '../../../shared/data/mockData';
+import { StoreInfo } from '../../../shared/types';
 import { PencilIcon } from '@/src/components/icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import IconButton from '@/components/ui/icon-button';
 import Button from '@/components/ui/button';
 
@@ -131,8 +130,8 @@ const StoreScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-gray-50/50">
-      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+    <View className="flex-1 bg-gray-50/50">
+      <ScrollView contentContainerStyle={{ paddingBottom: 110 }}>
         {/* Store Status Toggle */}
         <View className="bg-white px-4 py-3 flex-row justify-between items-center border-b border-gray-200">
           <View className="flex-1">
@@ -703,7 +702,7 @@ const StoreScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 

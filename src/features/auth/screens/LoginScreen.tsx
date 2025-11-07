@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import Button from '@/components/ui/button';
-import { useLogin } from './hooks';
+import { useLogin } from '../hooks/useLogin';
 import { useAuth } from '@/src/context/AuthContext';
 import { useRouter } from 'expo-router';
 

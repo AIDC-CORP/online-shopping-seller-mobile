@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Combo, Voucher } from '../../shared/types';
-import { mockCombos, mockVouchers, mockProducts } from '../../shared/data/mockData';
-import AddOptionMenu from '../products/components/AddOptionMenu';
-import AddCombo from '../products/components/AddCombo';
-import AddVoucher from '../products/components/AddVoucher';
+import { Combo, Voucher } from '../../../shared/types';
+import { mockCombos, mockVouchers, mockProducts } from '../../../shared/data/mockData';
+import AddOptionMenu from '../../products/components/AddOptionMenu';
+import AddCombo from '../../products/components/AddCombo';
+import AddVoucher from '../../products/components/AddVoucher';
 
 type TabType = 'combos' | 'vouchers' | 'flashsales';
 

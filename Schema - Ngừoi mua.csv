@@ -1,0 +1,316 @@
+ID (User Story),Feature (Tính năng),Giao thức,Endpoint (Phương thức & Đường dẫn),Đầu vaof,Đầu ra (Output),
+"US-001 &
+
+ US-002",Gửi mã OTP xác thực số điện thoại,HTTPS,POST /auth/send-otp,"Body:
+{
+""phone"": ""string""
+}","{
+ ""success"": true
+}",Để sau
+,Xác thực OTP & Đăng nhập/Đăng ký tài khoản,HTTPS,POST /auth/verify-otp,"Body:
+{
+ ""otp"": ""string""
+}","{
+ ""success"": true
+}",
+US-003,Tạo mới Hồ sơ sức khỏe cá nhân ,HTTPS,POST /user/profile,"{
+  ""name"": ""string"",
+  ""age"": ""number"",
+  ""location"": ""string"",
+  ""health"": 
+     {
+       ""height"": ""number"",
+        ""weight"": ""number"",
+        ""activityLevel"": ""string"",
+        ""alleryInformation"":""string""
+     }
+}","{
+ ""success"": true
+}",xong
+,Xem chi tiết Hồ sơ sức khỏe cá nhân,HTTPS,GET /user/profile,Auth: Bearer Token,"
+{
+ ""id"": ""string"" (hoặc uuid),
+ ""phone"": ""string"",
+ ""name"": ""string"",
+ ""age"": ""number"",
+ ""location"": ""string"",
+ ""health"": 
+     {
+       ""height"": ""number"",
+        ""weight"": ""number"",
+        ""activityLevel"": ""string"",
+        ""alleryInformation"":""string""
+     }
+}",xong
+,Thêm thành viên gia đình (Tạo hồ sơ thành viên),HTTPS,PATCH /user/profile,"Auth: Bearer Token
+
+Body: (Partial User)
+
+json
+{ 
+""weight"": 71, ""allergies"": ""Hải sản""
+}","{
+ ""success"": true
+}",xong
+(Codebase),Thêm thành viên gia đình (Tạo hồ sơ thành viên),HTTPS,POST /user/family-members,"Auth: Bearer Token
+Body: (Không cần id)
+{
+ ""name"": ""string"",
+ ""age"": ""number"",
+ ""location"": ""string"",
+""health"": 
+     {
+       ""height"": ""number"",
+        ""weight"": ""number"",
+        ""activityLevel"": ""string"",
+        ""alleryInformation"":""string""
+     }
+}","{
+ ""success"": true
+}",xong
+,Xem chi tiết Hồ sơ sức khỏe thanhf viên gia đình,HTTPS,GET /user/family-members,,"{
+ ""name"": ""string"",
+ ""age"": ""number"",
+ ""location"": ""string"",
+ ""health"": 
+     {
+       ""height"": ""number"",
+        ""weight"": ""number"",
+        ""activityLevel"": ""string"",
+        ""alleryInformation"":""string""
+     }
+}",xong
+,Cập nhật thông tin thành viên gia đình,HTTPS,PATCH /user/family-members/{id},"Auth: Bearer Token
+Path: id (string/uuid)
+Body: (Partial FamilyMember)
+json
+{
+""age"": 6
+}","{
+ ""success"":true
+}",xong
+US-004,Chọn chế độ mua sắm,HTTPS,PUT /user/preferences/shopping-mode,"Auth: Bearer Token
+
+Body:
+
+json<br>{<br> ""mode"": ""AI"" <br>}<br>","json<br>{<br> ""success"": true,<br> ""mode"": ""AI""<br>}<br>",
+,,HTTPS,GET /user/preferences,Auth: Bearer Token,"json<br>{<br> ""shoppingMode"": ""AI"",<br> ...<br>}<br>",
+US-005,Tạo mới & Lấy gợi ý thực đơn hàng ngày từ AI,HTTPS,POST /ai/menu-suggestion,"{
+  ""participants"": {
+    ""breakfast"": [""id_user_b"", ""id_user_c""],
+    ""lunch"": [""id_user_b"", ""id_user_c""],
+    ""dinner"": [""id_user_b""]
+  }
+}","{
+  ""id"": ""string""/uuid, 
+  ""meals"": [ 
+    {
+      ""name"": ""Bữa sáng""(""string""), 
+      ""dish"": ""string"", // Tên món ăn
+      ""total_calories"": number, /
+      ""ingredients"": [ 
+        {
+          ""name"": ""string"", // Tên nguyên liệu
+          ""quantity"": number, // Số lượng
+          ""unit"": ""number"" // Đơn vị (gram)
+        },
+      ]
+    },
+  ]
+}",
+,,HTTPS,GET /ai/menu-suggestion/{id},"Auth: Bearer Token
+
+Path: id (string)","json<br>{<br> ""id"": ""string"",<br> ""meals"": [<br> {<br> ""name"": ""string"",<br> ""dish"": ""string"",<br> ""ingredients"": [""string""]<br> }<br> ]<br>}<br>",
+,,HTTPS,PUT /ai/menu-suggestion/replace-item,"Auth: Bearer Token
+
+Body:
+
+json<br>{<br> ""mealId"": ""string"",<br> ""oldItem"": ""string"",<br> ""newItem"": ""string""<br>}<br>","json<br>{<br> ""id"": ""string"",<br> ""meals"": [<br> {<br> ""name"": ""string"",<br> ""dish"": ""string"",<br> ""ingredients"": [""string""]<br> }<br> ]<br>}<br>",
+US-006,Tìm kiếm & lọc sản phẩm,HTTPS,GET /products,"Query Params:
+
+query (string)
+
+category (string)
+
+page (number)
+
+limit (number)","{
+  ""data"": [
+    {
+      ""id"": ""string"",
+      ""name"": ""string"",
+      ""imageUrl"": ""string"",
+      ""price"": ""number"",
+      ""store"": ""string"",
+      ""category"": ""string""
+    }
+  ],
+  ""pagination"": {
+    ""currentPage"": ""number"",
+    ""limit"": ""number"",
+    ""totalPages"": ""number"",
+    ""totalItems"": ""number""
+  }
+}",
+US-007,Xem chi tiết giỏ hàng hiện tại,HTTPS,GET /cart,Auth: Bearer Token,"{
+  ""items"": [
+    {
+      ""itemId"": ""string"",
+      ""product"": {
+        ""id"": ""string"",
+        ""name"": ""string"",
+        ""imageUrl"": ""string"",
+        ""price"": ""number"",
+        ""store"": ""string"",
+        ""category"": ""string""
+      },
+      ""quantity"": ""number""
+    }
+  ],
+  ""subTotal"": ""number"",
+  ""shippingFee"": ""number"",
+  ""total"": ""number""
+}",
+,Thêm sản phẩm mới vào giỏ hàng,HTTPS,POST /cart/items,"Auth: Bearer Token
+
+Body:
+
+json<br>{<br> ""productId"": ""string"",<br> ""quantity"": ""number""<br>}<br>",(Tương tự GET /cart - Trả về giỏ hàng đã cập nhật),
+,Cập nhật số lượng sản phẩm trong giỏ hàng,HTTPS,PATCH /cart/items/{itemId},"Auth: Bearer Token
+
+Path: itemId (string)
+
+Body:
+
+json<br>{<br> ""quantity"": ""number""<br>}<br>",(Tương tự GET /cart - Trả về giỏ hàng đã cập nhật),
+,Xóa một sản phẩm khỏi giỏ hàng,HTTPS,DELETE /cart/items/{itemId},"Auth: Bearer Token
+
+Path: itemId (string)",(Tương tự GET /cart - Trả về giỏ hàng đã cập nhật),
+US-008,Tạo đơn hàng & Thanh toán,HTTPS,POST /orders,"Auth: Bearer Token
+
+Header: Idempotency-Key: <uuid>
+
+Body:
+
+json
+{
+ ""paymentMethod"": ""wallet""
+}","`json
+{
+ ""success"": true,
+ ""order"": {
+ ""id"": ""string"",
+ ""date"": ""string (ISO 8601)"",
+ ""status"": ""pending
+  }
+}",
+,Webhook: Nhận kết quả thanh toán từ cổng TT,HTTPS,POST /checkout/result-callback,"(Webhook từ cổng thanh toán)
+
+Body: (Payload từ cổng TT)","json
+{""received"": true}",
+(Codebase),Xem danh sách/Lịch sử các đơn hàng đã đặt,HTTPS,GET /orders,"Auth: Bearer Token
+
+Query Params: page, limit","{
+  ""data"": [
+    {
+      ""id"": ""string"",
+      ""date"": ""string (ISO 8601)"",
+      ""status"": ""string"",
+      ""total"": ""number"",
+      ""itemCount"": ""number""
+    }
+  ],
+  ""pagination"": {
+    ""currentPage"": ""number"",
+    ""limit"": ""number"",
+    ""totalPages"": ""number"",
+    ""totalItems"": ""number""
+  }
+}",
+(Codebase),Xem chi tiết một đơn hàng cụ thể,HTTPS,GET /orders/{id},"Auth: Bearer Token
+
+Path: id (string)","`json
+{
+ ""id"": ""string"",
+ ""date"": ""string (ISO 8601)"",
+ ""status"": ""string""
+}",
+(Codebase),Xem lịch sử giao dịch Ví điện tử,HTTPS,GET /wallet/transactions,"Auth: Bearer Token
+
+Query Params: page, limit","`json
+{
+ ""data"": [
+ {
+ ""id"": ""string"",
+ ""type"": ""string""
+ }
+ ]
+}",
+(Codebase),Nạp tiền vào Ví điện tử (Tạo giao dịch nạp),HTTPS,POST /wallet/top-up,"Auth: Bearer Token
+
+Header: Idempotency-Key: <uuid>
+
+Body:
+
+json
+{
+""amount"": ""number"",
+ ""method"": ""string""
+}","{
+""success"": true,
+""newBalance"": ""number""
+}",
+(Codebase),Xem danh sách các thông báo người dùng,HTTPS,GET /notifications,"Auth: Bearer Token
+
+Query Params: page, limit","{
+  ""data"": [
+    {
+      ""id"": ""string"",
+      ""type"": ""order_update"",
+      ""message"": ""string"", 
+      ""isRead"": ""boolean"",
+      ""timestamp"": ""string (ISO 8601)""
+    }
+  ]
+  // Nếu có Query Params (page, limit), nên có thêm phân trang:
+  // ""pagination"": { ... } 
+}",
+(Codebase),,HTTPS,PATCH /notifications/{id},"Auth: Bearer Token
+
+Path: id (string)
+
+Body:
+
+json<br>{<br> ""isRead"": true<br>}<br>","json<br>{<br> ""success"": true<br>}<br>",
+(Codebase),Gửi Push Notification theo sự kiện Backend,Push (FCM/APNs),(Server-to-Client),(Sự kiện Backend),Client nhận Push Notification,
+(Codebase),Hỗ trợ (AI),HTTPS,POST /ai/chatbot,"Auth: Bearer Token
+
+Body:
+
+`{
+  ""history"": [
+    {
+      ""id"": ""string""/uuid,
+      ""text"": ""string"",
+      ""sender"": ""user""
+    }
+  ]
+}","{
+  ""id"": ""string"",
+  ""text"": ""string"",
+  ""sender"": ""AI"",
+  ""timestamp"": ""string (ISO 8601)""
+}",
+(Codebase),Hỗ trợ (Người bán),WebSocket (WSS),WSS /support-chat,"Gửi tin:
+
+{
+  ""id"":""string""/uuid
+  ""text"": ""string""
+}","Nhận tin:
+
+{
+  ""id"": ""string"",
+  ""text"": ""string"",
+  ""sender"": ""seller"",
+  ""timestamp"": ""string (ISO 8601)""
+}",

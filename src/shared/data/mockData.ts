@@ -603,6 +603,7 @@ export const mockShareStoreData = {
   },
 };
 
+<<<<<<< HEAD
 // Mock Delivery Data
 export const mockDeliveries: Delivery[] = [
   {
@@ -902,5 +903,273 @@ export const mockDeliveries: Delivery[] = [
     ],
     createdAt: '2025-11-07T15:00:00',
     updatedAt: '2025-11-07T15:45:00',
+=======
+// Delivery Management Mock Data
+export const mockDeliveries: Delivery[] = [
+  {
+    id: 'd1',
+    orderId: 'o1',
+    trackingNumber: 'GRAB2025110701',
+    partner: DeliveryPartner.GrabExpress,
+    status: DeliveryStatus.InTransit,
+    customerName: 'Nguyễn Văn A',
+    customerPhone: '0901234567',
+    deliveryAddress: {
+      address: '123 Nguyễn Huệ',
+      ward: 'Phường Bến Nghé',
+      district: 'Quận 1',
+      city: 'TP. Hồ Chí Minh',
+      coordinates: { lat: 10.7769, lng: 106.7009 }
+    },
+    driver: {
+      id: 'dr1',
+      name: 'Trần Văn B',
+      phone: '0912345678',
+      vehicleType: 'motorbike',
+      vehicleNumber: '59A-12345',
+      rating: 4.8,
+    },
+    shippingFee: 25000,
+    codAmount: 320000,
+    createdAt: '2025-11-07T08:00:00',
+    pickedUpAt: '2025-11-07T08:30:00',
+    estimatedDeliveryTime: '2025-11-07T10:00:00',
+    weight: 2.5,
+    notes: 'Giao trước 10h sáng',
+    trackingHistory: [
+      {
+        status: DeliveryStatus.Pending,
+        timestamp: '2025-11-07T08:00:00',
+        location: 'Cửa hàng Fresh Food',
+        note: 'Đơn hàng đã được tạo'
+      },
+      {
+        status: DeliveryStatus.PickedUp,
+        timestamp: '2025-11-07T08:30:00',
+        location: 'Cửa hàng Fresh Food',
+        note: 'Tài xế đã lấy hàng'
+      },
+      {
+        status: DeliveryStatus.InTransit,
+        timestamp: '2025-11-07T09:00:00',
+        location: 'Trung tâm phân loại Quận 1',
+        note: 'Đang vận chuyển đến địa chỉ giao hàng'
+      }
+    ]
+  },
+  {
+    id: 'd2',
+    orderId: 'o2',
+    trackingNumber: 'GHN2025110702',
+    partner: DeliveryPartner.GHN,
+    status: DeliveryStatus.Delivering,
+    customerName: 'Trần Thị B',
+    customerPhone: '0923456789',
+    deliveryAddress: {
+      address: '456 Lê Lợi',
+      ward: 'Phường 4',
+      district: 'Quận 3',
+      city: 'TP. Hồ Chí Minh',
+    },
+    driver: {
+      id: 'dr2',
+      name: 'Lê Văn C',
+      phone: '0934567890',
+      vehicleType: 'motorbike',
+      vehicleNumber: '59B-67890',
+      rating: 4.6,
+    },
+    shippingFee: 30000,
+    codAmount: 450000,
+    createdAt: '2025-11-07T07:30:00',
+    pickedUpAt: '2025-11-07T08:00:00',
+    estimatedDeliveryTime: '2025-11-07T09:30:00',
+    weight: 3.2,
+    trackingHistory: [
+      {
+        status: DeliveryStatus.Pending,
+        timestamp: '2025-11-07T07:30:00',
+        note: 'Đơn hàng đã được tạo'
+      },
+      {
+        status: DeliveryStatus.PickedUp,
+        timestamp: '2025-11-07T08:00:00',
+        note: 'Tài xế đã lấy hàng'
+      },
+      {
+        status: DeliveryStatus.InTransit,
+        timestamp: '2025-11-07T08:30:00',
+        note: 'Đang vận chuyển'
+      },
+      {
+        status: DeliveryStatus.Delivering,
+        timestamp: '2025-11-07T09:15:00',
+        note: 'Tài xế đang giao hàng'
+      }
+    ]
+  },
+  {
+    id: 'd3',
+    orderId: 'o5',
+    trackingNumber: 'GHTK2025110703',
+    partner: DeliveryPartner.GHTK,
+    status: DeliveryStatus.Delivered,
+    customerName: 'Vũ Văn E',
+    customerPhone: '0945678901',
+    deliveryAddress: {
+      address: '789 Võ Văn Tần',
+      district: 'Quận 3',
+      city: 'TP. Hồ Chí Minh',
+    },
+    driver: {
+      id: 'dr3',
+      name: 'Phạm Văn D',
+      phone: '0956789012',
+      vehicleType: 'motorbike',
+      rating: 4.9,
+    },
+    shippingFee: 20000,
+    codAmount: 280000,
+    createdAt: '2025-11-06T14:00:00',
+    pickedUpAt: '2025-11-06T14:30:00',
+    estimatedDeliveryTime: '2025-11-06T16:00:00',
+    deliveredAt: '2025-11-06T15:45:00',
+    weight: 1.8,
+    proofOfDelivery: 'https://picsum.photos/seed/pod3/400/300',
+    trackingHistory: [
+      {
+        status: DeliveryStatus.Pending,
+        timestamp: '2025-11-06T14:00:00',
+        note: 'Đơn hàng đã được tạo'
+      },
+      {
+        status: DeliveryStatus.PickedUp,
+        timestamp: '2025-11-06T14:30:00',
+        note: 'Tài xế đã lấy hàng'
+      },
+      {
+        status: DeliveryStatus.InTransit,
+        timestamp: '2025-11-06T15:00:00',
+        note: 'Đang vận chuyển'
+      },
+      {
+        status: DeliveryStatus.Delivering,
+        timestamp: '2025-11-06T15:30:00',
+        note: 'Tài xế đang giao hàng'
+      },
+      {
+        status: DeliveryStatus.Delivered,
+        timestamp: '2025-11-06T15:45:00',
+        note: 'Giao hàng thành công'
+      }
+    ]
+  },
+  {
+    id: 'd4',
+    orderId: 'o8',
+    trackingNumber: 'NINJA2025110704',
+    partner: DeliveryPartner.Ninja,
+    status: DeliveryStatus.Failed,
+    customerName: 'Hoàng Thị H',
+    customerPhone: '0967890123',
+    deliveryAddress: {
+      address: '321 Điện Biên Phủ',
+      district: 'Quận Bình Thạnh',
+      city: 'TP. Hồ Chí Minh',
+    },
+    shippingFee: 35000,
+    codAmount: 520000,
+    createdAt: '2025-11-07T06:00:00',
+    pickedUpAt: '2025-11-07T07:00:00',
+    estimatedDeliveryTime: '2025-11-07T09:00:00',
+    weight: 4.5,
+    failureReason: 'Khách không nghe máy, hẹn giao lại',
+    trackingHistory: [
+      {
+        status: DeliveryStatus.Pending,
+        timestamp: '2025-11-07T06:00:00',
+        note: 'Đơn hàng đã được tạo'
+      },
+      {
+        status: DeliveryStatus.PickedUp,
+        timestamp: '2025-11-07T07:00:00',
+        note: 'Tài xế đã lấy hàng'
+      },
+      {
+        status: DeliveryStatus.InTransit,
+        timestamp: '2025-11-07T08:00:00',
+        note: 'Đang vận chuyển'
+      },
+      {
+        status: DeliveryStatus.Delivering,
+        timestamp: '2025-11-07T08:45:00',
+        note: 'Tài xế đang giao hàng'
+      },
+      {
+        status: DeliveryStatus.Failed,
+        timestamp: '2025-11-07T09:15:00',
+        note: 'Khách không nghe máy, hẹn giao lại'
+      }
+    ]
+  },
+  {
+    id: 'd5',
+    orderId: 'o3',
+    trackingNumber: 'SELF2025110705',
+    partner: DeliveryPartner.SelfDelivery,
+    status: DeliveryStatus.PickedUp,
+    customerName: 'Lê Văn C',
+    customerPhone: '0978901234',
+    deliveryAddress: {
+      address: '654 Cách Mạng Tháng 8',
+      district: 'Quận 10',
+      city: 'TP. Hồ Chí Minh',
+    },
+    shippingFee: 0,
+    codAmount: 180000,
+    createdAt: '2025-11-07T09:00:00',
+    pickedUpAt: '2025-11-07T09:30:00',
+    estimatedDeliveryTime: '2025-11-07T11:00:00',
+    weight: 1.2,
+    notes: 'Giao hàng tự quản, không qua đối tác',
+    trackingHistory: [
+      {
+        status: DeliveryStatus.Pending,
+        timestamp: '2025-11-07T09:00:00',
+        note: 'Đơn hàng đã được tạo'
+      },
+      {
+        status: DeliveryStatus.PickedUp,
+        timestamp: '2025-11-07T09:30:00',
+        note: 'Nhân viên đã lấy hàng'
+      }
+    ]
+  },
+  {
+    id: 'd6',
+    orderId: 'o4',
+    trackingNumber: 'JT2025110706',
+    partner: DeliveryPartner.JT,
+    status: DeliveryStatus.Pending,
+    customerName: 'Phạm Thị D',
+    customerPhone: '0989012345',
+    deliveryAddress: {
+      address: '987 Nguyễn Thị Minh Khai',
+      district: 'Quận 3',
+      city: 'TP. Hồ Chí Minh',
+    },
+    shippingFee: 28000,
+    codAmount: 395000,
+    createdAt: '2025-11-07T09:45:00',
+    estimatedDeliveryTime: '2025-11-07T12:00:00',
+    weight: 2.8,
+    trackingHistory: [
+      {
+        status: DeliveryStatus.Pending,
+        timestamp: '2025-11-07T09:45:00',
+        note: 'Chờ tài xế đến lấy hàng'
+      }
+    ]
+>>>>>>> delivery
   },
 ];

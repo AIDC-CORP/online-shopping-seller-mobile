@@ -1,3 +1,3 @@
-import PromotionsScreen from '@/src/features/promotions/PromotionsScreen';
+import { PromotionsScreen } from '@/src/features/promotions';
 
 export default PromotionsScreen;

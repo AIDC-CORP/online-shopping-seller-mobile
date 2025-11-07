@@ -1,0 +1,11 @@
+ID,Vai trò,Mô tả,Ưu tiên
+US01,Người mua,Tôi muốn đăng ký tài khoản nhanh bằng số điện thoại để mua hàng,Cao
+US02,Người mua,Tôi muốn nhập thông tin sức khỏe để AI gợi ý chế độ ăn,Cao
+US03,Người mua,Tôi muốn xem thực đơn dinh dưỡng phù hợp và mua theo gợi ý,Cao
+US04,Người mua,Tôi muốn so sánh giá giữa các cửa hàng để chọn nơi rẻ nhất,Trung bình
+US05,Người mua,Tôi muốn thanh toán dễ dàng bằng ví hoặc tiền mặt,Cao
+US06,Người bán,Tôi muốn tạo và quản lý gian hàng,Cao
+US07,Người bán,Tôi muốn xem và xác nhận đơn hàng từ người mua,Cao
+US08,Người bán,Tôi muốn thêm khuyến mãi hoặc combo suất ăn,Trung bình
+US09,Admin,"Tôi muốn theo dõi thống kê, doanh số, hành vi người dùng",Trung bình
+US10,Admin,Tôi muốn quản lý AI chatbot và dữ liệu dinh dưỡng,Cao

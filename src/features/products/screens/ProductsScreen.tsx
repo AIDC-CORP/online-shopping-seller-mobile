@@ -1,14 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, Image, Modal, TouchableOpacity, ScrollView, TextInput } from 'react-native';
-import { mockProducts as initialProducts, mockCombos as initialCombos, mockVouchers as initialVouchers } from '../../shared/data/mockData';
-import { Product, Combo, Voucher } from '../../shared/types';
+import { mockProducts as initialProducts, mockCombos as initialCombos, mockVouchers as initialVouchers } from '../../../shared/data/mockData';
+import { Product, Combo, Voucher } from '../../../shared/types';
 import { PlusIcon, XCircleIcon } from '@/src/components/icons';
-import AddProduct from './components/AddProduct';
-import AddOptionMenu from './components/AddOptionMenu';
-import AddCombo from './components/AddCombo';
-import AddVoucher from './components/AddVoucher';
+import AddProduct from '../components/AddProduct';
+import AddOptionMenu from '../components/AddOptionMenu';
+import AddCombo from '../components/AddCombo';
+import AddVoucher from '../components/AddVoucher';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import PromotionsScreen from '../promotions/PromotionsScreen';
+import PromotionsScreen from '../../promotions/screens/PromotionsScreen';
 
 // List Layout Card Component
 const ProductListCard: React.FC<{ 
@@ -893,7 +893,7 @@ const ProductsScreen: React.FC = () => {
   }).length;
 
   return (
-    <SafeAreaView edges={['bottom']} className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gray-50">
       {/* Main Tab Toggle Header */}
       <View style={{
         backgroundColor: 'white',
@@ -2135,7 +2135,7 @@ const ProductsScreen: React.FC = () => {
         /* Promotions Screen */
         <PromotionsScreen />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

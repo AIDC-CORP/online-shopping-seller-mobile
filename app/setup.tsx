@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import SetupScreen from '@/src/features/setup/screens/SetupScreen';
+=======
+import { SetupScreen } from '@/src/features/setup';
+>>>>>>> delivery
 import { useRouter } from 'expo-router';
 import type { SetupData } from '@/src/features/setup/screens/SetupScreen';
 

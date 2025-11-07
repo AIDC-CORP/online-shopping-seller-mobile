@@ -1,3 +1,3 @@
-import ProductsScreen from '@/src/features/products/ProductsScreen';
+import { ProductsScreen } from '@/src/features/products';
 
 export default ProductsScreen;

@@ -156,7 +156,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
               </View>
             </View>
 
-            <InputField label="Số lượng tồn kho *">
+            <InputField label="Số lượng *">
               <TextInput value={stock} onChangeText={setStock} keyboardType="numeric" className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-base" />
             </InputField>
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Image, ScrollView, Animated } from 'react-native';
-import { ChatConversation, Message } from '../../shared/types';
-import { mockChatConversations } from '../../shared/data/mockData';
+import { ChatConversation, Message } from '../../../shared/types';
+import { mockChatConversations } from '../../../shared/data/mockData';
 import * as ImagePicker from 'expo-image-picker';
 
 interface ChatDetailScreenProps {
@@ -198,9 +198,9 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
       style={{ flex: 1, backgroundColor: 'white' }}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 110 : 100}
     >
       <View style={{ flex: 1 }}>
         {/* Header */}

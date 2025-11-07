@@ -1,6 +1,6 @@
 import React from 'react';
 import { router } from 'expo-router';
-import LoginScreen from '@/src/features/auth/LoginScreen';
+import { LoginScreen } from '@/src/features/auth';
 
 export default function Login() {
   const handleLogin = () => {

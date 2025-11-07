@@ -119,14 +119,22 @@ export enum DeliveryStatus {
   Pending = 'Chờ lấy hàng',
   PickedUp = 'Đã lấy hàng',
   InTransit = 'Đang vận chuyển',
+<<<<<<< HEAD
   OutForDelivery = 'Đang giao hàng',
   Delivered = 'Đã giao thành công',
   Failed = 'Giao thất bại',
   Cancelled = 'Đã hủy',
+=======
+  Delivering = 'Đang giao',
+  Delivered = 'Đã giao',
+  Failed = 'Giao thất bại',
+  Returned = 'Đã hoàn',
+>>>>>>> delivery
 }
 
 export enum DeliveryPartner {
   GrabExpress = 'GrabExpress',
+<<<<<<< HEAD
   Gojek = 'Gojek',
   JT = 'J&T Express',
   NinjaDan = 'Ninja Van',
@@ -134,10 +142,20 @@ export enum DeliveryPartner {
   Viettel = 'Viettel Post',
   GHTK = 'GHTK',
   BestExpress = 'Best Express',
+=======
+  GoJek = 'GoJek',
+  Ninja = 'Ninja Van',
+  GHTK = 'GHTK',
+  GHN = 'Giao Hàng Nhanh',
+  ViettelPost = 'Viettel Post',
+  JT = 'J&T Express',
+  SelfDelivery = 'Tự giao hàng',
+>>>>>>> delivery
 }
 
 export interface DeliveryLocation {
   address: string;
+<<<<<<< HEAD
   lat: number;
   lng: number;
 }
@@ -153,11 +171,31 @@ export interface DeliveryTrackingPoint {
   status: DeliveryStatus;
   location?: string;
   note?: string;
+=======
+  ward?: string;
+  district: string;
+  city: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+}
+
+export interface DeliveryDriver {
+  id: string;
+  name: string;
+  phone: string;
+  vehicleType: string; // 'motorbike' | 'car' | 'bicycle'
+  vehicleNumber?: string;
+  rating?: number;
+  avatar?: string;
+>>>>>>> delivery
 }
 
 export interface Delivery {
   id: string;
   orderId: string;
+<<<<<<< HEAD
   customerName: string;
   customerPhone: string;
   status: DeliveryStatus;
@@ -179,4 +217,50 @@ export interface Delivery {
   };
   createdAt: string;
   updatedAt: string;
+=======
+  trackingNumber: string;
+  partner: DeliveryPartner;
+  status: DeliveryStatus;
+  
+  // Customer info
+  customerName: string;
+  customerPhone: string;
+  deliveryAddress: DeliveryLocation;
+  
+  // Driver info (if assigned)
+  driver?: DeliveryDriver;
+  
+  // Pricing
+  shippingFee: number;
+  codAmount?: number; // Cash on Delivery amount
+  
+  // Timestamps
+  createdAt: string;
+  pickedUpAt?: string;
+  estimatedDeliveryTime?: string;
+  deliveredAt?: string;
+  
+  // Package info
+  weight?: number; // kg
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
+  };
+  
+  // Additional info
+  notes?: string;
+  failureReason?: string;
+  proofOfDelivery?: string; // URL to image
+  
+  // Tracking history
+  trackingHistory: DeliveryTrackingPoint[];
+}
+
+export interface DeliveryTrackingPoint {
+  status: DeliveryStatus;
+  timestamp: string;
+  location?: string;
+  note?: string;
+>>>>>>> delivery
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChatScreen, ChatDetailScreen } from './index';
+import { ChatScreen, ChatDetailScreen } from '../index';
 
 /**
  * ChatContainer - Demo component showing both ChatScreen and ChatDetailScreen

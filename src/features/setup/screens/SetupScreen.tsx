@@ -161,7 +161,11 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete }) => {
   );
 
   const renderStep1 = () => (
-    <ScrollView contentContainerStyle={{ padding: 24 }}>
+    <ScrollView 
+      contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
       <View style={{ alignItems: 'center', marginBottom: 32 }}>
         <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#1f2937', marginBottom: 8 }}>
           👋 Chào mừng!
@@ -275,7 +279,11 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete }) => {
   );
 
   const renderStep2 = () => (
-    <ScrollView contentContainerStyle={{ padding: 24 }}>
+    <ScrollView 
+      contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
       <View style={{ alignItems: 'center', marginBottom: 32 }}>
         <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#1f2937', marginBottom: 8 }}>
           🏪 Cửa hàng của bạn
@@ -433,7 +441,11 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete }) => {
   );
 
   const renderStep3 = () => (
-    <ScrollView contentContainerStyle={{ padding: 24 }}>
+    <ScrollView 
+      contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
       <View style={{ alignItems: 'center', marginBottom: 32 }}>
         <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#1f2937', marginBottom: 8 }}>
           ⚙️ Thông tin bổ sung
@@ -618,7 +630,36 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete }) => {
           elevation: 5
         }}>
           <View style={{ flexDirection: 'row', gap: 12 }}>
+<<<<<<< HEAD
             {currentStep > 1 && (
+=======
+          {currentStep > 1 && (
+            <View style={{ flex: 1 }}>
+              <Button
+                onPress={handleBack}
+                variant="secondary"
+                size="md"
+                fullWidth
+              >
+                ← Quay lại
+              </Button>
+            </View>
+          )}
+          
+          {currentStep < 3 ? (
+            <View style={{ flex: 1 }}>
+              <Button
+                onPress={handleNext}
+                variant="primary"
+                size="md"
+                fullWidth
+              >
+                Tiếp tục →
+              </Button>
+            </View>
+          ) : (
+            <>
+>>>>>>> delivery
               <View style={{ flex: 1 }}>
                 <Button
                   onPress={handleBack}
@@ -668,6 +709,10 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete }) => {
             )}
           </View>
         </View>
+<<<<<<< HEAD
+=======
+      </View>
+>>>>>>> delivery
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
