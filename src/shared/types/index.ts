@@ -19,6 +19,8 @@ export interface Order {
 export interface Product {
   id: string;
   name: string;
+  description?: string; // Mô tả sản phẩm
+  category?: string; // Danh mục (vegetables, fruits, meat, dairy, etc.)
   price: number;
   stock: number;
   unit: string;

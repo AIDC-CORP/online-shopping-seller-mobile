@@ -6,6 +6,7 @@ import { mockCombos, mockVouchers, mockProducts } from '../../../shared/data/moc
 import AddOptionMenu from '../../products/components/AddOptionMenu';
 import AddCombo from '../../products/components/AddCombo';
 import AddVoucher from '../../products/components/AddVoucher';
+import FloatingButton from '../../../components/ui/FloatingButton';
 
 type TabType = 'combos' | 'vouchers' | 'flashsales';
 
@@ -526,27 +527,12 @@ const PromotionsScreen = () => {
 
       {/* Floating Add Button */}
       {activeTab !== 'flashsales' && (
-        <TouchableOpacity
-          onPress={() => setShowAddMenu(true)}
-          style={{
-            position: 'absolute',
-            bottom: 24,
-            right: 24,
-            width: 60,
-            height: 60,
-            borderRadius: 30,
-            backgroundColor: '#10b981',
-            justifyContent: 'center',
-            alignItems: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 4,
-            elevation: 8,
-          }}
-        >
-          <Text style={{ fontSize: 28, color: 'white' }}>+</Text>
-        </TouchableOpacity>
+        <View style={{ position: 'absolute', bottom: 24, right: 24, zIndex: 10 }}>
+          <FloatingButton
+            onPress={() => setShowAddMenu(true)}
+            icon={<Text style={{ fontSize: 28, color: 'white', fontWeight: '300' }}>+</Text>}
+          />
+        </View>
       )}
 
       {/* Modals */}

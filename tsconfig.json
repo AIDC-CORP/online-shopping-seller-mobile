@@ -4,10 +4,14 @@
     "strict": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./src/*"],
+      "@/features/*": ["./src/features/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/components/icons": ["./src/components/icons"],
+      "@/components/ui/*": ["./src/components/ui/*"],
+      "@/services/*": ["./services/*"]
     }
   },
   "include": [

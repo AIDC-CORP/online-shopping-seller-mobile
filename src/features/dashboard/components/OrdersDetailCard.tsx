@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { XCircleIcon, PackageIcon, CheckCircleIcon } from '@/src/components/icons';
+import { XCircleIcon, PackageIcon, CheckCircleIcon } from '../../../components/icons';
 
 interface OrdersDetailCardProps {
   totalOrders: number;

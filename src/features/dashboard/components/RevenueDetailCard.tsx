@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { XCircleIcon, ChartBarIcon } from '@/src/components/icons';
+import { XCircleIcon, ChartBarIcon } from '../../../components/icons';
 
 interface RevenueDetailCardProps {
   revenue: number;

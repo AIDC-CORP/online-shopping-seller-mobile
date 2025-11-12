@@ -1,4 +1,4 @@
-import { ChatDetailScreen } from '@/src/features/chat';
+import { ChatDetailScreen } from '../../../src/features/chat';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 export default function ChatDetailRoute() {

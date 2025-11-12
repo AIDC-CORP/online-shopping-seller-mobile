@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
-import { UserIcon, XCircleIcon } from '@/src/components/icons';
+import { UserIcon, XCircleIcon } from '../icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Button from '@/components/ui/button';
+import Button from '../ui/button';
 import { useRouter } from 'expo-router';
-import { ProfileScreen } from '@/src/features/profile';
+import { ProfileScreen } from '../../features/profile';
 
 interface AppHeaderProps {
   onLogout: () => void;

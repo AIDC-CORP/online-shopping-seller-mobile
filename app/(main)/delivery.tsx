@@ -1,3 +1,3 @@
-import { DeliveryScreen } from '@/src/features/delivery';
+import { DeliveryScreen } from '../../src/features/delivery';
 
 export default DeliveryScreen;

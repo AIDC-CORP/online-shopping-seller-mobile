@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, Image, ImageBackground, TouchableOpacity, Switch, Modal, TextInput, Alert, Share } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Image, ImageBackground, TouchableOpacity, Switch, Modal, TextInput, Alert, Share, ActivityIndicator } from 'react-native';
 import { mockStoreInfo, mockStoreStats, mockStoreReviews, mockStoreFollowers, mockStoreAnalytics, mockShareStoreData } from '../../../shared/data/mockData';
 import { StoreInfo } from '../../../shared/types';
-import { PencilIcon } from '@/src/components/icons';
-import IconButton from '@/components/ui/icon-button';
-import Button from '@/components/ui/button';
+import { PencilIcon } from '../../../components/icons';
+import IconButton from '../../../components/ui/icon-button';
+import Button from '../../../components/ui/button';
+import { useStore } from '../../../hooks/useStore';
 
 const InfoRow: React.FC<{ label: string; value: string; icon?: string }> = ({ label, value, icon }) => (
   <View className="py-3 border-b border-gray-200">
@@ -29,6 +30,8 @@ const CompactStat: React.FC<{
 );
 
 const StoreScreen: React.FC = () => {
+  const { storeProfile, isLoading, error, updateStore } = useStore();
+  
   const [storeInfo, setStoreInfo] = useState<StoreInfo>({
     ...mockStoreInfo,
     email: 'support@greenfarm.vn',
@@ -48,6 +51,24 @@ const StoreScreen: React.FC = () => {
   const [detailType, setDetailType] = useState<'reviews' | 'followers' | 'products' | null>(null);
   const [editField, setEditField] = useState<'description' | 'address' | 'phone' | 'hours' | 'email' | 'website' | 'paymentMethods' | 'shippingPolicy' | 'returnPolicy' | 'facebook' | 'instagram' | 'youtube' | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Update local state when storeProfile is loaded from API
+  useEffect(() => {
+    if (storeProfile) {
+      setStoreInfo(prev => ({
+        ...prev,
+        name: storeProfile.name || prev.name,
+        description: storeProfile.description || prev.description,
+        address: storeProfile.address || prev.address,
+        phone: storeProfile.phone || prev.phone,
+        openingHours: storeProfile.opening_hours || prev.openingHours,
+        avatarUrl: storeProfile.avatar_url || prev.avatarUrl,
+        coverImageUrl: storeProfile.cover_image_url || prev.coverImageUrl,
+      }));
+      setIsStoreOpen(storeProfile.is_active !== false);
+    }
+  }, [storeProfile]);
 
   const handleEditField = (field: 'description' | 'address' | 'phone' | 'hours' | 'email' | 'website' | 'paymentMethods' | 'shippingPolicy' | 'returnPolicy' | 'facebook' | 'instagram' | 'youtube') => {
     setEditField(field);
@@ -80,16 +101,52 @@ const StoreScreen: React.FC = () => {
     setShowEditModal(true);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editField) return;
     
-    setStoreInfo(prev => ({
-      ...prev,
-      [editField === 'hours' ? 'openingHours' : editField]: editValue
-    }));
-    setShowEditModal(false);
-    setEditField(null);
-    setEditValue('');
+    setIsSaving(true);
+    
+    // Map UI fields to API fields
+    const apiUpdates: any = {};
+    switch (editField) {
+      case 'description':
+        apiUpdates.description = editValue;
+        break;
+      case 'address':
+        apiUpdates.address = editValue;
+        break;
+      case 'phone':
+        apiUpdates.phone = editValue;
+        break;
+      case 'hours':
+        apiUpdates.opening_hours = editValue;
+        break;
+      default:
+        // For fields not in API, just update local state
+        setStoreInfo(prev => ({
+          ...prev,
+          [editField]: editValue
+        }));
+        setShowEditModal(false);
+        setEditField(null);
+        setEditValue('');
+        setIsSaving(false);
+        return;
+    }
+    
+    // Update via API
+    const result = await updateStore(apiUpdates);
+    
+    setIsSaving(false);
+    
+    if (result.success) {
+      setShowEditModal(false);
+      setEditField(null);
+      setEditValue('');
+      Alert.alert('Thành công', 'Đã cập nhật thông tin cửa hàng');
+    } else {
+      Alert.alert('Lỗi', result.error || 'Không thể cập nhật thông tin');
+    }
   };
 
   const handleToggleStore = (value: boolean) => {
@@ -131,7 +188,25 @@ const StoreScreen: React.FC = () => {
 
   return (
     <View className="flex-1 bg-gray-50/50">
-      <ScrollView contentContainerStyle={{ paddingBottom: 110 }}>
+      {isLoading && !storeProfile ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#10b981" />
+          <Text className="text-gray-600 mt-4">Đang tải thông tin cửa hàng...</Text>
+        </View>
+      ) : error && !storeProfile ? (
+        <View className="flex-1 items-center justify-center p-4">
+          <Text className="text-xl mb-2">⚠️</Text>
+          <Text className="text-gray-800 text-center mb-4">{error}</Text>
+          <Button
+            onPress={() => window.location.reload()}
+            variant="primary"
+            size="md"
+          >
+            Thử lại
+          </Button>
+        </View>
+      ) : (
+        <ScrollView contentContainerStyle={{ paddingBottom: 110 }}>
         {/* Store Status Toggle */}
         <View className="bg-white px-4 py-3 flex-row justify-between items-center border-b border-gray-200">
           <View className="flex-1">
@@ -327,7 +402,8 @@ const StoreScreen: React.FC = () => {
             🔗 Chia sẻ cửa hàng
           </Button>
         </View>
-      </ScrollView>
+        </ScrollView>
+      )}
 
       {/* Edit Modal */}
       <Modal
@@ -372,8 +448,9 @@ const StoreScreen: React.FC = () => {
                   variant="primary"
                   size="md"
                   fullWidth
+                  disabled={isSaving}
                 >
-                  Lưu
+                  {isSaving ? 'Đang lưu...' : 'Lưu'}
                 </Button>
               </View>
             </View>

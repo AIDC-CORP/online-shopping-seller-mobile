@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { mockOrders } from '../../../shared/data/mockData';
 import { Order, OrderStatus } from '../../../shared/types';
-import Button from '@/components/ui/button';
-import { XCircleIcon, UserIcon } from '@/src/components/icons';
+import Button from '../../../components/ui/button';
+import { XCircleIcon, UserIcon } from '../../../components/icons';
 
 // Modal Hóa đơn
 const InvoiceModal: React.FC<{

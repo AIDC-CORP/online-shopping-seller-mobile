@@ -1,43 +1,35 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
-import Button from '@/components/ui/button';
+import Button from '../../../components/ui/button';
 import { useLogin } from '../hooks/useLogin';
-import { useAuth } from '@/src/context/AuthContext';
-import { useRouter } from 'expo-router';
+import { useAuth } from '../../../context/AuthContext';
 
 interface LoginScreenProps {
-  onLogin: () => void;
+  onLogin: (userData?: any) => void;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const router = useRouter();
   const { setUser } = useAuth();
   
   // Sử dụng custom hook
   const { login, isLoading, error, clearError } = useLogin();
 
   const handleLoginClick = async () => {
-    const user = await login(email, password);
+    const user = await login(username, password);
     
     if (user) {
       // Lưu user vào context
       setUser(user);
       
-      // Check if user needs to complete setup
-      if (!user.isSetupCompleted) {
-        // Redirect to setup screen
-        router.replace('/setup');
-      } else {
-        // Redirect to main dashboard
-        onLogin();
-      }
+      // Call parent callback with user data to handle routing
+      onLogin(user);
     }
   };
 
-  const handleEmailChange = (text: string) => {
-    setEmail(text);
+  const handleUsernameChange = (text: string) => {
+    setUsername(text);
     if (error) clearError(); // Clear error khi user typing
   };
 
@@ -76,14 +68,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
 
             <View className="space-y-4">
               <View>
-                <Text className="text-sm font-medium text-gray-700 mb-1.5">Email</Text>
+                <Text className="text-sm font-medium text-gray-700 mb-1.5">Tên đăng nhập</Text>
                 <TextInput
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-                  placeholder="email@example.com"
-                  value={email}
-                  onChangeText={handleEmailChange}
-                  keyboardType="email-address"
+                  placeholder="username"
+                  value={username}
+                  onChangeText={handleUsernameChange}
                   autoCapitalize="none"
+                  autoCorrect={false}
                 />
               </View>
 

@@ -1,14 +1,16 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList, Image, Modal, TouchableOpacity, ScrollView, TextInput } from 'react-native';
-import { mockProducts as initialProducts, mockCombos as initialCombos, mockVouchers as initialVouchers } from '../../../shared/data/mockData';
+import React, { useState, useCallback, useEffect } from 'react';
+import { View, Text, FlatList, Image, Modal, TouchableOpacity, ScrollView, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { Product, Combo, Voucher } from '../../../shared/types';
-import { PlusIcon, XCircleIcon } from '@/src/components/icons';
+import { PlusIcon, XCircleIcon } from '../../../components/icons';
 import AddProduct from '../components/AddProduct';
 import AddOptionMenu from '../components/AddOptionMenu';
 import AddCombo from '../components/AddCombo';
 import AddVoucher from '../components/AddVoucher';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PromotionsScreen from '../../promotions/screens/PromotionsScreen';
+import FloatingButton from '../../../components/ui/FloatingButton';
+import { useStoreId } from '../../../hooks/useStoreId';
+import { ProductsService, ProductCategory, ProductUnit, ProductStatus } from '../../../../services';
 
 // List Layout Card Component
 const ProductListCard: React.FC<{ 
@@ -759,10 +761,14 @@ const getDaysUntilExpiry = (expiryDate?: string): number | null => {
 };
 
 const ProductsScreen: React.FC = () => {
+  // Get store ID
+  const { storeId, isLoading: isLoadingStoreId } = useStoreId();
+  
   // Main tab toggle between Products and Promotions
   const [activeMainTab, setActiveMainTab] = useState<'products' | 'promotions'>('products');
   
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [isAddingCombo, setIsAddingCombo] = useState(false);
   const [isAddingVoucher, setIsAddingVoucher] = useState(false);
@@ -776,14 +782,101 @@ const ProductsScreen: React.FC = () => {
   const [sortType, setSortType] = useState<SortType>('default');
   const [showSortMenu, setShowSortMenu] = useState(false);
 
-  const handleAddProduct = useCallback((newProductData: Omit<Product, 'id'>) => {
-    const newProduct: Product = {
-      id: `p${Date.now()}`,
-      ...newProductData,
-    };
-    setProducts(prevProducts => [newProduct, ...prevProducts]);
-    setIsAddingProduct(false);
-  }, []);
+  // Fetch products from API
+  const fetchProducts = useCallback(async () => {
+    if (!storeId) return;
+    
+    try {
+      setIsLoadingProducts(true);
+      console.log('[ProductsScreen] Fetching products for storeId:', storeId);
+      
+      const result = await ProductsService.getProductsByStoreId(storeId, 1, 100);
+      
+      console.log('[ProductsScreen] Fetched products:', result.products.length);
+      
+      // Transform API Product to UI Product
+      const uiProducts: Product[] = result.products.map(p => ({
+        id: p.id,
+        name: p.name,
+        description: p.description || undefined,
+        category: p.category,
+        price: p.price,
+        stock: p.stock,
+        unit: p.unit,
+        imageUrl: p.imageUrl || '',
+        expiryDate: p.expiration_date || undefined,
+        importDate: p.import_date || undefined,
+        sold: 0, // Backend không có field này
+      }));
+      
+      setProducts(uiProducts);
+    } catch (error: any) {
+      console.error('[ProductsScreen] Failed to fetch products:', error);
+      Alert.alert('Lỗi', 'Không thể tải danh sách sản phẩm. Vui lòng thử lại.');
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  }, [storeId]);
+
+  // Load products when component mounts or storeId changes
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  const handleAddProduct = useCallback(async (newProductData: Omit<Product, 'id'>) => {
+    try {
+      // Check if storeId is available
+      if (!storeId) {
+        Alert.alert('Lỗi', 'Không tìm thấy thông tin cửa hàng. Vui lòng đăng nhập lại.');
+        return;
+      }
+      
+      // Transform UI data to API format
+      const productCreateRequest = {
+        product_name: newProductData.name,
+        description: newProductData.description || '',
+        price: newProductData.price,
+        quantity: newProductData.stock,
+        category: (newProductData.category || 'vegetables') as ProductCategory,
+        image_urls: newProductData.imageUrl ? [newProductData.imageUrl] : [],
+        unit: newProductData.unit as ProductUnit,
+        status: ProductStatus.IN_STOCK,
+        import_date: newProductData.importDate,
+        expiration_date: newProductData.expiryDate,
+      };
+      
+      console.log('[ProductsScreen] Creating product with storeId:', storeId);
+      console.log('[ProductsScreen] Product data:', productCreateRequest);
+      
+      // Call API
+      const createdProduct = await ProductsService.addProduct(storeId, productCreateRequest);
+      
+      console.log('[ProductsScreen] Product created successfully:', createdProduct);
+      
+      // Transform backend response to UI format
+      const uiProduct: Product = {
+        id: createdProduct.id,
+        name: createdProduct.name,
+        description: createdProduct.description || undefined,
+        category: createdProduct.category,
+        price: createdProduct.price,
+        stock: createdProduct.stock,
+        unit: createdProduct.unit,
+        imageUrl: createdProduct.imageUrl || '',
+        expiryDate: createdProduct.expiration_date || undefined,
+        importDate: createdProduct.import_date || undefined,
+      };
+      
+      // Add to products list
+      setProducts(prevProducts => [uiProduct, ...prevProducts]);
+      setIsAddingProduct(false);
+      
+      Alert.alert('Thành công', `Đã thêm sản phẩm "${newProductData.name}"`);
+    } catch (error: any) {
+      console.error('[ProductsScreen] Failed to add product:', error);
+      Alert.alert('Lỗi', error.message || 'Không thể thêm sản phẩm. Vui lòng thử lại.');
+    }
+  }, [storeId]);
 
   const handleAddCombo = useCallback((newComboData: Omit<Combo, 'id' | 'createdAt'>) => {
     setIsAddingCombo(false);
@@ -795,26 +888,66 @@ const ProductsScreen: React.FC = () => {
     alert(`✅ Đã tạo voucher "${newVoucherData.code}" thành công!`);
   }, []);
 
-  const handleUpdateProduct = useCallback((productId: string, updates: Partial<Product>) => {
-    setProducts(prevProducts =>
-      prevProducts.map(product =>
-        product.id === productId
-          ? { ...product, ...updates }
-          : product
-      )
-    );
-    // Cập nhật selectedProduct để UI hiển thị ngay
-    setSelectedProduct(prev => 
-      prev && prev.id === productId 
-        ? { ...prev, ...updates } 
-        : prev
-    );
+  const handleUpdateProduct = useCallback(async (productId: string, updates: Partial<Product>) => {
+    try {
+      console.log('[ProductsScreen] Updating product:', productId, updates);
+      
+      // Transform UI updates to API format
+      const apiUpdates: any = {};
+      if (updates.name !== undefined) apiUpdates.product_name = updates.name;
+      if (updates.description !== undefined) apiUpdates.description = updates.description;
+      if (updates.price !== undefined) apiUpdates.price = updates.price;
+      if (updates.stock !== undefined) apiUpdates.quantity = updates.stock;
+      if (updates.category !== undefined) apiUpdates.category = updates.category;
+      if (updates.unit !== undefined) apiUpdates.unit = updates.unit;
+      if (updates.expiryDate !== undefined) apiUpdates.expiration_date = updates.expiryDate;
+      if (updates.importDate !== undefined) apiUpdates.import_date = updates.importDate;
+      if (updates.imageUrl !== undefined) apiUpdates.image_urls = [updates.imageUrl];
+      
+      // Call API
+      await ProductsService.updateProduct(productId, apiUpdates);
+      
+      // Update local state
+      setProducts(prevProducts =>
+        prevProducts.map(product =>
+          product.id === productId
+            ? { ...product, ...updates }
+            : product
+        )
+      );
+      
+      // Update selectedProduct để UI hiển thị ngay
+      setSelectedProduct(prev => 
+        prev && prev.id === productId 
+          ? { ...prev, ...updates } 
+          : prev
+      );
+      
+      console.log('[ProductsScreen] Product updated successfully');
+    } catch (error: any) {
+      console.error('[ProductsScreen] Failed to update product:', error);
+      Alert.alert('Lỗi', error.message || 'Không thể cập nhật sản phẩm. Vui lòng thử lại.');
+    }
   }, []);
 
-  const handleDeleteProduct = useCallback((productId: string) => {
-    setProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
-    setProductToDelete(null);
-    setSelectedProduct(null);
+  const handleDeleteProduct = useCallback(async (productId: string) => {
+    try {
+      console.log('[ProductsScreen] Deleting product:', productId);
+      
+      // Call API
+      await ProductsService.deleteProduct(productId);
+      
+      // Update local state
+      setProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
+      setProductToDelete(null);
+      setSelectedProduct(null);
+      
+      console.log('[ProductsScreen] Product deleted successfully');
+      Alert.alert('Thành công', 'Đã xóa sản phẩm');
+    } catch (error: any) {
+      console.error('[ProductsScreen] Failed to delete product:', error);
+      Alert.alert('Lỗi', error.message || 'Không thể xóa sản phẩm. Vui lòng thử lại.');
+    }
   }, []);
 
   // Quick Edit Handler
@@ -1331,39 +1464,47 @@ const ProductsScreen: React.FC = () => {
         )}
       </View>
 
-      <FlatList
-        data={filteredProducts}
-        renderItem={({ item }) => (
-          <ProductListCard 
-            item={item} 
-            onPress={() => setSelectedProduct(item)}
-            onEdit={() => handleQuickEdit(item)}
-            onDelete={() => setProductToDelete(item)}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingVertical: 8, paddingBottom: 100 }}
-      />
+      {isLoadingProducts || isLoadingStoreId ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 }}>
+          <ActivityIndicator size="large" color="#10b981" />
+          <Text style={{ fontSize: 14, color: '#6b7280', marginTop: 12 }}>
+            Đang tải sản phẩm...
+          </Text>
+        </View>
+      ) : filteredProducts.length === 0 ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 }}>
+          <Text style={{ fontSize: 48, marginBottom: 12 }}>📦</Text>
+          <Text style={{ fontSize: 16, fontWeight: '600', color: '#1f2937', marginBottom: 4 }}>
+            {searchQuery || filterType !== 'all' 
+              ? 'Không tìm thấy sản phẩm' 
+              : 'Chưa có sản phẩm nào'}
+          </Text>
+          <Text style={{ fontSize: 13, color: '#9ca3af', textAlign: 'center' }}>
+            {searchQuery || filterType !== 'all'
+              ? 'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm'
+              : 'Nhấn nút + để thêm sản phẩm đầu tiên'}
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredProducts}
+          renderItem={({ item }) => (
+            <ProductListCard 
+              item={item} 
+              onPress={() => setSelectedProduct(item)}
+              onEdit={() => handleQuickEdit(item)}
+              onDelete={() => setProductToDelete(item)}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingVertical: 8, paddingBottom: 100 }}
+        />
+      )}
       <View style={{ position: 'absolute', bottom: 24, right: 24, zIndex: 10 }}>
-        <TouchableOpacity
+        <FloatingButton
           onPress={() => setShowAddMenu(true)}
-          style={{
-            backgroundColor: '#10b981',
-            width: 56,
-            height: 56,
-            borderRadius: 28,
-            alignItems: 'center',
-            justifyContent: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 8,
-            elevation: 8,
-          }}
-          activeOpacity={0.8}
-        >
-          <PlusIcon className="h-6 w-6" color="white" />
-        </TouchableOpacity>
+          icon={<PlusIcon width={24} height={24} stroke="white" />}
+        />
       </View>
 
       {/* Add Option Menu */}
@@ -1382,6 +1523,8 @@ const ProductsScreen: React.FC = () => {
         visible={isAddingProduct}
         animationType="slide"
         onRequestClose={() => setIsAddingProduct(false)}
+        transparent={false}
+        statusBarTranslucent={false}
       >
         <AddProduct
           onClose={() => setIsAddingProduct(false)}

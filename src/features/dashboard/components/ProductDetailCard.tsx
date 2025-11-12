@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { XCircleIcon, PackageIcon, CheckCircleIcon } from '@/src/components/icons';
-import { Product } from '@/src/shared/types';
+import { XCircleIcon, PackageIcon, CheckCircleIcon } from '../../../components/icons';
+import { Product } from '../../../shared/types';
 
 interface ProductDetailCardProps {
   product: Product;

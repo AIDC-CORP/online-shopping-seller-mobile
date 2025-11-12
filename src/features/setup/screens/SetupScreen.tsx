@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CameraIcon, XCircleIcon } from '@/src/components/icons';
-import Button from '@/components/ui/button';
+import { CameraIcon } from '../../../components/icons';
+import Button from '../../../components/ui/button';
 import * as ImagePicker from 'expo-image-picker';
 
 interface SetupScreenProps {
   onComplete: (data: SetupData) => void;
+  isSubmitting?: boolean;
 }
 
 export interface SetupData {
@@ -33,7 +34,7 @@ export interface SetupData {
   youtube: string;
 }
 
-const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete }) => {
+const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete, isSubmitting = false }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<SetupData>({
     fullName: '',
@@ -662,6 +663,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete }) => {
                     variant="secondary"
                     size="md"
                     fullWidth
+                    disabled={isSubmitting}
                   >
                     Bỏ qua
                   </Button>
@@ -672,8 +674,9 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete }) => {
                     variant="primary"
                     size="md"
                     fullWidth
+                    disabled={isSubmitting}
                   >
-                    Hoàn tất ✓
+                    {isSubmitting ? 'Đang tạo...' : 'Hoàn tất ✓'}
                   </Button>
                 </View>
               </>

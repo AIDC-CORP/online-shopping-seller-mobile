@@ -1,12 +1,12 @@
 import { Tabs } from 'expo-router';
 import React, { useState, useMemo } from 'react';
-import { HomeIcon, PackageIcon, CubeIcon, StoreIcon, ChatIcon, GiftIcon, WalletIcon, TruckIcon } from '@/src/components/icons';
-import AppHeader from '@/src/components/common/AppHeader';
-import { mockChatConversations, mockProducts, mockOrders } from '@/src/shared/data/mockData';
-import { OrderStatus } from '@/src/shared/types';
-import AIAssistantBubble from '@/src/components/ai/AIAssistantBubble';
-import AIAssistantChat from '@/src/components/ai/AIAssistantChat';
-import type { BusinessContext } from '@/src/features/ai/aiAssistantService';
+import { HomeIcon, PackageIcon, CubeIcon, ChatIcon, WalletIcon, TruckIcon } from '../../src/components/icons';
+import AppHeader from '../../src/components/common/AppHeader';
+import { mockChatConversations, mockProducts, mockOrders } from '../../src/shared/data/mockData';
+import { OrderStatus } from '../../src/shared/types';
+import AIAssistantBubble from '../../src/components/ai/AIAssistantBubble';
+import AIAssistantChat from '../../src/components/ai/AIAssistantChat';
+import type { BusinessContext } from '../../src/features/ai/aiAssistantService';
 
 export default function MainLayout() {
   const [showAIChat, setShowAIChat] = useState(false);
@@ -16,22 +16,22 @@ export default function MainLayout() {
   };
 
   // Calculate total unread messages
-  const totalUnread = mockChatConversations.reduce((sum, chat) => sum + chat.unreadCount, 0);
+  const totalUnread = mockChatConversations.reduce((sum: number, chat: any) => sum + chat.unreadCount, 0);
 
   // Prepare business context for AI
   const businessContext: BusinessContext = useMemo(() => {
     // Calculate total revenue from completed orders
     const totalRevenue = mockOrders
-      .filter(order => order.status === OrderStatus.Completed)
-      .reduce((sum, order) => sum + order.total, 0);
+      .filter((order: any) => order.status === OrderStatus.Completed)
+      .reduce((sum: number, order: any) => sum + order.total, 0);
 
     // Find products with low stock (less than 10 units)
-    const lowStockCount = mockProducts.filter(p => p.stock < 10).length;
+    const lowStockCount = mockProducts.filter((p: any) => p.stock < 10).length;
 
     // Calculate top products by orders (mock data)
     const topProducts = mockProducts
       .slice(0, 3)
-      .map(p => p.name);
+      .map((p: any) => p.name);
 
     return {
       totalProducts: mockProducts.length,

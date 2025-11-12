@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, Image } from 'react-native';
-import { Product } from '../../../shared/types';
-import { XIcon, CameraIcon } from '@/src/components/icons';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, Image, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Button from '@/components/ui/button';
+import { Product } from '../../../shared/types';
+import { XIcon, CameraIcon } from '../../../components/icons';
 import * as ImagePicker from 'expo-image-picker';
 
 interface AddProductProps {
@@ -11,15 +10,28 @@ interface AddProductProps {
   onAddProduct: (product: Omit<Product, 'id'>) => void;
 }
 
-const InputField: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-  <View>
-    <Text className="text-sm font-medium text-gray-700 mb-1">{label}</Text>
+const InputField: React.FC<{ 
+  label: string; 
+  children: React.ReactNode;
+  required?: boolean;
+  icon?: string;
+}> = ({ label, children, required, icon }) => (
+  <View style={styles.inputContainer}>
+    <View style={styles.labelRow}>
+      {icon && <Text style={styles.labelIcon}>{icon}</Text>}
+      <Text style={styles.label}>
+        {label}
+        {required && <Text style={styles.required}> *</Text>}
+      </Text>
+    </View>
     {children}
   </View>
 );
 
 const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [unit, setUnit] = useState('kg');
   const [stock, setStock] = useState('');
@@ -29,7 +41,6 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
 
   const pickImage = async (useCamera: boolean) => {
     try {
-      // Request permissions
       const permissionResult = useCamera 
         ? await ImagePicker.requestCameraPermissionsAsync()
         : await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -39,7 +50,6 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
         return;
       }
 
-      // Launch picker
       const result = useCamera
         ? await ImagePicker.launchCameraAsync({
             mediaTypes: ['images'],
@@ -75,15 +85,31 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
   };
 
   const handleSubmit = () => {
-    if (!name || !price || !unit || !stock) {
-      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ các trường bắt buộc.');
+    // Validate required fields
+    if (!name.trim()) {
+      Alert.alert('Lỗi', 'Vui lòng nhập tên sản phẩm.');
       return;
     }
+    if (!price || parseFloat(price) <= 0) {
+      Alert.alert('Lỗi', 'Vui lòng nhập giá bán hợp lệ.');
+      return;
+    }
+    if (!unit.trim()) {
+      Alert.alert('Lỗi', 'Vui lòng nhập đơn vị.');
+      return;
+    }
+    if (!stock || parseInt(stock, 10) < 0) {
+      Alert.alert('Lỗi', 'Vui lòng nhập số lượng hợp lệ.');
+      return;
+    }
+
     onAddProduct({
-      name,
+      name: name.trim(),
+      description: description.trim() || undefined,
+      category: category.trim() || undefined,
       price: parseFloat(price),
       stock: parseInt(stock, 10),
-      unit,
+      unit: unit.trim(),
       imageUrl: imageUri || `https://picsum.photos/seed/${name}/${Math.random()}/300/200`,
       expiryDate: expiryDate || undefined,
       importDate: importDate || undefined,
@@ -91,135 +117,430 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50" edges={['bottom']}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <KeyboardAvoidingView 
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={0}
       >
-        <View style={{ 
-          flexDirection: 'row', 
-          alignItems: 'center', 
-          justifyContent: 'space-between', 
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          paddingTop: 50,
-          borderBottomWidth: 1,
-          borderBottomColor: '#e5e7eb',
-          backgroundColor: 'white'
-        }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1f2937' }}>
-            Thêm sản phẩm mới
-          </Text>
-          <TouchableOpacity onPress={onClose} style={{ padding: 4 }}>
-            <XIcon className="h-6 w-6" color="gray" />
-          </TouchableOpacity>
-        </View>
-        <ScrollView contentContainerStyle={{ padding: 16 }}>
-          <View className="space-y-4">
-            <TouchableOpacity 
-              onPress={showImageOptions}
-              className="flex-col items-center p-6 border-2 border-dashed border-gray-300 rounded-lg text-center"
-            >
-              {imageUri ? (
-                <>
-                  <Image 
-                    source={{ uri: imageUri }} 
-                    style={{ width: 200, height: 150, borderRadius: 8, marginBottom: 8 }}
-                    resizeMode="cover"
-                  />
-                  <Text className="text-sm font-semibold text-emerald-600">✓ Ảnh đã chọn</Text>
-                  <Text className="text-xs text-gray-500">Nhấn để thay đổi</Text>
-                </>
-              ) : (
-                <>
-                  <CameraIcon className="h-10 w-10 text-gray-400 mb-2" color="gray"/>
-                  <Text className="text-sm font-semibold text-emerald-600">Tải lên hình ảnh</Text>
-                  <Text className="text-xs text-gray-500">Chụp ảnh hoặc chọn từ thư viện</Text>
-                </>
-              )}
+        <View style={styles.container}>
+          {/* Header */}
+          <View style={styles.header}>
+            <View>
+              <Text style={styles.headerTitle}>✨ Sản phẩm mới</Text>
+              <Text style={styles.headerSubtitle}>Điền thông tin sản phẩm của bạn</Text>
+            </View>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <XIcon color="white" />
             </TouchableOpacity>
-            
-            <InputField label="Tên sản phẩm *">
-              <TextInput value={name} onChangeText={setName} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-base" />
-            </InputField>
+          </View>
 
-            <View className="flex-row gap-4">
-              <View className="flex-1">
-                <InputField label="Giá bán *">
-                  <TextInput value={price} onChangeText={setPrice} keyboardType="numeric" className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-base" />
-                </InputField>
-              </View>
-              <View className="flex-1">
-                <InputField label="Đơn vị *">
-                  <TextInput placeholder="kg, mớ..." value={unit} onChangeText={setUnit} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-base" />
-                </InputField>
-              </View>
+          {/* ScrollView */}
+          <ScrollView 
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* Image Upload */}
+            <View style={styles.card}>
+              <TouchableOpacity onPress={showImageOptions} style={styles.imageUploadContainer}>
+                {imageUri ? (
+                  <View style={styles.uploadedImageContainer}>
+                    <Image source={{ uri: imageUri }} style={styles.uploadedImage} resizeMode="cover" />
+                    <View style={styles.imageSuccessBadge}>
+                      <Text style={styles.imageSuccessText}>✓ Ảnh đã chọn</Text>
+                    </View>
+                    <Text style={styles.imageHintText}>Nhấn để thay đổi</Text>
+                  </View>
+                ) : (
+                  <View style={styles.emptyImageContainer}>
+                    <View style={styles.cameraIconCircle}>
+                      <CameraIcon color="#10b981" />
+                    </View>
+                    <Text style={styles.uploadTitle}>📸 Tải lên hình ảnh sản phẩm</Text>
+                    <Text style={styles.uploadSubtitle}>Chụp ảnh hoặc chọn từ thư viện</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
             </View>
 
-            <InputField label="Số lượng *">
-              <TextInput value={stock} onChangeText={setStock} keyboardType="numeric" className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-base" />
-            </InputField>
-
-            <View className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
-              <Text className="text-xs font-semibold text-blue-800 mb-2">📅 Thông tin hạn sử dụng (Thực phẩm tươi)</Text>
+            {/* Basic Info */}
+            <View style={styles.card}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>📝 Thông tin cơ bản</Text>
+              </View>
               
-              <View className="flex-row gap-4">
-                <View className="flex-1">
-                  <InputField label="Ngày nhập hàng">
+              <InputField label="Tên sản phẩm" required icon="🏷️">
+                <TextInput 
+                  value={name} 
+                  onChangeText={setName} 
+                  style={styles.input}
+                  placeholder="Nhập tên sản phẩm..."
+                  placeholderTextColor="#9ca3af"
+                />
+              </InputField>
+
+              <InputField label="Mô tả" icon="📄">
+                <TextInput 
+                  value={description} 
+                  onChangeText={setDescription} 
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Mô tả ngắn về sản phẩm..."
+                  placeholderTextColor="#9ca3af"
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                />
+              </InputField>
+
+              <InputField label="Danh mục" icon="📂">
+                <TextInput 
+                  value={category} 
+                  onChangeText={setCategory} 
+                  style={styles.input}
+                  placeholder="Ví dụ: Rau củ, Thịt, Hải sản..."
+                  placeholderTextColor="#9ca3af"
+                />
+              </InputField>
+            </View>
+
+            {/* Price & Stock */}
+            <View style={styles.card}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>💰 Giá & Tồn kho</Text>
+              </View>
+
+              <View style={styles.row}>
+                <View style={styles.halfWidth}>
+                  <InputField label="Giá bán" required icon="💵">
+                    <TextInput 
+                      value={price} 
+                      onChangeText={setPrice} 
+                      keyboardType="numeric" 
+                      style={styles.input}
+                      placeholder="0"
+                      placeholderTextColor="#9ca3af"
+                    />
+                  </InputField>
+                </View>
+                
+                <View style={styles.halfWidth}>
+                  <InputField label="Đơn vị" required icon="⚖️">
+                    <TextInput 
+                      placeholder="kg, mớ..." 
+                      value={unit} 
+                      onChangeText={setUnit} 
+                      style={styles.input}
+                      placeholderTextColor="#9ca3af"
+                    />
+                  </InputField>
+                </View>
+              </View>
+
+              <InputField label="Số lượng" required icon="📦">
+                <TextInput 
+                  value={stock} 
+                  onChangeText={setStock} 
+                  keyboardType="numeric" 
+                  style={styles.input}
+                  placeholder="0"
+                  placeholderTextColor="#9ca3af"
+                />
+              </InputField>
+            </View>
+
+            {/* Expiry Date */}
+            <View style={[styles.card, styles.expiryCard]}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionTitle, styles.expiryTitle]}>📅 Hạn sử dụng</Text>
+                <Text style={styles.sectionSubtitle}>Chỉ áp dụng cho thực phẩm tươi</Text>
+              </View>
+              
+              <View style={styles.row}>
+                <View style={styles.halfWidth}>
+                  <InputField label="Ngày nhập" icon="📥">
                     <TextInput 
                       value={importDate} 
                       onChangeText={setImportDate} 
                       placeholder="YYYY-MM-DD" 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-base" 
+                      style={[styles.input, styles.whiteInput]}
+                      placeholderTextColor="#9ca3af"
                     />
+                    <Text style={styles.hintText}>VD: 2025-11-05</Text>
                   </InputField>
-                  <Text className="text-xs text-gray-500 mt-1">VD: 2025-11-05</Text>
                 </View>
                 
-                <View className="flex-1">
-                  <InputField label="Ngày hết hạn">
+                <View style={styles.halfWidth}>
+                  <InputField label="Ngày hết hạn" icon="⏰">
                     <TextInput 
                       value={expiryDate} 
                       onChangeText={setExpiryDate} 
                       placeholder="YYYY-MM-DD" 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-base" 
+                      style={[styles.input, styles.whiteInput]}
+                      placeholderTextColor="#9ca3af"
                     />
+                    <Text style={styles.hintText}>VD: 2025-11-15</Text>
                   </InputField>
-                  <Text className="text-xs text-gray-500 mt-1">VD: 2025-11-15</Text>
                 </View>
               </View>
             </View>
+          </ScrollView>
 
-            <InputField label="Mô tả chi tiết">
-              <TextInput multiline={true} numberOfLines={3} placeholder="Nguồn gốc, thông tin dinh dưỡng..." className="w-full px-3 py-2 border border-gray-300 rounded-md h-24 bg-white text-base" textAlignVertical="top" />
-            </InputField>
-          </View>
-        </ScrollView>
-        <View className="p-4 bg-white border-t border-gray-200 flex-row gap-3">
-          <View className="flex-1">
-            <Button
-              onPress={onClose}
-              variant="secondary"
-              size="md"
-              fullWidth
-            >
-              Hủy
-            </Button>
-          </View>
-          <View className="flex-1">
-            <Button
-              onPress={handleSubmit}
-              variant="primary"
-              size="md"
-              fullWidth
-            >
-              Thêm sản phẩm
-            </Button>
+          {/* Bottom Bar */}
+          <View style={styles.bottomBar}>
+            <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
+              <Text style={styles.cancelButtonText}>Hủy</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+              <Text style={styles.submitButtonText}>✓ Thêm sản phẩm</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  safeArea: { 
+    flex: 1, 
+    backgroundColor: '#10b981' 
+  },
+  keyboardView: {
+    flex: 1
+  },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#f8fafc' 
+  },
+  header: { 
+    paddingHorizontal: 20, 
+    paddingVertical: 16, 
+    backgroundColor: '#10b981', 
+    borderBottomLeftRadius: 24, 
+    borderBottomRightRadius: 24, 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 4 }, 
+    shadowOpacity: 0.1, 
+    shadowRadius: 8, 
+    elevation: 5, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between' 
+  },
+  headerTitle: { 
+    fontSize: 24, 
+    fontWeight: '700', 
+    color: 'white', 
+    marginBottom: 4 
+  },
+  headerSubtitle: { 
+    fontSize: 13, 
+    color: '#d1fae5', 
+    fontWeight: '500' 
+  },
+  closeButton: { 
+    backgroundColor: 'rgba(255,255,255,0.2)', 
+    padding: 8, 
+    borderRadius: 20 
+  },
+  scrollView: { 
+    flex: 1 
+  },
+  scrollContent: { 
+    padding: 20, 
+    paddingBottom: 20
+  },
+  card: { 
+    backgroundColor: 'white', 
+    borderRadius: 16, 
+    padding: 16, 
+    marginBottom: 16, 
+    borderWidth: 1, 
+    borderColor: '#e5e7eb', 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.05, 
+    shadowRadius: 4, 
+    elevation: 2 
+  },
+  expiryCard: { 
+    backgroundColor: '#eff6ff', 
+    borderColor: '#3b82f6' 
+  },
+  sectionHeader: { 
+    marginBottom: 16, 
+    paddingBottom: 12, 
+    borderBottomWidth: 1, 
+    borderBottomColor: '#f3f4f6' 
+  },
+  sectionTitle: { 
+    fontSize: 16, 
+    fontWeight: '700', 
+    color: '#1f2937', 
+    marginBottom: 2 
+  },
+  expiryTitle: { 
+    color: '#1e40af' 
+  },
+  sectionSubtitle: { 
+    fontSize: 12, 
+    color: '#6b7280', 
+    fontWeight: '500' 
+  },
+  inputContainer: { 
+    marginBottom: 16 
+  },
+  labelRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 8 
+  },
+  labelIcon: { 
+    fontSize: 16, 
+    marginRight: 6 
+  },
+  label: { 
+    fontSize: 14, 
+    fontWeight: '600', 
+    color: '#374151' 
+  },
+  required: { 
+    color: '#ef4444', 
+    fontWeight: '700' 
+  },
+  input: { 
+    backgroundColor: '#f9fafb', 
+    borderWidth: 1, 
+    borderColor: '#d1d5db', 
+    borderRadius: 12, 
+    paddingHorizontal: 16, 
+    paddingVertical: 12, 
+    fontSize: 15, 
+    color: '#1f2937' 
+  },
+  whiteInput: { 
+    backgroundColor: 'white' 
+  },
+  textArea: { 
+    height: 80, 
+    paddingTop: 12 
+  },
+  row: { 
+    flexDirection: 'row', 
+    gap: 12 
+  },
+  halfWidth: { 
+    flex: 1 
+  },
+  hintText: { 
+    fontSize: 11, 
+    color: '#6b7280', 
+    marginTop: 4, 
+    fontStyle: 'italic' 
+  },
+  imageUploadContainer: { 
+    alignItems: 'center', 
+    padding: 24, 
+    borderWidth: 2, 
+    borderStyle: 'dashed', 
+    borderColor: '#d1d5db', 
+    borderRadius: 16, 
+    backgroundColor: '#f9fafb' 
+  },
+  emptyImageContainer: { 
+    alignItems: 'center' 
+  },
+  uploadedImageContainer: { 
+    alignItems: 'center' 
+  },
+  cameraIconCircle: { 
+    width: 72, 
+    height: 72, 
+    borderRadius: 36, 
+    backgroundColor: '#d1fae5', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginBottom: 16 
+  },
+  uploadTitle: { 
+    fontSize: 16, 
+    fontWeight: '700', 
+    color: '#10b981', 
+    marginBottom: 6 
+  },
+  uploadSubtitle: { 
+    fontSize: 13, 
+    color: '#6b7280' 
+  },
+  uploadedImage: { 
+    width: 220, 
+    height: 165, 
+    borderRadius: 12, 
+    marginBottom: 12 
+  },
+  imageSuccessBadge: { 
+    backgroundColor: '#d1fae5', 
+    paddingHorizontal: 12, 
+    paddingVertical: 6, 
+    borderRadius: 20, 
+    marginBottom: 4 
+  },
+  imageSuccessText: { 
+    fontSize: 13, 
+    fontWeight: '700', 
+    color: '#10b981' 
+  },
+  imageHintText: { 
+    fontSize: 12, 
+    color: '#6b7280' 
+  },
+  bottomBar: { 
+    backgroundColor: 'white', 
+    borderTopWidth: 1, 
+    borderTopColor: '#e5e7eb', 
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: -2 }, 
+    shadowOpacity: 0.1, 
+    shadowRadius: 8, 
+    elevation: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 16,
+    flexDirection: 'row',
+    gap: 12
+  },
+  cancelButton: { 
+    flex: 1, 
+    backgroundColor: '#f3f4f6', 
+    paddingVertical: 14, 
+    borderRadius: 12, 
+    alignItems: 'center' 
+  },
+  cancelButtonText: { 
+    fontSize: 16, 
+    fontWeight: '600', 
+    color: '#4b5563' 
+  },
+  submitButton: { 
+    flex: 2, 
+    backgroundColor: '#10b981', 
+    paddingVertical: 14, 
+    borderRadius: 12, 
+    alignItems: 'center', 
+    shadowColor: '#10b981', 
+    shadowOffset: { width: 0, height: 4 }, 
+    shadowOpacity: 0.3, 
+    shadowRadius: 8, 
+    elevation: 4 
+  },
+  submitButtonText: { 
+    fontSize: 16, 
+    fontWeight: '700', 
+    color: 'white' 
+  },
+});
 
 export default AddProduct;
