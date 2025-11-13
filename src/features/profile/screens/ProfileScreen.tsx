@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, Switch, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { XCircleIcon, PencilIcon, UserIcon } from '../../../components/icons';
-import Button from '../../../components/ui/button';
+import Button from '../../../components/common/button';
 
 interface ProfileModalProps {
   visible: boolean;

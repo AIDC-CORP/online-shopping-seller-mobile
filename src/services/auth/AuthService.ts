@@ -163,6 +163,10 @@ class AuthService {
 
       // Save tokens
       await this.saveTokensToStorage(access_token, refresh_token);
+      
+      // Save credentials for auto re-authentication (encrypted by SecureStore)
+      await SecureStore.setItemAsync('saved_phone', credentials.username);
+      await SecureStore.setItemAsync('saved_password', credentials.password);
 
       // Verify token and get user info
       await this.verifyAndSetUserInfo();
@@ -312,6 +316,10 @@ class AuthService {
       // Clear local state and storage regardless of API success
       this.currentUser = null;
       await this.clearTokensFromStorage();
+      
+      // Clear saved credentials
+      await SecureStore.deleteItemAsync('saved_phone');
+      await SecureStore.deleteItemAsync('saved_password');
     }
   }
 

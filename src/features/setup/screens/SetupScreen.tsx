@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraIcon } from '../../../components/icons';
-import Button from '../../../components/ui/button';
+import Button from '../../../components/common/button';
 import * as ImagePicker from 'expo-image-picker';
 
 interface SetupScreenProps {

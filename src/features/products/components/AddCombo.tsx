@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Product, Combo, ComboProduct } from '../../../shared/types';
+import { Product, Combo, ComboProduct } from '../../../common/types';
 import * as ImagePicker from 'expo-image-picker';
 
 interface AddComboProps {

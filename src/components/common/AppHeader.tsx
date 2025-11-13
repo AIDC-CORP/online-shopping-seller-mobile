@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { UserIcon, XCircleIcon } from '../icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Button from '../ui/button';
+import Button from './button';
 import { useRouter } from 'expo-router';
 import { ProfileScreen } from '../../features/profile';
 

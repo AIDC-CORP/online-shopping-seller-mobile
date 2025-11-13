@@ -1,19 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
-import apiService from '../services/apiService';
+import apiService from '../../../services/apiService';
 
 export interface StoreProfile {
   id?: string;
-  name: string;
+  seller_id?: string;
+  store_name: string;
   description?: string;
   address?: string;
   phone?: string;
-  opening_hours?: string;
-  avatar_url?: string;
-  cover_image_url?: string;
-  is_active?: boolean;
-  rating?: number;
-  follower_count?: number;
-  product_count?: number;
+  avatar?: string;
+  cover?: string;
   created_at?: string;
   updated_at?: string;
 }

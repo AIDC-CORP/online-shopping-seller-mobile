@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SetupService } from '../../services';
+import { SetupService } from '../services/setup';
 
 /**
  * Hook để lấy storeId của seller hiện tại

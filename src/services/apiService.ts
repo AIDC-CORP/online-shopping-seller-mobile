@@ -21,7 +21,7 @@ class ApiService {
   async getStoreProfile(): Promise<ApiResponse<any>> {
     try {
       const headers = await this.getHeaders();
-      const response = await fetch(`${PROFILE_URL}/api/v1/store/me`, {
+      const response = await fetch(`${PROFILE_URL}/profile/store`, {
         method: 'GET',
         headers,
       });
@@ -57,7 +57,7 @@ class ApiService {
   }): Promise<ApiResponse<any>> {
     try {
       const headers = await this.getHeaders();
-      const response = await fetch(`${PROFILE_URL}/api/v1/store`, {
+      const response = await fetch(`${PROFILE_URL}/profile/store`, {
         method: 'POST',
         headers,
         body: JSON.stringify(storeData),
@@ -96,7 +96,7 @@ class ApiService {
   }): Promise<ApiResponse<any>> {
     try {
       const headers = await this.getHeaders();
-      const response = await fetch(`${PROFILE_URL}/api/v1/store/me`, {
+      const response = await fetch(`${PROFILE_URL}/profile/store`, {
         method: 'PATCH',
         headers,
         body: JSON.stringify(updates),
@@ -117,6 +117,76 @@ class ApiService {
       };
     } catch (error) {
       console.error('Update store profile error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Network error',
+      };
+    }
+  }
+
+  // Store Settings APIs
+  async getStoreSettings(): Promise<ApiResponse<any>> {
+    try {
+      const headers = await this.getHeaders();
+      const response = await fetch(`${PROFILE_URL}/profile/store/settings`, {
+        method: 'GET',
+        headers,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        return {
+          success: false,
+          error: error.detail || 'Failed to fetch store settings',
+        };
+      }
+
+      const data = await response.json();
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      console.error('Get store settings error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Network error',
+      };
+    }
+  }
+
+  async updateStoreSettings(settings: {
+    currency?: 'VND' | 'Dollar';
+    language?: 'vietnamese' | 'english';
+    time_zone?: string;
+    tax_rate?: number;
+    shipping_enable?: boolean;
+    auto_accept_order?: boolean;
+    notification_enable?: boolean;
+  }): Promise<ApiResponse<any>> {
+    try {
+      const headers = await this.getHeaders();
+      const response = await fetch(`${PROFILE_URL}/profile/store/settings`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify(settings),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        return {
+          success: false,
+          error: error.detail || 'Failed to update store settings',
+        };
+      }
+
+      const data = await response.json();
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      console.error('Update store settings error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Network error',

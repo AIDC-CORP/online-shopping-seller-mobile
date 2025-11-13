@@ -24,6 +24,7 @@ export interface Product {
   price: number;
   stock: number;
   unit: string;
+  status?: string; // Trạng thái sản phẩm: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK'
   imageUrl: string;
   sold?: number; // Số lượng đã bán
   expiryDate?: string; // Ngày hết hạn (ISO format: YYYY-MM-DD)

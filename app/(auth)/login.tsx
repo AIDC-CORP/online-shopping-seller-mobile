@@ -2,7 +2,7 @@ import React from 'react';
 import { router } from 'expo-router';
 import { LoginScreen } from '../../src/features/auth';
 import { useAuth } from '../../src/context/AuthContext';
-import { SetupService } from '@/services/setup';
+import { SetupService } from '../../src/services/setup';
 
 export default function Login() {
   const { setUser } = useAuth();

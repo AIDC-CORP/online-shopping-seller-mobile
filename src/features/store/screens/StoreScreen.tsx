@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image, ImageBackground, TouchableOpacity, Switch, Modal, TextInput, Alert, Share, ActivityIndicator } from 'react-native';
-import { mockStoreInfo, mockStoreStats, mockStoreReviews, mockStoreFollowers, mockStoreAnalytics, mockShareStoreData } from '../../../shared/data/mockData';
-import { StoreInfo } from '../../../shared/types';
+import { useRouter } from 'expo-router';
+import { mockStoreInfo, mockStoreStats, mockStoreReviews, mockStoreFollowers, mockStoreAnalytics, mockShareStoreData } from '../../../common/data/mockData';
+import { StoreInfo } from '../../../common/types';
 import { PencilIcon } from '../../../components/icons';
-import IconButton from '../../../components/ui/icon-button';
-import Button from '../../../components/ui/button';
-import { useStore } from '../../../hooks/useStore';
+import IconButton from '../../../components/common/icon-button';
+import Button from '../../../components/common/button';
+import { useStore } from '../hooks/useStore';
 
 const InfoRow: React.FC<{ label: string; value: string; icon?: string }> = ({ label, value, icon }) => (
   <View className="py-3 border-b border-gray-200">
@@ -14,12 +15,12 @@ const InfoRow: React.FC<{ label: string; value: string; icon?: string }> = ({ la
   </View>
 );
 
-const CompactStat: React.FC<{ 
-  icon: string; 
-  value: string; 
-  onPress?: () => void 
+const CompactStat: React.FC<{
+  icon: string;
+  value: string;
+  onPress?: () => void
 }> = ({ icon, value, onPress }) => (
-  <TouchableOpacity 
+  <TouchableOpacity
     onPress={onPress}
     className="flex-1 flex-row items-center justify-center py-2"
     disabled={!onPress}
@@ -31,7 +32,8 @@ const CompactStat: React.FC<{
 
 const StoreScreen: React.FC = () => {
   const { storeProfile, isLoading, error, updateStore } = useStore();
-  
+  const router = useRouter();
+
   const [storeInfo, setStoreInfo] = useState<StoreInfo>({
     ...mockStoreInfo,
     email: 'support@greenfarm.vn',
@@ -58,15 +60,16 @@ const StoreScreen: React.FC = () => {
     if (storeProfile) {
       setStoreInfo(prev => ({
         ...prev,
-        name: storeProfile.name || prev.name,
+        name: storeProfile.store_name || prev.name,
         description: storeProfile.description || prev.description,
         address: storeProfile.address || prev.address,
         phone: storeProfile.phone || prev.phone,
-        openingHours: storeProfile.opening_hours || prev.openingHours,
-        avatarUrl: storeProfile.avatar_url || prev.avatarUrl,
-        coverImageUrl: storeProfile.cover_image_url || prev.coverImageUrl,
+        openingHours: prev.openingHours, // Backend doesn't have this field yet
+        avatarUrl: storeProfile.avatar || prev.avatarUrl,
+        coverImageUrl: storeProfile.cover || prev.coverImageUrl,
       }));
-      setIsStoreOpen(storeProfile.is_active !== false);
+      // Backend doesn't have is_active field in current response, default to true
+      setIsStoreOpen(true);
     }
   }, [storeProfile]);
 
@@ -103,9 +106,9 @@ const StoreScreen: React.FC = () => {
 
   const handleSaveEdit = async () => {
     if (!editField) return;
-    
+
     setIsSaving(true);
-    
+
     // Map UI fields to API fields
     const apiUpdates: any = {};
     switch (editField) {
@@ -133,12 +136,12 @@ const StoreScreen: React.FC = () => {
         setIsSaving(false);
         return;
     }
-    
+
     // Update via API
     const result = await updateStore(apiUpdates);
-    
+
     setIsSaving(false);
-    
+
     if (result.success) {
       setShowEditModal(false);
       setEditField(null);
@@ -156,8 +159,8 @@ const StoreScreen: React.FC = () => {
         'Khách hàng sẽ không thể đặt hàng khi cửa hàng đóng cửa. Bạn có chắc chắn?',
         [
           { text: 'Hủy', style: 'cancel' },
-          { 
-            text: 'Đồng ý', 
+          {
+            text: 'Đồng ý',
             style: 'destructive',
             onPress: () => setIsStoreOpen(false)
           }
@@ -207,201 +210,220 @@ const StoreScreen: React.FC = () => {
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ paddingBottom: 110 }}>
-        {/* Store Status Toggle */}
-        <View className="bg-white px-4 py-3 flex-row justify-between items-center border-b border-gray-200">
-          <View className="flex-1">
-            <Text className="text-base font-semibold text-gray-800">Trạng thái cửa hàng</Text>
-            <Text className="text-sm text-gray-600 mt-0.5">
-              {isStoreOpen ? '🟢 Đang mở cửa' : '🔴 Đã đóng cửa'}
-            </Text>
+          {/* Store Status Toggle */}
+          <View className="bg-white px-4 py-3 flex-row justify-between items-center border-b border-gray-200">
+            <View className="flex-1">
+              <Text className="text-base font-semibold text-gray-800">Trạng thái cửa hàng</Text>
+              <Text className="text-sm text-gray-600 mt-0.5">
+                {isStoreOpen ? '🟢 Đang mở cửa' : '🔴 Đã đóng cửa'}
+              </Text>
+            </View>
+            <Switch
+              value={isStoreOpen}
+              onValueChange={handleToggleStore}
+              trackColor={{ false: '#d1d5db', true: '#10b981' }}
+              thumbColor={isStoreOpen ? '#ffffff' : '#f3f4f6'}
+            />
           </View>
-          <Switch
-            value={isStoreOpen}
-            onValueChange={handleToggleStore}
-            trackColor={{ false: '#d1d5db', true: '#10b981' }}
-            thumbColor={isStoreOpen ? '#ffffff' : '#f3f4f6'}
-          />
-        </View>
 
-        {/* Cover Image with Edit Button */}
-        <ImageBackground source={{ uri: storeInfo.coverImageUrl }} className="w-full h-48" resizeMode="cover">
+          {/* Cover Image with Edit Button */}
+          <ImageBackground source={{ uri: storeInfo.coverImageUrl }} className="w-full h-48" resizeMode="cover">
             <View className="flex-1 bg-black/30 justify-end p-4">
               <View className="self-end">
                 <IconButton onPress={() => console.log('Edit cover')}>
-                  <View style={{ 
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-                    padding: 8, 
-                    borderRadius: 8 
+                  <View style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    padding: 8,
+                    borderRadius: 8
                   }}>
                     <PencilIcon className="h-5 w-5" color="white" />
                   </View>
                 </IconButton>
               </View>
             </View>
-        </ImageBackground>
-        
-        {/* Store Profile Section */}
-        <View className="px-4 -mt-16">
-          <View className="flex-row items-center" style={{ gap: 16 }}>
-            <Image source={{ uri: storeInfo.avatarUrl }} className="w-24 h-24 rounded-2xl border-4 border-white shadow-lg" />
-            <View className="flex-1">
-              <View style={{ 
-                backgroundColor: 'rgba(0, 0, 0, 0.4)', 
-                paddingHorizontal: 12, 
-                paddingVertical: 8, 
-                borderRadius: 12,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.3,
-                shadowRadius: 4,
-                elevation: 3,
-                marginBottom: 8,
-              }}>
-                <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#ffffff' }}>
-                  {storeInfo.name}
-                </Text>
-              </View>
-              
-              {/* Compact Stats Row */}
-              <View className="flex-row bg-white rounded-xl shadow-sm">
-                <CompactStat 
-                  icon="⭐" 
-                  value={`${mockStoreStats.averageRating}`} 
-                  onPress={() => {
-                    setDetailType('reviews');
-                    setShowDetailModal(true);
-                  }}
-                />
-                <View className="w-px bg-gray-200 my-1.5" />
-                <CompactStat 
-                  icon="❤️" 
-                  value={mockStoreStats.totalFollowers > 999 ? `${(mockStoreStats.totalFollowers / 1000).toFixed(1)}K` : `${mockStoreStats.totalFollowers}`}
-                  onPress={() => {
-                    setDetailType('followers');
-                    setShowDetailModal(true);
-                  }}
-                />
-                <View className="w-px bg-gray-200 my-1.5" />
-                <CompactStat 
-                  icon="📦" 
-                  value={`${mockStoreStats.totalProducts}`}
-                  onPress={() => {
-                    setDetailType('products');
-                    setShowDetailModal(true);
-                  }}
-                />
+          </ImageBackground>
+
+          {/* Store Profile Section */}
+          <View className="px-4 -mt-16" style={{ marginBottom: 16, zIndex: 1 }}>
+            <View className="flex-row items-center" style={{ gap: 16 }}>
+              <Image source={{ uri: storeInfo.avatarUrl }} className="w-24 h-24 rounded-2xl border-4 border-white shadow-lg" />
+              <View className="flex-1">
+                <View style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                  borderRadius: 12,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 4,
+                  elevation: 3,
+                  marginBottom: 8,
+                }}>
+                  <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#ffffff' }}>
+                    {storeInfo.name}
+                  </Text>
+                </View>
+
+                {/* Compact Stats Row */}
+                <View className="flex-row bg-white rounded-xl shadow-sm">
+                  <CompactStat
+                    icon="⭐"
+                    value={`${mockStoreStats.averageRating}`}
+                    onPress={() => {
+                      setDetailType('reviews');
+                      setShowDetailModal(true);
+                    }}
+                  />
+                  <View className="w-px bg-gray-200 my-1.5" />
+                  <CompactStat
+                    icon="❤️"
+                    value={mockStoreStats.totalFollowers > 999 ? `${(mockStoreStats.totalFollowers / 1000).toFixed(1)}K` : `${mockStoreStats.totalFollowers}`}
+                    onPress={() => {
+                      setDetailType('followers');
+                      setShowDetailModal(true);
+                    }}
+                  />
+                  <View className="w-px bg-gray-200 my-1.5" />
+                  <CompactStat
+                    icon="📦"
+                    value={`${mockStoreStats.totalProducts}`}
+                    onPress={() => {
+                      setDetailType('products');
+                      setShowDetailModal(true);
+                    }}
+                  />
+                </View>
               </View>
             </View>
           </View>
-        </View>
 
-        {/* Store Description Card */}
-        <View className="bg-white p-4 rounded-xl shadow-sm mx-4 mt-4">
-          <View className="flex-row justify-between items-start mb-2">
-            <Text className="text-base font-semibold text-gray-800">Giới thiệu</Text>
-            <IconButton onPress={() => handleEditField('description')}>
-              <PencilIcon className="h-4 w-4" color="#6b7280" />
-            </IconButton>
+          {/* Store Description Card */}
+         <View style={{ 
+            backgroundColor: 'white', 
+            padding: 16, 
+            borderRadius: 12, 
+            marginHorizontal: 16, 
+            marginTop: 10,
+            zIndex: 10,
+            position: 'relative'
+          }}> 
+            <View className="flex-row justify-between items-start mb-2">
+              <Text style={{ fontSize: 16, fontWeight: '600', color: '#1f2937' }}>Giới thiệu</Text>
+              {/* <IconButton onPress={() => handleEditField('description')}>
+                <PencilIcon className="h-4 w-4" color="#6b7280" />
+              </IconButton> */}
+            </View>
+            <Text style={{ fontSize: 14, color: '#1f2937', lineHeight: 20 }}>
+              {storeInfo.description || 'Chưa có mô tả'}
+            </Text>
           </View>
-          <Text className="text-sm text-gray-600 leading-5">{storeInfo.description}</Text>
-        </View>
 
-        {/* Store Information Card */}
-        <View className="bg-white p-4 rounded-xl shadow-sm mx-4 mt-4">
-          <View className="flex-row justify-between items-center mb-3">
-            <Text className="text-base font-semibold text-gray-800">Thông tin liên hệ</Text>
-          </View>
-          <TouchableOpacity onPress={() => handleEditField('address')}>
-            <InfoRow label="Địa chỉ" value={storeInfo.address} icon="📍" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleEditField('phone')}>
-            <InfoRow label="Số điện thoại" value={storeInfo.phone} icon="📞" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleEditField('hours')}>
-            <InfoRow label="Giờ mở cửa" value={storeInfo.openingHours} icon="🕐" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Additional Info Cards */}
-        <View className="bg-white p-4 rounded-xl shadow-sm mx-4 mt-4">
-          <Text className="text-base font-semibold text-gray-800 mb-3">Thông tin bổ sung</Text>
-          <TouchableOpacity onPress={() => handleEditField('email')}>
-            <InfoRow label="Email liên hệ" value={storeInfo.email || 'Chưa cập nhật'} icon="📧" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleEditField('website')}>
-            <InfoRow label="Website" value={storeInfo.website || 'Chưa cập nhật'} icon="🌐" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleEditField('paymentMethods')}>
-            <InfoRow label="Phương thức thanh toán" value={storeInfo.paymentMethods || 'Chưa cập nhật'} icon="💳" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleEditField('shippingPolicy')}>
-            <InfoRow label="Chính sách giao hàng" value={storeInfo.shippingPolicy || 'Chưa cập nhật'} icon="🚚" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleEditField('returnPolicy')}>
-            <InfoRow label="Chính sách đổi trả" value={storeInfo.returnPolicy || 'Chưa cập nhật'} icon="↩️" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Social Media Links */}
-        <View className="bg-white p-4 rounded-xl shadow-sm mx-4 mt-4">
-          <Text className="text-base font-semibold text-gray-800 mb-3">Mạng xã hội</Text>
-          <View className="flex-row justify-around items-center">
-            <TouchableOpacity 
-              className="w-14 h-14 rounded-full items-center justify-center" 
-              style={{ backgroundColor: '#1877F2' }}
-              onPress={() => handleEditField('facebook')}
-            >
-              <Image 
-                source={{ uri: 'https://cdn-icons-png.flaticon.com/512/733/733547.png' }}
-                style={{ width: 28, height: 28, tintColor: 'white' }}
-                resizeMode="contain"
-              />
+          {/* Store Information Card */}
+          <View className="bg-white p-4 rounded-xl shadow-sm mx-4 mt-4">
+            <View className="flex-row justify-between items-center mb-3">
+              <Text className="text-base font-semibold text-gray-800">Thông tin liên hệ</Text>
+            </View>
+            <TouchableOpacity onPress={() => handleEditField('address')}>
+              <InfoRow label="Địa chỉ" value={storeInfo.address} icon="📍" />
             </TouchableOpacity>
-            <TouchableOpacity 
-              className="w-14 h-14 rounded-full items-center justify-center" 
-              style={{ backgroundColor: '#E4405F' }}
-              onPress={() => handleEditField('instagram')}
-            >
-              <Image 
-                source={{ uri: 'https://cdn-icons-png.flaticon.com/512/2111/2111463.png' }}
-                style={{ width: 28, height: 28, tintColor: 'white' }}
-                resizeMode="contain"
-              />
+            <TouchableOpacity onPress={() => handleEditField('phone')}>
+              <InfoRow label="Số điện thoại" value={storeInfo.phone} icon="📞" />
             </TouchableOpacity>
-            <TouchableOpacity 
-              className="w-14 h-14 rounded-full items-center justify-center" 
-              style={{ backgroundColor: '#FF0000' }}
-              onPress={() => handleEditField('youtube')}
-            >
-              <Image 
-                source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png' }}
-                style={{ width: 28, height: 28, tintColor: 'white' }}
-                resizeMode="contain"
-              />
+            <TouchableOpacity onPress={() => handleEditField('hours')}>
+              <InfoRow label="Giờ mở cửa" value={storeInfo.openingHours} icon="🕐" />
             </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Quick Actions */}
-        <View style={{ paddingHorizontal: 16, marginTop: 24, gap: 12 }}>
-          <Button
-            onPress={() => setShowAnalyticsModal(true)}
-            variant="primary"
-            size="md"
-            fullWidth
-          >
-            📊 Xem thống kê cửa hàng
-          </Button>
-          
-          <Button
-            onPress={() => setShowShareModal(true)}
-            variant="secondary"
-            size="md"
-            fullWidth
-          >
-            🔗 Chia sẻ cửa hàng
-          </Button>
-        </View>
+          {/* Additional Info Cards */}
+          <View className="bg-white p-4 rounded-xl shadow-sm mx-4 mt-4">
+            <Text className="text-base font-semibold text-gray-800 mb-3">Thông tin bổ sung</Text>
+            <TouchableOpacity onPress={() => handleEditField('email')}>
+              <InfoRow label="Email liên hệ" value={storeInfo.email || 'Chưa cập nhật'} icon="📧" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleEditField('website')}>
+              <InfoRow label="Website" value={storeInfo.website || 'Chưa cập nhật'} icon="🌐" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleEditField('paymentMethods')}>
+              <InfoRow label="Phương thức thanh toán" value={storeInfo.paymentMethods || 'Chưa cập nhật'} icon="💳" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleEditField('shippingPolicy')}>
+              <InfoRow label="Chính sách giao hàng" value={storeInfo.shippingPolicy || 'Chưa cập nhật'} icon="🚚" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleEditField('returnPolicy')}>
+              <InfoRow label="Chính sách đổi trả" value={storeInfo.returnPolicy || 'Chưa cập nhật'} icon="↩️" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Social Media Links */}
+          <View className="bg-white p-4 rounded-xl shadow-sm mx-4 mt-4">
+            <Text className="text-base font-semibold text-gray-800 mb-3">Mạng xã hội</Text>
+            <View className="flex-row justify-around items-center">
+              <TouchableOpacity
+                className="w-14 h-14 rounded-full items-center justify-center"
+                style={{ backgroundColor: '#1877F2' }}
+                onPress={() => handleEditField('facebook')}
+              >
+                <Image
+                  source={{ uri: 'https://cdn-icons-png.flaticon.com/512/733/733547.png' }}
+                  style={{ width: 28, height: 28, tintColor: 'white' }}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="w-14 h-14 rounded-full items-center justify-center"
+                style={{ backgroundColor: '#E4405F' }}
+                onPress={() => handleEditField('instagram')}
+              >
+                <Image
+                  source={{ uri: 'https://cdn-icons-png.flaticon.com/512/2111/2111463.png' }}
+                  style={{ width: 28, height: 28, tintColor: 'white' }}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="w-14 h-14 rounded-full items-center justify-center"
+                style={{ backgroundColor: '#FF0000' }}
+                onPress={() => handleEditField('youtube')}
+              >
+                <Image
+                  source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png' }}
+                  style={{ width: 28, height: 28, tintColor: 'white' }}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Quick Actions */}
+          <View style={{ paddingHorizontal: 16, marginTop: 24, gap: 12 }}>
+            <Button
+              onPress={() => setShowAnalyticsModal(true)}
+              variant="primary"
+              size="md"
+              fullWidth
+            >
+              📊 Xem thống kê cửa hàng
+            </Button>
+
+            <Button
+              onPress={() => setShowShareModal(true)}
+              variant="secondary"
+              size="md"
+              fullWidth
+            >
+              🔗 Chia sẻ cửa hàng
+            </Button>
+
+            <Button
+              onPress={() => router.push('/store-settings' as any)}
+              variant="secondary"
+              size="md"
+              fullWidth
+            >
+              ⚙️ Cài đặt cửa hàng
+            </Button>
+          </View>
         </ScrollView>
       )}
 
@@ -420,7 +442,7 @@ const StoreScreen: React.FC = () => {
                 <Text className="text-2xl text-gray-400">✕</Text>
               </TouchableOpacity>
             </View>
-            
+
             <TextInput
               value={editValue}
               onChangeText={setEditValue}
@@ -477,13 +499,13 @@ const StoreScreen: React.FC = () => {
                 <Text className="text-2xl text-gray-400">✕</Text>
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView className="flex-1 p-4">
               {detailType === 'reviews' && mockStoreReviews.map((review) => (
                 <View key={review.id} className="bg-gray-50 p-4 rounded-xl mb-3">
                   <View className="flex-row items-center mb-2">
-                    <Image 
-                      source={{ uri: review.customerAvatar }} 
+                    <Image
+                      source={{ uri: review.customerAvatar }}
                       className="w-10 h-10 rounded-full"
                     />
                     <View className="flex-1 ml-3">
@@ -499,9 +521,9 @@ const StoreScreen: React.FC = () => {
                   {review.images && (
                     <View className="flex-row mt-2" style={{ gap: 8 }}>
                       {review.images.map((img, idx) => (
-                        <Image 
+                        <Image
                           key={idx}
-                          source={{ uri: img }} 
+                          source={{ uri: img }}
                           className="w-20 h-20 rounded-lg"
                         />
                       ))}
@@ -509,11 +531,11 @@ const StoreScreen: React.FC = () => {
                   )}
                 </View>
               ))}
-              
+
               {detailType === 'followers' && mockStoreFollowers.map((follower) => (
                 <View key={follower.id} className="bg-gray-50 p-4 rounded-xl mb-3 flex-row items-center">
-                  <Image 
-                    source={{ uri: follower.customerAvatar }} 
+                  <Image
+                    source={{ uri: follower.customerAvatar }}
                     className="w-12 h-12 rounded-full"
                   />
                   <View className="flex-1 ml-3">
@@ -564,7 +586,7 @@ const StoreScreen: React.FC = () => {
                 <Text className="text-2xl text-gray-400">✕</Text>
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView className="flex-1 p-4">
               {/* Overview Stats */}
               <View className="bg-emerald-50 p-4 rounded-xl mb-4">
@@ -640,8 +662,8 @@ const StoreScreen: React.FC = () => {
                   <View key={hour.hour} className="flex-row items-center justify-between py-2">
                     <Text className="text-sm text-gray-700">{hour.hour}</Text>
                     <View className="flex-1 mx-3 bg-gray-200 rounded-full h-2">
-                      <View 
-                        className="bg-orange-500 h-2 rounded-full" 
+                      <View
+                        className="bg-orange-500 h-2 rounded-full"
                         style={{ width: `${(hour.orders / 42) * 100}%` }}
                       />
                     </View>
@@ -669,11 +691,11 @@ const StoreScreen: React.FC = () => {
                 <Text className="text-2xl text-gray-400">✕</Text>
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView className="flex-1 p-4">
               {/* QR Code */}
               <View className="items-center bg-gray-50 p-6 rounded-xl mb-4">
-                <Image 
+                <Image
                   source={{ uri: mockShareStoreData.qrCodeUrl }}
                   style={{ width: 200, height: 200 }}
                   resizeMode="contain"
@@ -690,7 +712,7 @@ const StoreScreen: React.FC = () => {
                   <Text className="text-sm text-gray-800 flex-1" numberOfLines={1}>
                     {mockShareStoreData.storeUrl}
                   </Text>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     className="ml-2 bg-emerald-100 px-3 py-1.5 rounded-lg"
                     onPress={async () => {
                       try {
@@ -715,7 +737,7 @@ const StoreScreen: React.FC = () => {
                   <Text className="text-base font-semibold text-emerald-600">
                     {mockShareStoreData.shortUrl}
                   </Text>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     className="ml-2 bg-emerald-100 px-3 py-1.5 rounded-lg"
                     onPress={async () => {
                       try {

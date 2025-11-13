@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { AuthService } from '../../../../services';
-import SetupService from '../../../../services/setup/SetupService';
+import { AuthService } from '../../../services';
+import SetupService from '../../../services/setup/SetupService';
 
 interface User {
   id: string;

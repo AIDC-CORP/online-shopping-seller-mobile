@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, Image, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Product } from '../../../shared/types';
+import { Product } from '../../../common/types';
 import { XIcon, CameraIcon } from '../../../components/icons';
 import * as ImagePicker from 'expo-image-picker';
+import { CategoryPicker } from './CategoryPicker';
+import { UnitPicker } from './UnitPicker';
+import { StatusPicker } from './StatusPicker';
+import type { ProductStatus } from '../../../common/data/productEnums';
 
 interface AddProductProps {
   onClose: () => void;
@@ -35,6 +39,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
   const [price, setPrice] = useState('');
   const [unit, setUnit] = useState('kg');
   const [stock, setStock] = useState('');
+  const [status, setStatus] = useState<ProductStatus | null>('Còn hàng'); // Default: Còn hàng
   const [expiryDate, setExpiryDate] = useState('');
   const [importDate, setImportDate] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -90,44 +95,84 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
       Alert.alert('Lỗi', 'Vui lòng nhập tên sản phẩm.');
       return;
     }
+    if (!category) {
+      Alert.alert('Lỗi', 'Vui lòng chọn danh mục sản phẩm.');
+      return;
+    }
     if (!price || parseFloat(price) <= 0) {
       Alert.alert('Lỗi', 'Vui lòng nhập giá bán hợp lệ.');
       return;
     }
-    if (!unit.trim()) {
-      Alert.alert('Lỗi', 'Vui lòng nhập đơn vị.');
+    if (!unit) {
+      Alert.alert('Lỗi', 'Vui lòng chọn đơn vị.');
       return;
     }
     if (!stock || parseInt(stock, 10) < 0) {
       Alert.alert('Lỗi', 'Vui lòng nhập số lượng hợp lệ.');
       return;
     }
+    if (!status) {
+      Alert.alert('Lỗi', 'Vui lòng chọn trạng thái sản phẩm.');
+      return;
+    }
+
+    // Validate date format YYYY-MM-DD
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (expiryDate && !dateRegex.test(expiryDate)) {
+      Alert.alert('Lỗi', 'Ngày hết hạn phải theo định dạng YYYY-MM-DD (ví dụ: 2025-11-20)');
+      return;
+    }
+    if (importDate && !dateRegex.test(importDate)) {
+      Alert.alert('Lỗi', 'Ngày nhập hàng phải theo định dạng YYYY-MM-DD (ví dụ: 2025-11-11)');
+      return;
+    }
+
+    // Validate expiry date is valid date
+    if (expiryDate) {
+      const expiry = new Date(expiryDate);
+      if (isNaN(expiry.getTime())) {
+        Alert.alert('Lỗi', 'Ngày hết hạn không hợp lệ. Vui lòng kiểm tra lại (tháng 1-12, ngày hợp lệ).');
+        return;
+      }
+    }
+
+    // Validate import date is valid date
+    if (importDate) {
+      const imported = new Date(importDate);
+      if (isNaN(imported.getTime())) {
+        Alert.alert('Lỗi', 'Ngày nhập hàng không hợp lệ. Vui lòng kiểm tra lại (tháng 1-12, ngày hợp lệ).');
+        return;
+      }
+    }
 
     onAddProduct({
       name: name.trim(),
       description: description.trim() || undefined,
-      category: category.trim() || undefined,
+      category: category,
       price: parseFloat(price),
       stock: parseInt(stock, 10),
-      unit: unit.trim(),
+      unit: unit,
+      status: status,
       imageUrl: imageUri || `https://picsum.photos/seed/${name}/${Math.random()}/300/200`,
       expiryDate: expiryDate || undefined,
       importDate: importDate || undefined,
     });
   };
 
+  console.log('[AddProduct] Rendering component');
+  
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#10b981' }} edges={['top', 'bottom']}>
       <KeyboardAvoidingView 
-        style={styles.keyboardView}
+        style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}
       >
         <View style={styles.container}>
-          {/* Header */}
+          {/* Header - Fixed height */}
           <View style={styles.header}>
-            <View>
-              <Text style={styles.headerTitle}>✨ Sản phẩm mới</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.headerTitle }>✨ Sản phẩm mới</Text>
               <Text style={styles.headerSubtitle}>Điền thông tin sản phẩm của bạn</Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -136,10 +181,10 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
           </View>
 
           {/* ScrollView */}
-          <ScrollView 
+           <ScrollView 
             style={styles.scrollView}
             contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator={true}
             keyboardShouldPersistTaps="handled"
           >
             {/* Image Upload */}
@@ -194,13 +239,11 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
                 />
               </InputField>
 
-              <InputField label="Danh mục" icon="📂">
-                <TextInput 
-                  value={category} 
-                  onChangeText={setCategory} 
-                  style={styles.input}
-                  placeholder="Ví dụ: Rau củ, Thịt, Hải sản..."
-                  placeholderTextColor="#9ca3af"
+              <InputField label="Danh mục" required icon="📂">
+                <CategoryPicker
+                  selectedValue={category}
+                  onValueChange={setCategory}
+                  placeholder="Chọn danh mục sản phẩm"
                 />
               </InputField>
             </View>
@@ -227,12 +270,10 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
                 
                 <View style={styles.halfWidth}>
                   <InputField label="Đơn vị" required icon="⚖️">
-                    <TextInput 
-                      placeholder="kg, mớ..." 
-                      value={unit} 
-                      onChangeText={setUnit} 
-                      style={styles.input}
-                      placeholderTextColor="#9ca3af"
+                    <UnitPicker
+                      selectedValue={unit}
+                      onValueChange={setUnit}
+                      placeholder="Chọn đơn vị"
                     />
                   </InputField>
                 </View>
@@ -248,13 +289,18 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
                   placeholderTextColor="#9ca3af"
                 />
               </InputField>
+
+              {/* Status Picker */}
+              <StatusPicker
+                selectedStatus={status}
+                onSelectStatus={setStatus}
+              />
             </View>
 
             {/* Expiry Date */}
             <View style={[styles.card, styles.expiryCard]}>
               <View style={styles.sectionHeader}>
                 <Text style={[styles.sectionTitle, styles.expiryTitle]}>📅 Hạn sử dụng</Text>
-                <Text style={styles.sectionSubtitle}>Chỉ áp dụng cho thực phẩm tươi</Text>
               </View>
               
               <View style={styles.row}>
@@ -304,20 +350,18 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: { 
-    flex: 1, 
-    backgroundColor: '#10b981' 
-  },
   keyboardView: {
     flex: 1
   },
   container: { 
     flex: 1, 
-    backgroundColor: '#f8fafc' 
+    backgroundColor: '#f8fafc'
   },
   header: { 
     paddingHorizontal: 20, 
-    paddingVertical: 16, 
+    paddingVertical: 16,
+    minHeight: 80,
+    maxHeight: 80,
     backgroundColor: '#10b981', 
     borderBottomLeftRadius: 24, 
     borderBottomRightRadius: 24, 

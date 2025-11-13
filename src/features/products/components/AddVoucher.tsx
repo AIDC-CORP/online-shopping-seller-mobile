@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Voucher } from '../../../shared/types';
+import { Voucher } from '../../../common/types';
 
 interface AddVoucherProps {
   visible: boolean;

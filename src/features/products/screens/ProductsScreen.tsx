@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, FlatList, Image, Modal, TouchableOpacity, ScrollView, TextInput, Alert, ActivityIndicator } from 'react-native';
-import { Product, Combo, Voucher } from '../../../shared/types';
+import { Product, Combo, Voucher } from '../../../common/types';
 import { PlusIcon, XCircleIcon } from '../../../components/icons';
 import AddProduct from '../components/AddProduct';
 import AddOptionMenu from '../components/AddOptionMenu';
@@ -8,9 +8,9 @@ import AddCombo from '../components/AddCombo';
 import AddVoucher from '../components/AddVoucher';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PromotionsScreen from '../../promotions/screens/PromotionsScreen';
-import FloatingButton from '../../../components/ui/FloatingButton';
+import FloatingButton from '../../../components/common/FloatingButton';
 import { useStoreId } from '../../../hooks/useStoreId';
-import { ProductsService, ProductCategory, ProductUnit, ProductStatus } from '../../../../services';
+import { ProductsService, ProductCategory, ProductUnit, ProductStatus } from '../../../services/products';
 
 // List Layout Card Component
 const ProductListCard: React.FC<{ 
@@ -762,7 +762,7 @@ const getDaysUntilExpiry = (expiryDate?: string): number | null => {
 
 const ProductsScreen: React.FC = () => {
   // Get store ID
-  const { storeId, isLoading: isLoadingStoreId } = useStoreId();
+  const { storeId, isLoading: isLoadingStoreId, error: storeIdError } = useStoreId();
   
   // Main tab toggle between Products and Promotions
   const [activeMainTab, setActiveMainTab] = useState<'products' | 'promotions'>('products');
@@ -837,10 +837,10 @@ const ProductsScreen: React.FC = () => {
         description: newProductData.description || '',
         price: newProductData.price,
         quantity: newProductData.stock,
-        category: (newProductData.category || 'vegetables') as ProductCategory,
+        category: (newProductData.category || 'rau củ') as ProductCategory,
         image_urls: newProductData.imageUrl ? [newProductData.imageUrl] : [],
         unit: newProductData.unit as ProductUnit,
-        status: ProductStatus.IN_STOCK,
+        status: (newProductData.status || 'Còn hàng') as any,
         import_date: newProductData.importDate,
         expiration_date: newProductData.expiryDate,
       };

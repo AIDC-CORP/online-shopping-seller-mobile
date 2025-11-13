@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import type { SetupData } from '../src/features/setup';
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
-import { SetupService } from '@/services/setup';
+import { SetupService } from '../src/services/setup';
 
 export default function Setup() {
   const router = useRouter();

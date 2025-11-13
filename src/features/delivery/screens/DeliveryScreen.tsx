@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, Image, Linking } from 'react-native';
-import { mockDeliveries } from '../../../shared/data/mockData';
-import { Delivery, DeliveryStatus, DeliveryPartner } from '../../../shared/types';
+import { mockDeliveries } from '../../../common/data/mockData';
+import { Delivery, DeliveryStatus, DeliveryPartner } from '../../../common/types';
 
 // Status colors
 const getStatusColor = (status: DeliveryStatus) => {

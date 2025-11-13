@@ -21,14 +21,20 @@ export async function createProduct(
   product: ProductCreateRequest
 ): Promise<Product> {
   try {
+    console.log('[createProduct] Creating product for store:', storeId);
+    console.log('[createProduct] Product data:', product);
+    console.log('[createProduct] Endpoint:', `${CATALOG_ENDPOINTS.CREATE_PRODUCT}/${storeId}`);
+    
     const response = await httpClient.post<BackendProductResponse>(
       `${CATALOG_ENDPOINTS.CREATE_PRODUCT}/${storeId}`,
       product
     );
 
+    console.log('[createProduct] Success! Response:', response.data);
     return transformProductResponse(response.data);
   } catch (error: any) {
     console.error('Failed to create product:', error);
+    console.error('Error response:', error.response?.data);
     
     // Parse error message
     const errorDetail = error.response?.data?.detail;

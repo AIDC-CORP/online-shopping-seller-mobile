@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { mockDashboardStatsByPeriod } from '../../../shared/data/mockData';
+import { mockDashboardStatsByPeriod } from '../../../common/data/mockData';
 import { ChartBarIcon, PackageIcon, CheckCircleIcon, XCircleIcon } from '../../../components/icons';
-import { Product } from '../../../shared/types';
+import { Product } from '../../../common/types';
 import { RevenueDetailCard } from '../components/RevenueDetailCard';
 import { OrdersDetailCard } from '../components/OrdersDetailCard';
 import { ProductDetailCard } from '../components/ProductDetailCard';

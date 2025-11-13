@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import aiAssistantService, { AIMessage, BusinessContext } from '../../features/ai/aiAssistantService';
+import aiAssistantService, { AIMessage, BusinessContext } from '../aiAssistantService';
 
 interface AIAssistantChatProps {
   visible: boolean;

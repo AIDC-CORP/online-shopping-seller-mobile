@@ -2,10 +2,10 @@ import { Tabs } from 'expo-router';
 import React, { useState, useMemo } from 'react';
 import { HomeIcon, PackageIcon, CubeIcon, ChatIcon, WalletIcon, TruckIcon } from '../../src/components/icons';
 import AppHeader from '../../src/components/common/AppHeader';
-import { mockChatConversations, mockProducts, mockOrders } from '../../src/shared/data/mockData';
-import { OrderStatus } from '../../src/shared/types';
-import AIAssistantBubble from '../../src/components/ai/AIAssistantBubble';
-import AIAssistantChat from '../../src/components/ai/AIAssistantChat';
+import { mockChatConversations, mockProducts, mockOrders } from '../../src/common/data/mockData';
+import { OrderStatus } from '../../src/common/types';
+import AIAssistantBubble from '../../src/features/ai/components/AIAssistantBubble';
+import AIAssistantChat from '../../src/features/ai/components/AIAssistantChat';
 import type { BusinessContext } from '../../src/features/ai/aiAssistantService';
 
 export default function MainLayout() {
@@ -111,6 +111,12 @@ export default function MainLayout() {
           name="store"
           options={{
             href: null, // Hide from tab bar - accessible from header
+          }}
+        />
+        <Tabs.Screen
+          name="store-settings"
+          options={{
+            href: null, // Hide from tab bar - accessible from store screen
           }}
         />
         {/* Hide chat detail from tab bar - it's a nested screen */}

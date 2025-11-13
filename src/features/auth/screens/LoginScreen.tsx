@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
-import Button from '../../../components/ui/button';
+import Button from '../../../components/common/button';
 import { useLogin } from '../hooks/useLogin';
 import { useAuth } from '../../../context/AuthContext';
 

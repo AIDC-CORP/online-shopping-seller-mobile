@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import catalogService from '../services/catalogService';
+import catalogService from '../../../services/catalogService';
 
 export interface Product {
   id: string;
