@@ -414,15 +414,6 @@ const StoreScreen: React.FC = () => {
             >
               🔗 Chia sẻ cửa hàng
             </Button>
-
-            <Button
-              onPress={() => router.push('/store-settings' as any)}
-              variant="secondary"
-              size="md"
-              fullWidth
-            >
-              ⚙️ Cài đặt cửa hàng
-            </Button>
           </View>
         </ScrollView>
       )}

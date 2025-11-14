@@ -9,7 +9,7 @@ import AddVoucher from '../components/AddVoucher';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PromotionsScreen from '../../promotions/screens/PromotionsScreen';
 import FloatingButton from '../../../components/common/FloatingButton';
-import { useStoreId } from '../../../hooks/useStoreId';
+import { useStoreId } from '../../store/hooks/useStoreId';
 import { ProductsService, ProductCategory, ProductUnit, ProductStatus } from '../../../services/products';
 
 // List Layout Card Component

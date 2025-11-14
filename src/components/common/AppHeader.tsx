@@ -4,7 +4,7 @@ import { UserIcon, XCircleIcon } from '../icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from './button';
 import { useRouter } from 'expo-router';
-import { ProfileScreen } from '../../features/profile';
+import SettingsScreen from '../../features/settings/screens/SettingsScreen';
 
 interface AppHeaderProps {
   onLogout: () => void;
@@ -295,16 +295,14 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onLogout }) => {
               )}
             </TouchableOpacity>
 
-            {/* User Button */}
+            {/* Settings Button */}
             <TouchableOpacity
               onPress={() => setShowProfileModal(true)}
               style={{
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                padding: 10,
-                borderRadius: 8
+                padding: 8,
               }}
             >
-              <UserIcon className="h-6 w-6" color="white" />
+              <Text style={{ fontSize: 24 }}>⚙️</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -320,11 +318,57 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onLogout }) => {
       />
 
       {/* Profile Modal */}
-      <ProfileScreen
+      <Modal
         visible={showProfileModal}
-        onClose={() => setShowProfileModal(false)}
-        onLogout={onLogout}
-      />
+        transparent={false}
+        animationType="slide"
+        onRequestClose={() => setShowProfileModal(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+          {/* Header */}
+          <View style={{ 
+            flexDirection: 'row', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            padding: 20,
+            paddingTop: 60,
+            backgroundColor: 'white',
+            borderBottomWidth: 1,
+            borderBottomColor: '#e5e7eb'
+          }}>
+            <Text style={{ fontSize: 20, fontWeight: '700', color: '#1f2937' }}>⚙️ Cài đặt</Text>
+            <TouchableOpacity onPress={() => setShowProfileModal(false)}>
+              <Text style={{ fontSize: 24, color: '#6b7280' }}>✕</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Settings Content */}
+          <View style={{ flex: 1 }}>
+            <SettingsScreen />
+          </View>
+
+          {/* Logout Button */}
+          <View style={{ 
+            padding: 16, 
+            backgroundColor: 'white',
+            borderTopWidth: 1, 
+            borderTopColor: '#e5e7eb',
+            paddingBottom: 40
+          }}>
+            <Button 
+              onPress={() => {
+                setShowProfileModal(false);
+                onLogout();
+              }} 
+              variant="danger" 
+              size="md" 
+              fullWidth
+            >
+              🚪 Đăng xuất
+            </Button>
+          </View>
+        </View>
+      </Modal>
     </>
   );
 };

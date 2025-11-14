@@ -113,12 +113,6 @@ export default function MainLayout() {
             href: null, // Hide from tab bar - accessible from header
           }}
         />
-        <Tabs.Screen
-          name="store-settings"
-          options={{
-            href: null, // Hide from tab bar - accessible from store screen
-          }}
-        />
         {/* Hide chat detail from tab bar - it's a nested screen */}
         <Tabs.Screen
           name="chat/[id]"
