@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Image, ScrollView, Animated } from 'react-native';
-import { ChatConversation, Message } from '../../../common/types';
-import { mockChatConversations } from '../../../common/data/mockData';
+import { View, Text, FlatList, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Animated } from 'react-native';
+import { useChat } from '../../../hooks/useChat';
 import * as ImagePicker from 'expo-image-picker';
 
 interface ChatDetailScreenProps {
@@ -10,9 +9,7 @@ interface ChatDetailScreenProps {
 }
 
 const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) => {
-  const [conversation, setConversation] = useState<ChatConversation | undefined>(
-    mockChatConversations.find(c => c.id === chatId)
-  );
+  const { messages, loading, error, sending, sendMessage } = useChat(chatId);
   const [inputText, setInputText] = useState('');
   const [showQuickReplies, setShowQuickReplies] = useState(false);
   const flatListRef = useRef<FlatList>(null);
@@ -35,48 +32,44 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
   }, [fadeAnim]);
 
   const scrollToBottom = () => {
-    if (flatListRef.current && conversation?.messages.length) {
+    if (flatListRef.current && messages.length) {
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }
   };
 
-  if (!conversation) {
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: 'white' }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ fontSize: 16, color: '#9ca3af' }}>Không tìm thấy cuộc trò chuyện</Text>
-        </View>
+      <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#3b82f6" />
+        <Text style={{ marginTop: 12, color: '#6b7280' }}>Đang tải tin nhắn...</Text>
       </View>
     );
   }
 
-  const handleSend = (text?: string) => {
+  if (error) {
+    return (
+      <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+        <Text style={{ fontSize: 48, marginBottom: 12 }}>⚠️</Text>
+        <Text style={{ fontSize: 16, color: '#ef4444', textAlign: 'center' }}>
+          {error}
+        </Text>
+      </View>
+    );
+  }
+
+  const handleSend = async (text?: string) => {
     const messageText = text || inputText.trim();
     if (!messageText) return;
 
-    const newMessage: Message = {
-      id: `m${Date.now()}`,
-      text: messageText,
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-      isFromSeller: true,
-      isRead: false,
-    };
-
-    setConversation(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        messages: [...prev.messages, newMessage],
-        lastMessage: `Bạn: ${messageText}`,
-        lastMessageTime: 'Vừa xong',
-      };
-    });
-
+    await sendMessage(messageText);
     setInputText('');
     setShowQuickReplies(false);
-    scrollToBottom();
   };
 
   const pickImage = async () => {
@@ -114,10 +107,16 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
     }
   };
 
-  const renderMessage = ({ item, index }: { item: Message; index: number }) => {
-    const isFromSeller = item.isFromSeller;
-    const prevMessage = index > 0 ? conversation?.messages[index - 1] : null;
-    const showAvatar = !isFromSeller && (!prevMessage || prevMessage.isFromSeller);
+  const renderMessage = ({ item, index }: { item: any; index: number }) => {
+    const isFromSeller = item.senderType === 'seller';
+    const prevMessage = index > 0 ? messages[index - 1] : null;
+    const showAvatar = !isFromSeller && (!prevMessage || prevMessage.senderType === 'seller');
+    
+    // Format timestamp
+    const formatTime = (timestamp: string) => {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    };
     
     return (
       <Animated.View
@@ -138,15 +137,20 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
         {!isFromSeller && (
           <View style={{ width: 32, marginRight: 8 }}>
             {showAvatar && (
-              <Image
-                source={{ uri: conversation?.customerAvatar || 'https://i.pravatar.cc/150?img=1' }}
+              <View
                 style={{
                   width: 32,
                   height: 32,
                   borderRadius: 16,
-                  backgroundColor: '#e5e7eb',
+                  backgroundColor: '#3b82f6',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
-              />
+              >
+                <Text style={{ fontSize: 14, fontWeight: 'bold', color: 'white' }}>
+                  K
+                </Text>
+              </View>
             )}
           </View>
         )}
@@ -183,13 +187,8 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
                 color: isFromSeller ? '#d1fae5' : '#9ca3af',
               }}
             >
-              {item.timestamp}
+              {formatTime(item.timestamp)}
             </Text>
-            {isFromSeller && (
-              <Text style={{ fontSize: 10, marginLeft: 4 }}>
-                {item.isRead ? '✓✓' : '✓'}
-              </Text>
-            )}
           </View>
         </View>
       </Animated.View>
@@ -226,20 +225,25 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
             <Text style={{ fontSize: 20 }}>←</Text>
           </TouchableOpacity>
 
-          <Image
-            source={{ uri: conversation.customerAvatar || 'https://i.pravatar.cc/150?img=1' }}
+          <View
             style={{
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: '#e5e7eb',
+              backgroundColor: '#3b82f6',
               marginRight: 12,
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
-          />
+          >
+            <Text style={{ fontSize: 16, fontWeight: 'bold', color: 'white' }}>
+              K
+            </Text>
+          </View>
 
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 16, fontWeight: '700', color: '#1f2937' }}>
-              {conversation.customerName}
+              Khách hàng
             </Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
               <View
@@ -267,7 +271,7 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
         <View style={{ flex: 1 }}>
           <FlatList
             ref={flatListRef}
-            data={conversation.messages}
+            data={messages}
             renderItem={renderMessage}
             keyExtractor={(item) => item.id}
             style={{ backgroundColor: '#fafafa' }}
@@ -290,11 +294,7 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
               paddingVertical: 10,
             }}
           >
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 12 }}
-            >
+            <View style={{ flexDirection: 'row', paddingHorizontal: 12, flexWrap: 'wrap' }}>
               {quickReplies.map((reply, index) => (
                 <TouchableOpacity
                   key={index}
@@ -307,12 +307,13 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
                     paddingHorizontal: 16,
                     paddingVertical: 8,
                     marginRight: 8,
+                    marginBottom: 8,
                   }}
                 >
                   <Text style={{ fontSize: 14, color: '#059669' }}>{reply}</Text>
                 </TouchableOpacity>
               ))}
-            </ScrollView>
+            </View>
           </View>
         )}
 
@@ -391,23 +392,27 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
               onPress={() => handleSend()}
               style={{
                 marginLeft: 8,
-                backgroundColor: inputText.trim() ? '#10b981' : '#e5e7eb',
+                backgroundColor: (inputText.trim() && !sending) ? '#10b981' : '#e5e7eb',
                 width: 42,
                 height: 42,
                 borderRadius: 21,
                 justifyContent: 'center',
                 alignItems: 'center',
-                shadowColor: inputText.trim() ? '#10b981' : 'transparent',
+                shadowColor: (inputText.trim() && !sending) ? '#10b981' : 'transparent',
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.3,
                 shadowRadius: 4,
                 elevation: 3,
               }}
-              disabled={!inputText.trim()}
+              disabled={!inputText.trim() || sending}
             >
-              <Text style={{ fontSize: 20, color: inputText.trim() ? 'white' : '#9ca3af' }}>
-                ➤
-              </Text>
+              {sending ? (
+                <ActivityIndicator size="small" color="#9ca3af" />
+              ) : (
+                <Text style={{ fontSize: 20, color: inputText.trim() ? 'white' : '#9ca3af' }}>
+                  ➤
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
