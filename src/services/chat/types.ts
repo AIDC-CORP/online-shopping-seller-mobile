@@ -22,6 +22,7 @@ export interface ChatConversation {
 }
 
 export interface SendMessageRequest {
+  type: 'message';
   text: string;
   attachments?: ChatAttachment[];
 }

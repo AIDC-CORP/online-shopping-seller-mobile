@@ -167,6 +167,29 @@ class ProductsService {
   async softDeleteProduct(productId: string): Promise<void> {
     return operations.softDeleteProduct(productId);
   }
+
+  // ========== EXCEL Operations ==========
+
+  /**
+   * Import products from Excel file
+   * @param storeId - UUID của store
+   * @param formData - FormData with Excel file
+   */
+  async importProductsFromExcel(storeId: string, formData: FormData): Promise<{
+    success_count: number;
+    error_count: number;
+    errors: Array<{ row: number | string; error: string }>;
+    message: string;
+  }> {
+    return operations.importProductsFromExcel(storeId, formData);
+  }
+
+  /**
+   * Get Excel template download URL
+   */
+  getExcelTemplateUrl(): string {
+    return operations.getExcelTemplateUrl();
+  }
 }
 
 export default ProductsService.getInstance();

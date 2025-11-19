@@ -10,10 +10,19 @@ class ChatService {
    */
   async getConversations(): Promise<ChatConversation[]> {
     try {
-      const response = await httpClient.get<ChatConversation[]>(
+      const response = await httpClient.get(
         `${CHAT_BASE_URL}${API_PREFIX}/seller/chat/conversations`
       );
-      return response.data;
+      
+      // Map snake_case response to camelCase
+      return response.data.map((conv: any) => ({
+        id: conv.id,
+        customerId: conv.customer_id || conv.customerId,
+        lastMessage: conv.last_message || conv.lastMessage,
+        unreadCount: conv.unread_count || conv.unreadCount,
+        timestamp: conv.updated_at || conv.timestamp,
+        status: conv.status
+      }));
     } catch (error) {
       console.error('Failed to fetch conversations:', error);
       throw error;
@@ -25,13 +34,22 @@ class ChatService {
    */
   async getMessages(conversationId: string, limit = 50, offset = 0): Promise<ChatMessage[]> {
     try {
-      const response = await httpClient.get<ChatMessage[]>(
+      const response = await httpClient.get(
         `${CHAT_BASE_URL}${API_PREFIX}/seller/chat/conversations/${conversationId}/messages`,
         {
           params: { limit, offset }
         }
       );
-      return response.data;
+      
+      // Map snake_case response to camelCase
+      return response.data.map((msg: any) => ({
+        id: msg.id,
+        senderId: msg.sender_id || msg.senderId,
+        senderType: msg.sender_type || msg.senderType,
+        text: msg.text,
+        attachments: msg.attachments,
+        timestamp: msg.created_at || msg.timestamp
+      }));
     } catch (error) {
       console.error('Failed to fetch messages:', error);
       throw error;

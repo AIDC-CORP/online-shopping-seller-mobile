@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import ChatService from '../services/chat/ChatService';
 import { ChatMessage, SendMessageRequest, WSMessage } from '../services/chat/types';
 
@@ -28,9 +28,9 @@ export function useChat(conversationId: string) {
   // Initialize WebSocket
   const connectWebSocket = useCallback(async () => {
     try {
-      const token = await AsyncStorage.getItem('access_token');
+      const token = await SecureStore.getItemAsync('access_token');
       if (!token) {
-        console.error('No access token found');
+        console.error('[useChat] No access token found');
         return;
       }
 
@@ -38,21 +38,28 @@ export function useChat(conversationId: string) {
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('WebSocket connected');
+        console.log('[useChat] WebSocket connected for conversation:', conversationId);
       };
 
       ws.onmessage = (event) => {
         try {
-          const wsMessage: WSMessage = JSON.parse(event.data);
-          const newMessage: ChatMessage = {
-            id: wsMessage.id,
-            senderId: wsMessage.senderId,
-            senderType: wsMessage.senderType,
-            text: wsMessage.text,
-            attachments: wsMessage.attachments,
-            timestamp: wsMessage.timestamp,
-          };
-          setMessages((prev) => [...prev, newMessage]);
+          console.log('[Seller WebSocket] Received message:', event.data);
+          const wsMessage = JSON.parse(event.data);
+          
+          // Only add messages from customer (not our own echoed messages)
+          const senderType = wsMessage.senderType || wsMessage.sender_type;
+          if (senderType === 'customer') {
+            const newMessage: ChatMessage = {
+              id: wsMessage.id,
+              senderId: wsMessage.senderId || wsMessage.sender_id,
+              senderType: 'customer',
+              text: wsMessage.text,
+              attachments: wsMessage.attachments,
+              timestamp: wsMessage.timestamp || wsMessage.created_at || new Date().toISOString(),
+            };
+            console.log('[Seller WebSocket] Adding customer message:', newMessage);
+            setMessages((prev) => [...prev, newMessage]);
+          }
         } catch (err) {
           console.error('Error parsing WebSocket message:', err);
         }
@@ -77,14 +84,18 @@ export function useChat(conversationId: string) {
     try {
       setSending(true);
       const message: SendMessageRequest = {
+        type: 'message',
         text: text.trim(),
         attachments,
       };
 
       if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        console.log('[useChat] Sending message via WebSocket:', message);
         ChatService.sendWebSocketMessage(wsRef.current, message);
       } else {
-        throw new Error('WebSocket not connected');
+        const state = wsRef.current?.readyState;
+        console.error('[useChat] WebSocket not ready. State:', state);
+        throw new Error(`WebSocket not connected (state: ${state})`);
       }
     } catch (err: any) {
       setError(err?.message || 'Failed to send message');

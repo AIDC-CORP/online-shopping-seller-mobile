@@ -7,9 +7,11 @@ interface AddOptionMenuProps {
   onSelectProduct: () => void;
   onSelectCombo: () => void;
   onSelectVoucher: () => void;
+  onSelectExcel?: () => void;
   showProduct?: boolean;
   showCombo?: boolean;
   showVoucher?: boolean;
+  showExcel?: boolean;
 }
 
 const AddOptionMenu: React.FC<AddOptionMenuProps> = ({
@@ -18,9 +20,11 @@ const AddOptionMenu: React.FC<AddOptionMenuProps> = ({
   onSelectProduct,
   onSelectCombo,
   onSelectVoucher,
+  onSelectExcel,
   showProduct = true,
   showCombo = true,
   showVoucher = true,
+  showExcel = false,
 }) => {
   return (
     <Modal
@@ -154,6 +158,8 @@ const AddOptionMenu: React.FC<AddOptionMenuProps> = ({
               alignItems: 'center',
               paddingHorizontal: 20,
               paddingVertical: 18,
+              borderBottomWidth: showExcel ? 1 : 0,
+              borderBottomColor: '#f3f4f6',
             }}
             activeOpacity={0.7}
           >
@@ -178,6 +184,45 @@ const AddOptionMenu: React.FC<AddOptionMenuProps> = ({
                 Tạo mã giảm giá cho khách hàng
               </Text>
             </View>
+            </TouchableOpacity>
+          )}
+
+          {/* Option 4: Import Excel */}
+          {showExcel && onSelectExcel && (
+            <TouchableOpacity
+              onPress={() => {
+                onClose();
+                onSelectExcel();
+              }}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingHorizontal: 20,
+                paddingVertical: 18,
+              }}
+              activeOpacity={0.7}
+            >
+              <View
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 24,
+                  backgroundColor: '#fef3c7',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginRight: 16,
+                }}
+              >
+                <Text style={{ fontSize: 24 }}>📊</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: '#1f2937', marginBottom: 4 }}>
+                  Import Excel
+                </Text>
+                <Text style={{ fontSize: 13, color: '#6b7280' }}>
+                  Thêm hàng loạt từ file Excel
+                </Text>
+              </View>
             </TouchableOpacity>
           )}
 
