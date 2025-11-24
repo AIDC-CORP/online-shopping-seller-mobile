@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, Image, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Product } from '../../../common/types';
@@ -11,7 +11,9 @@ import type { ProductStatus } from '../../../common/data/productEnums';
 
 interface AddProductProps {
   onClose: () => void;
-  onAddProduct: (product: Omit<Product, 'id'>) => void;
+  onAddProduct?: (product: Omit<Product, 'id'>) => void;
+  onUpdateProduct?: (product: Product) => void;
+  initialProduct?: Product | null;
 }
 
 const InputField: React.FC<{ 
@@ -32,17 +34,40 @@ const InputField: React.FC<{
   </View>
 );
 
-const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
+const AddProduct: React.FC<AddProductProps> = ({ 
+  onClose, 
+  onAddProduct, 
+  onUpdateProduct, 
+  initialProduct 
+}) => {
+  const isEditMode = !!initialProduct;
+  
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [unit, setUnit] = useState('kg');
   const [stock, setStock] = useState('');
-  const [status, setStatus] = useState<ProductStatus | null>('Còn hàng'); // Default: Còn hàng
+  const [status, setStatus] = useState<ProductStatus | null>('Còn hàng');
   const [expiryDate, setExpiryDate] = useState('');
   const [importDate, setImportDate] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
+
+  // Populate form when editing
+  useEffect(() => {
+    if (initialProduct) {
+      setName(initialProduct.name || '');
+      setDescription(initialProduct.description || '');
+      setCategory(initialProduct.category || '');
+      setPrice(initialProduct.price?.toString() || '');
+      setUnit(initialProduct.unit || 'kg');
+      setStock(initialProduct.stock?.toString() || '');
+      setStatus(initialProduct.status as ProductStatus || 'Còn hàng');
+      setExpiryDate(initialProduct.expiryDate || '');
+      setImportDate(initialProduct.importDate || '');
+      setImageUri(initialProduct.imageUrl || null);
+    }
+  }, [initialProduct]);
 
   const pickImage = async (useCamera: boolean) => {
     try {
@@ -145,7 +170,7 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
       }
     }
 
-    onAddProduct({
+    const productData = {
       name: name.trim(),
       description: description.trim() || undefined,
       category: category,
@@ -156,7 +181,17 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
       imageUrl: imageUri || `https://picsum.photos/seed/${name}/${Math.random()}/300/200`,
       expiryDate: expiryDate || undefined,
       importDate: importDate || undefined,
-    });
+    };
+
+    if (isEditMode && onUpdateProduct && initialProduct) {
+      onUpdateProduct({
+        ...productData,
+        id: initialProduct.id,
+        sold: initialProduct.sold,
+      });
+    } else if (onAddProduct) {
+      onAddProduct(productData);
+    }
   };
 
   console.log('[AddProduct] Rendering component');
@@ -172,8 +207,10 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
           {/* Header - Fixed height */}
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.headerTitle }>✨ Sản phẩm mới</Text>
-              <Text style={styles.headerSubtitle}>Điền thông tin sản phẩm của bạn</Text>
+              <Text style={styles.headerTitle }>{isEditMode ? '✏️ Sửa sản phẩm' : '✨ Sản phẩm mới'}</Text>
+              <Text style={styles.headerSubtitle}>
+                {isEditMode ? 'Chỉnh sửa thông tin sản phẩm' : 'Điền thông tin sản phẩm của bạn'}
+              </Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <XIcon color="white" />
@@ -340,7 +377,9 @@ const AddProduct: React.FC<AddProductProps> = ({ onClose, onAddProduct }) => {
             </TouchableOpacity>
             
             <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-              <Text style={styles.submitButtonText}>✓ Thêm sản phẩm</Text>
+              <Text style={styles.submitButtonText}>
+                {isEditMode ? '✓ Cập nhật sản phẩm' : '✓ Thêm sản phẩm'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

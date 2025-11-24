@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { PlusIcon } from '../../../components/icons';
 import FloatingButton from '../../../components/common/FloatingButton';
 import { useStoreId } from '../../store/hooks/useStoreId';
@@ -57,6 +58,7 @@ const ProductsScreen: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [showImportExcel, setShowImportExcel] = useState(false);
   const [filterType, setFilterType] = useState<FilterType>('all');
@@ -95,9 +97,13 @@ const ProductsScreen: React.FC = () => {
     }
   }, [storeId]);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+  // Refresh products when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      console.log('[ProductsScreen] Screen focused, refreshing products...');
+      fetchProducts();
+    }, [fetchProducts])
+  );
 
   // Calculate stats
   const stats = {
@@ -194,6 +200,41 @@ const ProductsScreen: React.FC = () => {
     } catch (error: any) {
       console.error('[ProductsScreen] Failed to add product:', error);
       Alert.alert('Lỗi', error.message || 'Không thể thêm sản phẩm');
+    }
+  }, [storeId]);
+
+  const handleUpdateProduct = useCallback(async (updatedProduct: Product) => {
+    try {
+      if (!storeId) {
+        Alert.alert('Lỗi', 'Không tìm thấy thông tin cửa hàng');
+        return;
+      }
+      
+      const productUpdateRequest = {
+        product_name: updatedProduct.name,
+        description: updatedProduct.description || '',
+        price: updatedProduct.price,
+        quantity: updatedProduct.stock,
+        category: (updatedProduct.category || 'rau củ') as any,
+        image_urls: updatedProduct.imageUrl ? [updatedProduct.imageUrl] : [],
+        unit: updatedProduct.unit as any,
+        status: (updatedProduct.status || 'Còn hàng') as any,
+        import_date: updatedProduct.importDate,
+        expiration_date: updatedProduct.expiryDate,
+      };
+      
+      await ProductsService.updateProduct(updatedProduct.id, productUpdateRequest);
+      
+      // Update local state
+      setProducts(prev => prev.map(p => 
+        p.id === updatedProduct.id ? updatedProduct : p
+      ));
+      
+      setEditingProduct(null);
+      Alert.alert('Thành công', `Đã cập nhật sản phẩm "${updatedProduct.name}"`);
+    } catch (error: any) {
+      console.error('[ProductsScreen] Failed to update product:', error);
+      Alert.alert('Lỗi', error.message || 'Không thể cập nhật sản phẩm');
     }
   }, [storeId]);
 
@@ -315,8 +356,8 @@ const ProductsScreen: React.FC = () => {
           renderItem={({ item }) => (
             <ProductListCard 
               item={item} 
-              onPress={() => {}}
-              onEdit={() => {}}
+              onPress={() => setEditingProduct(item)}
+              onEdit={() => setEditingProduct(item)}
               onDelete={() => setProductToDelete(item)}
             />
           )}
@@ -361,6 +402,18 @@ const ProductsScreen: React.FC = () => {
         <AddProduct
           onClose={() => setIsAddingProduct(false)}
           onAddProduct={handleAddProduct}
+        />
+      </Modal>
+
+      <Modal
+        visible={!!editingProduct}
+        animationType="slide"
+        onRequestClose={() => setEditingProduct(null)}
+      >
+        <AddProduct
+          onClose={() => setEditingProduct(null)}
+          onUpdateProduct={handleUpdateProduct}
+          initialProduct={editingProduct}
         />
       </Modal>
 

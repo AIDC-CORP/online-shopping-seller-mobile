@@ -1,5 +1,7 @@
 import httpClient from '../auth/config/httpClient';
 
+const PAYMENT_BASE_URL = process.env.EXPO_PUBLIC_PAYMENT_URL || 'http://192.168.1.4:8205';
+
 export interface SellerWallet {
   id: string;
   store_id: string;
@@ -53,7 +55,7 @@ class WalletService {
     try {
       console.log('[WalletService] Fetching wallet balance...');
       const response = await httpClient.get<SellerWallet>(
-        '/payments/seller/wallet/balance'
+        `${PAYMENT_BASE_URL}/api/v1/online-shopping/public/payments/seller/wallet/balance`
       );
       console.log('[WalletService] Wallet balance:', response.data);
       return response.data;
@@ -80,7 +82,7 @@ class WalletService {
         `[WalletService] Fetching transactions (page: ${page}, limit: ${limit})...`
       );
       const response = await httpClient.get<WalletTransactionListResponse>(
-        '/payments/seller/wallet/transactions',
+        `${PAYMENT_BASE_URL}/api/v1/online-shopping/public/payments/seller/wallet/transactions`,
         {
           params: { page, limit },
         }
@@ -93,6 +95,33 @@ class WalletService {
       console.error('[WalletService] Failed to get transactions:', error);
       throw new Error(
         error.response?.data?.detail || 'Không thể lấy lịch sử giao dịch'
+      );
+    }
+  }
+
+  /**
+   * Thêm tiền vào ví khi hoàn thành đơn hàng
+   */
+  async creditOrderAmount(orderId: string, amount: number): Promise<WalletTransaction> {
+    try {
+      console.log(`[WalletService] Crediting ${amount} for order ${orderId}...`);
+      const response = await httpClient.post<WalletTransaction>(
+        `${PAYMENT_BASE_URL}/api/v1/online-shopping/public/payments/seller/wallet/credit`,
+        {
+          order_id: orderId,
+          amount: amount,
+          description: `Thanh toán đơn hàng ${orderId}`
+        }
+      );
+      console.log('[WalletService] Credit successful:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('[WalletService] Failed to credit wallet:', error);
+      if (error.response?.status === 404) {
+        throw new Error('Endpoint chưa được triển khai trên server');
+      }
+      throw new Error(
+        error.response?.data?.detail || 'Không thể cộng tiền vào ví'
       );
     }
   }

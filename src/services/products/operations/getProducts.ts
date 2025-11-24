@@ -74,9 +74,23 @@ export async function getProducts(storeId: string, category?: string): Promise<P
 
 /**
  * Get product by ID
- * Note: Backend chưa có endpoint này, cần implement nếu cần
+ * Workaround: Backend chưa có endpoint riêng, fetch all và filter
  */
-export async function getProductById(productId: string): Promise<Product | null> {
-  // TODO: Implement khi backend có endpoint GET /catalog/products/{product_id}
-  throw new Error('Not implemented yet');
+export async function getProductById(productId: string, storeId?: string): Promise<Product | null> {
+  try {
+    // Nếu không có storeId, không thể fetch
+    if (!storeId) {
+      console.warn('[getProductById] No storeId provided, cannot fetch product');
+      return null;
+    }
+    
+    // Fetch all products và tìm theo ID
+    const products = await getProducts(storeId);
+    const product = products.find(p => p.id === productId);
+    
+    return product || null;
+  } catch (error) {
+    console.error('[getProductById] Failed to get product:', error);
+    return null;
+  }
 }

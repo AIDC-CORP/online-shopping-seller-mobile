@@ -23,15 +23,15 @@ export const useStore = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await StoreService.getStoreProfile();
-    
-    if (response.success && response.data) {
-      setStoreProfile(response.data);
-    } else {
-      setError(response.error || 'Failed to fetch store profile');
+    try {
+      const data = await StoreService.getStoreProfile();
+      setStoreProfile(data);
+    } catch (err: any) {
+      console.error('[useStore] Error fetching store profile:', err);
+      setError(err.message || 'Failed to fetch store profile');
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   }, []);
 
   const createStore = useCallback(async (storeData: {
@@ -44,16 +44,22 @@ export const useStore = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await StoreService.createStoreProfile(storeData);
-    
-    if (response.success && response.data) {
-      setStoreProfile(response.data);
-      setIsLoading(false);
+    try {
+      const data = await StoreService.createStoreProfile({
+        store_name: storeData.name,
+        phone: storeData.phone || '',
+        address: storeData.address || '',
+        avatar: '',
+        description: storeData.description || '',
+      });
+      setStoreProfile(data);
       return { success: true };
-    } else {
-      setError(response.error || 'Failed to create store');
+    } catch (err: any) {
+      const errorMessage = err.message || 'Failed to create store';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
       setIsLoading(false);
-      return { success: false, error: response.error };
     }
   }, []);
 
@@ -69,16 +75,23 @@ export const useStore = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await StoreService.updateStoreProfile(updates);
-    
-    if (response.success && response.data) {
-      setStoreProfile(response.data);
-      setIsLoading(false);
+    try {
+      const data = await StoreService.updateStoreProfile({
+        store_name: updates.name,
+        description: updates.description,
+        address: updates.address,
+        phone: updates.phone,
+        avatar: updates.avatar_url,
+        cover: updates.cover_image_url,
+      });
+      setStoreProfile(data);
       return { success: true };
-    } else {
-      setError(response.error || 'Failed to update store');
+    } catch (err: any) {
+      const errorMessage = err.message || 'Failed to update store';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
       setIsLoading(false);
-      return { success: false, error: response.error };
     }
   }, []);
 

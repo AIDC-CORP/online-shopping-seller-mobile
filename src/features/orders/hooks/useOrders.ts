@@ -33,7 +33,7 @@ const mapApiStatusToUi = (apiStatus: ApiOrderStatus): OrderStatus => {
 const transformApiOrder = (apiOrder: ApiOrder): Order => {
   return {
     id: apiOrder.order_id,
-    customerName: apiOrder.shipping_address?.recipient_name || 'Khách hàng',
+    customerName: apiOrder.shipping_address?.recipient_name || 'Chưa có thông tin',
     phone: apiOrder.shipping_address?.phone,
     address: apiOrder.shipping_address?.address,
     itemCount: apiOrder.items_snapshot?.length || 0,
@@ -49,6 +49,7 @@ const transformApiOrder = (apiOrder: ApiOrder): Order => {
     items: apiOrder.items_snapshot?.map((item) => ({
       name: item.name_at_purchase,
       quantity: item.quantity,
+      product_id: item.product_id,
     })) || [],
   };
 };
@@ -58,6 +59,12 @@ export const useOrders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [mockOrdersState, setMockOrdersState] = useState<Record<string, OrderStatus>>({
+    'mock-preparing-order-001': OrderStatus.Preparing,
+    'mock-delivery-order-001': OrderStatus.Delivering,
+  });
+  // Store local status overrides (since backend doesn't support ship/complete yet)
+  const [localStatusOverrides, setLocalStatusOverrides] = useState<Record<string, OrderStatus>>({});
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -74,18 +81,44 @@ export const useOrders = () => {
 
       const response = await OrdersService.getOrders({
         page: 1,
-        page_limit: 100, // Get all orders for now
+        page_limit: 100,
       });
 
       console.log('[useOrders] API response:', response);
 
-      // Transform API orders to UI format
-      const transformedOrders = response.data.map(transformApiOrder);
+      // Backend list endpoint doesn't include shipping_address & items_snapshot
+      // Need to fetch detail for each order to get full data
+      const ordersWithDetails = await Promise.all(
+        response.data.map(async (order) => {
+          try {
+            // Fetch full order detail
+            const detailOrder = await OrdersService.getOrderById(order.order_id);
+            return transformApiOrder(detailOrder);
+          } catch (error) {
+            console.error(`[useOrders] Failed to fetch detail for order ${order.order_id}:`, error);
+            // Fallback to incomplete data
+            return transformApiOrder(order);
+          }
+        })
+      );
 
-      console.log('[useOrders] Transformed orders:', transformedOrders);
-      setOrders(transformedOrders);
+      console.log('[useOrders] Transformed orders with details:', ordersWithDetails);
+      
+      // Apply local status overrides (for ship/complete actions until backend supports)
+      console.log('[useOrders] Applying local status overrides:', localStatusOverrides);
+      const ordersWithOverrides = ordersWithDetails.map(order => {
+        const currentOverride = localStatusOverrides[order.id];
+        if (currentOverride) {
+          console.log(`[useOrders] Overriding order ${order.id}: ${order.status} → ${currentOverride}`);
+          return { ...order, status: currentOverride };
+        }
+        return order;
+      });
+      
+      console.log('[useOrders] Final orders with overrides:', ordersWithOverrides);
+      setOrders(ordersWithOverrides);
 
-      // Update pagination info (for future use)
+      // Update pagination info
       if (response.pagination) {
         setPagination({
           currentPage: response.pagination.current_page,
@@ -100,6 +133,7 @@ export const useOrders = () => {
       setLoading(false);
       setRefreshing(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -161,31 +195,68 @@ export const useOrders = () => {
   }, []);
 
   /**
-   * Ship order (Preparing -> Delivering)
-   * TODO: Backend doesn't support this yet, manual status update for now
+   * Ship order (Preparing -> Completed) - TEMPORARY: Skip "Delivering" status
+   * TODO: Change to (Preparing -> Delivering) when shipping service is ready
    */
-  const shipOrder = useCallback(async (orderId: string) => {
-    console.warn('[useOrders] Ship order not implemented in backend yet');
+  const shipOrder = useCallback(async (
+    orderId: string, 
+    orderTotal: number,
+    orderItems: { product_id?: string; name: string; quantity: number }[],
+    onStockDecreased?: (results: { name: string; decreased: number; remaining: number; success: boolean }[]) => void
+  ) => {
+    console.log('[useOrders] shipOrder called for:', orderId);
+    
+    // Store override so it persists across refreshes
+    setLocalStatusOverrides(prev => {
+      const newOverrides = { ...prev, [orderId]: OrderStatus.Delivering };
+      console.log('[useOrders] Updated localStatusOverrides:', newOverrides);
+      return newOverrides;
+    });
+    
     // Optimistically update local state (temporary until backend supports)
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
+    setOrders((prevOrders) => {
+      const updated = prevOrders.map((order) =>
         order.id === orderId ? { ...order, status: OrderStatus.Delivering } : order
-      )
-    );
+      );
+      console.log('[useOrders] Updated orders state:', updated.map(o => ({ id: o.id.slice(-4), status: o.status })));
+      return updated;
+    });
+    
+    console.log('[useOrders] shipOrder completed');
+    // Return success (no items needed for shipOrder anymore)
+    return { success: true };
   }, []);
 
   /**
    * Complete order (Delivering -> Completed)
    * TODO: Backend doesn't support this yet, manual status update for now
    */
-  const completeOrder = useCallback(async (orderId: string) => {
-    console.warn('[useOrders] Complete order not implemented in backend yet');
+  const completeOrder = useCallback(async (
+    orderId: string,
+    orderItems: { product_id?: string; name: string; quantity: number }[]
+  ) => {
+    console.log('[useOrders] Marking order as completed:', orderId);
+    
+    // Return items info for stock decrease
+    const itemsForStock = orderItems
+      .filter(item => item.product_id) // Only items with product_id
+      .map(item => ({
+        product_id: item.product_id!,
+        name: item.name,
+        quantity: item.quantity
+      }));
+    
+    // Store override so it persists across refreshes
+    setLocalStatusOverrides(prev => ({ ...prev, [orderId]: OrderStatus.Completed }));
     // Optimistically update local state (temporary until backend supports)
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
         order.id === orderId ? { ...order, status: OrderStatus.Completed } : order
       )
     );
+    
+    // Return items for caller to decrease stock
+    return { itemsForStock };
   }, []);
 
   /**
@@ -194,6 +265,7 @@ export const useOrders = () => {
   const getOrderDetail = useCallback(async (orderId: string): Promise<Order> => {
     try {
       console.log('[useOrders] Getting order detail for ID:', orderId);
+      
       const apiOrder = await OrdersService.getOrderById(orderId);
       const transformed = transformApiOrder(apiOrder);
       return transformed;
@@ -210,6 +282,16 @@ export const useOrders = () => {
     fetchOrders();
   }, [fetchOrders]);
 
+  /**
+   * Reset all local status overrides (for testing)
+   */
+  const resetLocalOverrides = useCallback(() => {
+    console.log('[useOrders] Clearing all local status overrides');
+    setLocalStatusOverrides({});
+    // Refresh to get backend status
+    refresh();
+  }, [refresh]);
+
   return {
     orders,
     loading,
@@ -221,6 +303,7 @@ export const useOrders = () => {
     cancelOrder,
     shipOrder,
     completeOrder,
+    resetLocalOverrides, // Export for testing
     pagination, // Export pagination for future use
   };
 };

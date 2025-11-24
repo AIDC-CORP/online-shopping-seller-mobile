@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import ChatService from '../services/chat/ChatService';
-import { ChatMessage, SendMessageRequest, WSMessage } from '../services/chat/types';
+import ChatService from '../../../services/chat/ChatService';
+import { ChatMessage, SendMessageRequest } from '../../../services/chat/types';
 
 export function useChat(conversationId: string) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);

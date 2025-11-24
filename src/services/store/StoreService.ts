@@ -4,8 +4,37 @@
  * Integrates with backend Profile Service API
  */
 
-import { httpClient } from '../auth/config';
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
 import { PROFILE_ENDPOINTS } from './config/apiConfig';
+
+// Profile Service base URL
+const PROFILE_BASE_URL = process.env.EXPO_PUBLIC_PROFILE_URL || 'http://192.168.1.4:8113';
+
+// Create axios instance for Profile service
+const profileClient = axios.create({
+  baseURL: PROFILE_BASE_URL,
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add auth interceptor
+profileClient.interceptors.request.use(
+  async (config) => {
+    try {
+      const token = await SecureStore.getItemAsync('access_token');
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (error) {
+      console.error('[ProfileClient] Failed to get token:', error);
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export interface StoreProfile {
   id: string;
@@ -103,13 +132,19 @@ class StoreService {
    */
   async getStoreProfile(): Promise<StoreProfile> {
     try {
-      const response = await httpClient.get<BackendStoreResponse>(
+      console.log('[StoreService] Fetching store profile...');
+      const response = await profileClient.get<BackendStoreResponse>(
         PROFILE_ENDPOINTS.GET_MY_STORE
       );
       
-      return this.transformStoreResponse(response.data);
+      console.log('[StoreService] Store response:', JSON.stringify(response.data));
+      const transformed = this.transformStoreResponse(response.data);
+      console.log('[StoreService] Transformed store:', JSON.stringify(transformed));
+      
+      return transformed;
     } catch (error: any) {
-      console.error('Failed to get store profile:', error);
+      console.error('[StoreService] Failed to get store profile:', error);
+      console.error('[StoreService] Error response:', error.response?.data);
       
       // If store not found (404), return null hoặc throw
       if (error.response?.status === 404) {
@@ -142,7 +177,7 @@ class StoreService {
         description: data.description,
       };
 
-      const response = await httpClient.post<BackendStoreResponse>(
+      const response = await profileClient.post<BackendStoreResponse>(
         PROFILE_ENDPOINTS.CREATE_STORE,
         request
       );
@@ -182,7 +217,7 @@ class StoreService {
         description: updates.description,
       };
 
-      const response = await httpClient.patch<BackendStoreResponse>(
+      const response = await profileClient.patch<BackendStoreResponse>(
         PROFILE_ENDPOINTS.UPDATE_MY_STORE,
         request
       );
@@ -249,7 +284,7 @@ class StoreService {
       formData.append('file', file);
       formData.append('upload_type', uploadType);
 
-      const response = await httpClient.post(
+      const response = await profileClient.post(
         PROFILE_ENDPOINTS.UPLOAD_FILE,
         formData,
         {

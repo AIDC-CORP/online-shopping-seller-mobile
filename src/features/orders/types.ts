@@ -16,5 +16,5 @@ export interface Order {
   total: number;
   status: OrderStatus;
   timestamp: string;
-  items: { name: string; quantity: number }[];
+  items: { name: string; quantity: number; product_id?: string }[];
 }

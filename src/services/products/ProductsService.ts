@@ -49,10 +49,12 @@ class ProductsService {
 
   /**
    * Get product by ID
-   * Note: Backend chưa có endpoint này
+   * Workaround: Backend chưa có endpoint, fetch all và filter
+   * @param productId - UUID của product
+   * @param storeId - UUID của store (required)
    */
-  async getProductById(productId: string): Promise<Product | null> {
-    return operations.getProductById(productId);
+  async getProductById(productId: string, storeId?: string): Promise<Product | null> {
+    return operations.getProductById(productId, storeId);
   }
 
   // ========== CREATE Operations ==========

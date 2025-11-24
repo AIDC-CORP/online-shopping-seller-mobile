@@ -7,6 +7,7 @@ import { OrderStatus } from '../../src/common/types';
 import AIAssistantBubble from '../../src/features/ai/components/AIAssistantBubble';
 import AIAssistantChat from '../../src/features/ai/components/AIAssistantChat';
 import type { BusinessContext } from '../../src/features/ai/aiAssistantService';
+import { OrdersProvider } from '../../src/features/orders/context/OrdersContext';
 
 export default function MainLayout() {
   const [showAIChat, setShowAIChat] = useState(false);
@@ -43,7 +44,7 @@ export default function MainLayout() {
   }, []);
 
   return (
-    <>
+    <OrdersProvider>
       <AppHeader onLogout={handleLogout} />
       <Tabs
         screenOptions={{
@@ -102,6 +103,12 @@ export default function MainLayout() {
         />
         {/* Hidden tabs - accessible from header/other screens */}
         <Tabs.Screen
+          name="order-detail"
+          options={{
+            href: null, // Hide from tab bar
+          }}
+        />
+        <Tabs.Screen
           name="promotions"
           options={{
             href: null, // Hide from tab bar
@@ -131,6 +138,6 @@ export default function MainLayout() {
         onClose={() => setShowAIChat(false)}
         businessContext={businessContext}
       />
-    </>
+    </OrdersProvider>
   );
 }
