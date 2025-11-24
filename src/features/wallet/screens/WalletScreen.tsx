@@ -1,40 +1,79 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-
-// Mock wallet data
-const mockWalletData = {
-  balance: 45800000, // 45.8M VND
-  pendingBalance: 12500000, // 12.5M VND (from pending orders)
-  totalEarnings: 125000000, // 125M VND
-  totalWithdrawals: 79200000, // 79.2M VND
-};
-
-// Mock transaction history
-const mockTransactions = [
-  { id: 't1', type: 'income', amount: 2500000, description: 'Đơn hàng #o123', date: '2024-11-06 14:30', status: 'completed' },
-  { id: 't2', type: 'income', amount: 1200000, description: 'Đơn hàng #o124', date: '2024-11-06 10:15', status: 'completed' },
-  { id: 't3', type: 'withdrawal', amount: -5000000, description: 'Rút tiền về VCB *1234', date: '2024-11-05 16:20', status: 'completed' },
-  { id: 't4', type: 'income', amount: 850000, description: 'Đơn hàng #o125', date: '2024-11-05 09:45', status: 'completed' },
-  { id: 't5', type: 'pending', amount: 3200000, description: 'Đơn hàng #o126 (Chờ xác nhận)', date: '2024-11-04 18:00', status: 'pending' },
-];
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
+import { useWallet } from '../hooks/useWallet';
 
 const WalletScreen: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<'all' | 'income' | 'withdrawal'>('all');
+  const {
+    wallet,
+    transactions,
+    loading,
+    refreshing,
+    error,
+    refresh,
+  } = useWallet();
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
   };
 
-  const filteredTransactions = mockTransactions.filter(t => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const filteredTransactions = transactions.filter(t => {
     if (selectedTab === 'all') return true;
-    if (selectedTab === 'income') return t.type === 'income' || t.type === 'pending';
-    if (selectedTab === 'withdrawal') return t.type === 'withdrawal';
+    if (selectedTab === 'income') return t.type === 'CREDIT' || t.type === 'REFUND';
+    if (selectedTab === 'withdrawal') return t.type === 'DEBIT';
     return true;
   });
 
+  // Tính tổng thu và tổng rút từ transactions
+  const totalEarnings = transactions
+    .filter(t => t.type === 'CREDIT')
+    .reduce((sum, t) => sum + t.amount, 0);
+  
+  const totalWithdrawals = transactions
+    .filter(t => t.type === 'DEBIT')
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  if (error && !wallet) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+        <Text style={{ fontSize: 64, marginBottom: 16 }}>⚠️</Text>
+        <Text style={{ fontSize: 16, color: '#ef4444', textAlign: 'center', marginBottom: 24 }}>
+          {error}
+        </Text>
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#10b981',
+            paddingHorizontal: 24,
+            paddingVertical: 12,
+            borderRadius: 8,
+          }}
+          onPress={refresh}
+        >
+          <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Thử lại</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1 bg-gray-50">
-      <ScrollView contentContainerStyle={{ paddingBottom: 110 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 110 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#10b981']} />
+        }
+      >
         {/* Balance Card */}
         <View style={{
           backgroundColor: '#10b981',
@@ -50,26 +89,13 @@ const WalletScreen: React.FC = () => {
           <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14, marginBottom: 8 }}>
             💰 Số dư khả dụng
           </Text>
-          <Text style={{ color: 'white', fontSize: 32, fontWeight: 'bold', marginBottom: 16 }}>
-            {formatCurrency(mockWalletData.balance)}
-          </Text>
-          
-          <View style={{ 
-            flexDirection: 'row', 
-            backgroundColor: 'rgba(255,255,255,0.15)', 
-            padding: 12, 
-            borderRadius: 8,
-            marginBottom: 16
-          }}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12, marginBottom: 4 }}>
-                ⏳ Chờ thanh toán
-              </Text>
-              <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
-                {formatCurrency(mockWalletData.pendingBalance)}
-              </Text>
-            </View>
-          </View>
+          {wallet ? (
+            <Text style={{ color: 'white', fontSize: 32, fontWeight: 'bold', marginBottom: 16 }}>
+              {formatCurrency(wallet.balance)}
+            </Text>
+          ) : (
+            <ActivityIndicator size="large" color="#fff" style={{ marginBottom: 16 }} />
+          )}
 
           {/* Action Buttons */}
           <View style={{ flexDirection: 'row', gap: 12 }}>
@@ -116,7 +142,7 @@ const WalletScreen: React.FC = () => {
           }}>
             <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>📈 Tổng thu</Text>
             <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#059669' }}>
-              {formatCurrency(mockWalletData.totalEarnings)}
+              {formatCurrency(totalEarnings)}
             </Text>
           </View>
 
@@ -133,7 +159,7 @@ const WalletScreen: React.FC = () => {
           }}>
             <Text style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>📤 Đã rút</Text>
             <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#3b82f6' }}>
-              {formatCurrency(mockWalletData.totalWithdrawals)}
+              {formatCurrency(totalWithdrawals)}
             </Text>
           </View>
         </View>
@@ -188,68 +214,84 @@ const WalletScreen: React.FC = () => {
 
           {/* Transactions List */}
           <View style={{ paddingTop: 8 }}>
-            {filteredTransactions.map((transaction, index) => {
-              const isIncome = transaction.type === 'income' || transaction.type === 'pending';
-              const isPending = transaction.type === 'pending';
-              
-              return (
-                <TouchableOpacity
-                  key={transaction.id}
-                  style={{
-                    flexDirection: 'row',
-                    padding: 16,
-                    borderBottomWidth: index < filteredTransactions.length - 1 ? 1 : 0,
-                    borderBottomColor: '#f3f4f6',
-                  }}
-                >
-                  {/* Icon */}
-                  <View style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: isIncome ? '#d1fae5' : '#dbeafe',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: 12,
-                  }}>
-                    <Text style={{ fontSize: 20 }}>
-                      {isPending ? '⏳' : isIncome ? '💰' : '💸'}
-                    </Text>
-                  </View>
-
-                  {/* Info */}
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ 
-                      fontSize: 14, 
-                      fontWeight: '600', 
-                      color: '#1f2937',
-                      marginBottom: 2
+            {loading && filteredTransactions.length === 0 ? (
+              <View style={{ padding: 32, alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#10b981" />
+              </View>
+            ) : filteredTransactions.length === 0 ? (
+              <View style={{ padding: 32, alignItems: 'center' }}>
+                <Text style={{ fontSize: 48, marginBottom: 8 }}>💰</Text>
+                <Text style={{ fontSize: 14, color: '#6b7280' }}>Chưa có giao dịch</Text>
+              </View>
+            ) : (
+              filteredTransactions.map((transaction, index) => {
+                const isIncome = transaction.type === 'CREDIT' || transaction.type === 'REFUND';
+                const isPending = transaction.status === 'PENDING';
+                
+                return (
+                  <TouchableOpacity
+                    key={transaction.id}
+                    style={{
+                      flexDirection: 'row',
+                      padding: 16,
+                      borderBottomWidth: index < filteredTransactions.length - 1 ? 1 : 0,
+                      borderBottomColor: '#f3f4f6',
+                    }}
+                  >
+                    {/* Icon */}
+                    <View style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: isIncome ? '#d1fae5' : '#dbeafe',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginRight: 12,
                     }}>
-                      {transaction.description}
-                    </Text>
-                    <Text style={{ fontSize: 12, color: '#9ca3af' }}>
-                      {transaction.date}
-                    </Text>
-                  </View>
-
-                  {/* Amount */}
-                  <View style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
-                    <Text style={{
-                      fontSize: 16,
-                      fontWeight: 'bold',
-                      color: isPending ? '#f59e0b' : isIncome ? '#10b981' : '#3b82f6',
-                    }}>
-                      {isIncome ? '+' : ''}{formatCurrency(transaction.amount)}
-                    </Text>
-                    {isPending && (
-                      <Text style={{ fontSize: 10, color: '#f59e0b', marginTop: 2 }}>
-                        Chờ xác nhận
+                      <Text style={{ fontSize: 20 }}>
+                        {isPending ? '⏳' : transaction.type === 'CREDIT' ? '💰' : transaction.type === 'REFUND' ? '↩️' : '💸'}
                       </Text>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
+                    </View>
+
+                    {/* Info */}
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ 
+                        fontSize: 14, 
+                        fontWeight: '600', 
+                        color: '#1f2937',
+                        marginBottom: 2
+                      }}>
+                        {transaction.description || `Giao dịch #${transaction.id.slice(0, 8)}`}
+                      </Text>
+                      {transaction.order_id && (
+                        <Text style={{ fontSize: 12, color: '#9ca3af', marginBottom: 2 }}>
+                          Đơn hàng: #{transaction.order_id.slice(0, 8)}
+                        </Text>
+                      )}
+                      <Text style={{ fontSize: 12, color: '#9ca3af' }}>
+                        {formatDate(transaction.created_at)}
+                      </Text>
+                    </View>
+
+                    {/* Amount */}
+                    <View style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
+                      <Text style={{
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        color: isPending ? '#f59e0b' : isIncome ? '#10b981' : '#3b82f6',
+                      }}>
+                        {isIncome ? '+' : '-'}{formatCurrency(transaction.amount)}
+                      </Text>
+                      {isPending && (
+                        <Text style={{ fontSize: 10, color: '#f59e0b', marginTop: 2 }}>
+                          Chờ xác nhận
+                        </Text>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                );
+              })
+            )}
           </View>
         </View>
       </ScrollView>

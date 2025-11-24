@@ -9,6 +9,8 @@ import OrdersService from './orders/OrdersService';
 import ProductsService from './products/ProductsService';
 import StoreService from './store/StoreService';
 import SetupService from './setup/SetupService';
+import WalletService from './wallet/WalletService';
+import { GeminiService } from './ai';
 
 export const services = {
   auth: AuthService,
@@ -17,12 +19,23 @@ export const services = {
   products: ProductsService,
   store: StoreService,
   setup: SetupService,
+  wallet: WalletService,
+  ai: GeminiService,
 };
 
 export type Services = typeof services;
 
 // Export individual services for direct import
-export { AuthService, DashboardService, OrdersService, ProductsService, StoreService, SetupService };
+export { 
+  AuthService, 
+  DashboardService, 
+  OrdersService, 
+  ProductsService, 
+  StoreService, 
+  SetupService,
+  WalletService,
+  GeminiService
+};
 
 // Export types
 export type { 
@@ -62,3 +75,10 @@ export {
   ProductUnit,
   ProductStatus
 } from './products';
+
+// Export wallet types
+export type { 
+  SellerWallet, 
+  WalletTransaction,
+  WalletTransactionListResponse 
+} from './wallet/WalletService';

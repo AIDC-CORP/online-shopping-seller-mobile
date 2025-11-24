@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
-import { mockOrders } from '../../../common/data/mockData';
+import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Order, OrderStatus } from '../../../common/types';
 import Button from '../../../components/common/button';
 import { XCircleIcon, UserIcon } from '../../../components/icons';
+import { useOrders } from '../hooks/useOrders';
 
 // Modal Hóa đơn
 const InvoiceModal: React.FC<{
@@ -232,168 +234,6 @@ const InvoiceModal: React.FC<{
   );
 };
 
-// Modal chi tiết đơn hàng
-const OrderDetailModal: React.FC<{ 
-  order: Order | null; 
-  visible: boolean; 
-  onClose: () => void;
-  onAccept: () => void;
-  onReject: () => void;
-  onShowInvoice: () => void;
-}> = ({ order, visible, onClose, onAccept, onReject, onShowInvoice }) => {
-  if (!order) return null;
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-  };
-
-  const getStatusStyle = (status: OrderStatus) => {
-    switch (status) {
-      case OrderStatus.New: return { bg: '#dbeafe', text: '#1e40af' };
-      case OrderStatus.Preparing: return { bg: '#fef3c7', text: '#92400e' };
-      case OrderStatus.Delivering: return { bg: '#e0e7ff', text: '#3730a3' };
-      case OrderStatus.Completed: return { bg: '#d1fae5', text: '#065f46' };
-      case OrderStatus.Cancelled: return { bg: '#fee2e2', text: '#991b1b' };
-    }
-  };
-
-  const statusColors = getStatusStyle(order.status);
-
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 16 }}>
-        <View style={{ backgroundColor: 'white', borderRadius: 16, width: '100%', maxHeight: '90%' }}>
-          {/* Header */}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' }}>
-            <Text style={{ fontSize: 20, fontWeight: '700', color: '#1f2937' }}>Chi tiết đơn hàng</Text>
-            <TouchableOpacity onPress={onClose}>
-              <XCircleIcon className="h-6 w-6" color="#6b7280" />
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView style={{ maxHeight: 500 }} contentContainerStyle={{ padding: 20 }}>
-            {/* Order ID & Status */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2937' }}>Đơn #{order.id}</Text>
-              <View style={{ backgroundColor: statusColors.bg, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 }}>
-                <Text style={{ color: statusColors.text, fontSize: 13, fontWeight: '700' }}>
-                  {order.status}
-                </Text>
-              </View>
-            </View>
-
-            {/* Customer Info */}
-            <View style={{ backgroundColor: '#f9fafb', borderRadius: 12, padding: 16, marginBottom: 16 }}>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#374151', marginBottom: 12 }}>👤 Thông tin khách hàng</Text>
-              <View style={{ gap: 10 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <UserIcon className="h-4 w-4" color="#6b7280" />
-                  <Text style={{ fontSize: 14, color: '#4b5563' }}>{order.customerName}</Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <Text style={{ fontSize: 14, color: '#6b7280' }}>📞</Text>
-                  <Text style={{ fontSize: 14, color: '#4b5563' }}>0987 654 321</Text>
-                </View>
-                <View style={{ flexDirection: 'row', gap: 10 }}>
-                  <Text style={{ fontSize: 14, color: '#6b7280' }}>📍</Text>
-                  <Text style={{ fontSize: 14, color: '#4b5563', flex: 1 }}>123 Đường ABC, Phường X, Quận Y, TP.HCM</Text>
-                </View>
-              </View>
-            </View>
-
-            {/* Order Items */}
-            <View style={{ backgroundColor: '#f9fafb', borderRadius: 12, padding: 16, marginBottom: 16 }}>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#374151', marginBottom: 12 }}>📦 Sản phẩm đặt hàng</Text>
-              {order.items.map((item, index) => (
-                <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: index < order.items.length - 1 ? 1 : 0, borderBottomColor: '#e5e7eb' }}>
-                  <Text style={{ fontSize: 14, color: '#4b5563', flex: 1 }}>{item.name}</Text>
-                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#1f2937' }}>x{item.quantity}</Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Payment Info */}
-            <View style={{ backgroundColor: '#ecfdf5', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#a7f3d0', marginBottom: 16 }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
-                <Text style={{ fontSize: 14, color: '#065f46' }}>Thành tiền:</Text>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: '#065f46' }}>{formatCurrency(order.total)}</Text>
-              </View>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
-                <Text style={{ fontSize: 14, color: '#065f46' }}>Phí vận chuyển:</Text>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: '#065f46' }}>Miễn phí</Text>
-              </View>
-              <View style={{ height: 1, backgroundColor: '#a7f3d0', marginVertical: 8 }} />
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#065f46' }}>Tổng thanh toán:</Text>
-                <Text style={{ fontSize: 18, fontWeight: '700', color: '#10b981' }}>{formatCurrency(order.total)}</Text>
-              </View>
-            </View>
-
-            {/* Time */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <Text style={{ fontSize: 13, color: '#9ca3af' }}>⏰ Thời gian đặt hàng:</Text>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#6b7280' }}>{order.timestamp}</Text>
-            </View>
-
-            {/* View Invoice Button */}
-            <TouchableOpacity
-              onPress={onShowInvoice}
-              style={{
-                backgroundColor: '#f0fdf4',
-                borderWidth: 1,
-                borderColor: '#86efac',
-                borderRadius: 10,
-                padding: 14,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8
-              }}
-            >
-              <Text style={{ fontSize: 18 }}>🧾</Text>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#16a34a' }}>
-                Xem hóa đơn chi tiết
-              </Text>
-            </TouchableOpacity>
-          </ScrollView>
-
-          {/* Action Buttons */}
-          {order.status === OrderStatus.New && (
-            <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: '#f3f4f6', gap: 10 }}>
-              <Button onPress={onAccept} variant="primary" size="md" fullWidth>
-               Xác nhận đơn hàng
-              </Button>
-              <Button onPress={onReject} variant="danger" size="md" fullWidth>
-               Từ chối đơn hàng
-              </Button>
-            </View>
-          )}
-
-          {order.status === OrderStatus.Preparing && (
-            <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: '#f3f4f6' }}>
-              <Button onPress={onClose} variant="primary" size="md" fullWidth>
-                🚚 Giao hàng
-              </Button>
-            </View>
-          )}
-
-          {(order.status === OrderStatus.Delivering || order.status === OrderStatus.Completed || order.status === OrderStatus.Cancelled) && (
-            <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: '#f3f4f6' }}>
-              <Button onPress={onClose} variant="secondary" size="md" fullWidth>
-                Đóng
-              </Button>
-            </View>
-          )}
-        </View>
-      </View>
-    </Modal>
-  );
-};
 
 // Modal lý do từ chối
 const RejectReasonModal: React.FC<{
@@ -587,11 +427,11 @@ const OrderCard: React.FC<{ order: Order; onPress: () => void }> = ({ order, onP
 
 const OrdersScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<OrderStatus>(OrderStatus.New);
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
+  const { orders, loading, error, refreshing, refresh, acceptOrder, cancelOrder, shipOrder } = useOrders();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   
   const tabs = [
     OrderStatus.New, 
@@ -609,49 +449,74 @@ const OrdersScreen: React.FC = () => {
   };
 
   // Handle order card press
+  const router = useRouter();
   const handleOrderPress = (order: Order) => {
-    setSelectedOrder(order);
-    setShowDetailModal(true);
+    router.push({
+      pathname: '/(main)/order-detail',
+      params: { orderId: order.id }
+    });
   };
 
   // Handle accept order
-  const handleAcceptOrder = () => {
+  const handleAcceptOrder = async () => {
     if (selectedOrder) {
-      setOrders(orders.map(order => 
-        order.id === selectedOrder.id 
-          ? { ...order, status: OrderStatus.Preparing }
-          : order
-      ));
-      setShowDetailModal(false);
-      setActiveTab(OrderStatus.Preparing); // Chuyển sang tab Đang chuẩn bị
-      setSelectedOrder(null);
+      try {
+        setActionLoading(true);
+        await acceptOrder(selectedOrder.id);
+        setActiveTab(OrderStatus.Preparing); // Chuyển sang tab Đang chuẩn bị
+        setSelectedOrder(null);
+      } catch (error) {
+        console.error('Failed to accept order:', error);
+        alert('Không thể xác nhận đơn hàng. Vui lòng thử lại.');
+      } finally {
+        setActionLoading(false);
+      }
     }
   };
 
   // Handle show reject modal
   const handleShowRejectModal = () => {
-    setShowDetailModal(false);
     setShowRejectModal(true);
   };
 
   // Handle reject order with reason
-  const handleRejectOrder = (reason: string) => {
+  const handleRejectOrder = async (reason: string) => {
     if (selectedOrder) {
-      setOrders(orders.map(order => 
-        order.id === selectedOrder.id 
-          ? { ...order, status: OrderStatus.Cancelled }
-          : order
-      ));
-      setShowRejectModal(false);
-      setSelectedOrder(null);
-      console.log(`Đơn ${selectedOrder.id} bị từ chối. Lý do: ${reason}`);
+      try {
+        setActionLoading(true);
+        await cancelOrder(selectedOrder.id, reason);
+        setShowRejectModal(false);
+        setSelectedOrder(null);
+        console.log(`Đơn ${selectedOrder.id} bị từ chối. Lý do: ${reason}`);
+      } catch (error) {
+        console.error('Failed to reject order:', error);
+        alert('Không thể từ chối đơn hàng. Vui lòng thử lại.');
+      } finally {
+        setActionLoading(false);
+      }
     }
   };
 
   // Handle show invoice
   const handleShowInvoice = () => {
-    setShowDetailModal(false);
     setShowInvoiceModal(true);
+  };
+
+  // Handle ship order
+  const handleShipOrder = async () => {
+    if (selectedOrder) {
+      try {
+        setActionLoading(true);
+        await shipOrder(selectedOrder.id);
+        setActiveTab(OrderStatus.Delivering);
+        setSelectedOrder(null);
+      } catch (error) {
+        console.error('Failed to ship order:', error);
+        alert('Không thể chuyển trạng thái giao hàng. Vui lòng thử lại.');
+      } finally {
+        setActionLoading(false);
+      }
+    }
   };
 
   return (
@@ -735,8 +600,27 @@ const OrdersScreen: React.FC = () => {
       <ScrollView 
         contentContainerStyle={{ padding: 16, paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+        }
       >
-        {filteredOrders.length > 0 ? (
+        {loading && !refreshing ? (
+          <View className="items-center justify-center mt-20">
+            <ActivityIndicator size="large" color="#10b981" />
+            <Text className="text-gray-500 text-sm mt-4">Đang tải đơn hàng...</Text>
+          </View>
+        ) : error ? (
+          <View className="items-center justify-center mt-20">
+            <Text className="text-red-500 text-base mb-2">⚠️ Lỗi</Text>
+            <Text className="text-gray-600 text-sm text-center px-8">{error}</Text>
+            <TouchableOpacity 
+              onPress={refresh}
+              className="mt-4 bg-emerald-500 px-6 py-2 rounded-lg"
+            >
+              <Text className="text-white font-semibold">Thử lại</Text>
+            </TouchableOpacity>
+          </View>
+        ) : filteredOrders.length > 0 ? (
           filteredOrders.map(order => (
             <OrderCard 
               key={order.id} 
@@ -753,18 +637,6 @@ const OrdersScreen: React.FC = () => {
       </ScrollView>
 
       {/* Modals */}
-      <OrderDetailModal
-        order={selectedOrder}
-        visible={showDetailModal}
-        onClose={() => {
-          setShowDetailModal(false);
-          setSelectedOrder(null);
-        }}
-        onAccept={handleAcceptOrder}
-        onReject={handleShowRejectModal}
-        onShowInvoice={handleShowInvoice}
-      />
-
       <RejectReasonModal
         visible={showRejectModal}
         onClose={() => setShowRejectModal(false)}
@@ -776,7 +648,6 @@ const OrdersScreen: React.FC = () => {
         visible={showInvoiceModal}
         onClose={() => {
           setShowInvoiceModal(false);
-          setShowDetailModal(true);
         }}
       />
     </View>
