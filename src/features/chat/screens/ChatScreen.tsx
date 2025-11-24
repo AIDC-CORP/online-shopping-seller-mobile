@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, TextInput, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useConversations } from '../../../hooks/useConversations';
+import { useConversations } from '../hooks/useConversations';
 import { ChatConversation as ChatConv } from '../../../services/chat/types';
 
 const ChatScreen: React.FC = () => {

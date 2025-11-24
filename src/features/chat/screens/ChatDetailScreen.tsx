@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Animated } from 'react-native';
-import { useChat } from '../../../hooks/useChat';
+import { useChat } from '../hooks/useChat';
 import * as ImagePicker from 'expo-image-picker';
 
 interface ChatDetailScreenProps {
@@ -31,17 +31,17 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
     }).start();
   }, [fadeAnim]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (flatListRef.current && messages.length) {
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }
-  };
+  }, [messages.length]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   if (loading) {
     return (
@@ -86,23 +86,8 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ chatId, onBack }) =
     });
 
     if (!result.canceled) {
-      const newMessage: Message = {
-        id: `m${Date.now()}`,
-        text: '📷 [Đã gửi hình ảnh]',
-        timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-        isFromSeller: true,
-        isRead: false,
-      };
-
-      setConversation(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          messages: [...prev.messages, newMessage],
-          lastMessage: '📷 Hình ảnh',
-          lastMessageTime: 'Vừa xong',
-        };
-      });
+      // TODO: Implement image upload to backend
+      await sendMessage('📷 [Đã gửi hình ảnh]');
       scrollToBottom();
     }
   };
