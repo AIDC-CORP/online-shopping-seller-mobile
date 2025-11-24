@@ -77,8 +77,12 @@ export const useWallet = () => {
    * Initial load
    */
   useEffect(() => {
-    refresh();
-  }, []);
+    const loadData = async () => {
+      await fetchWalletBalance();
+      await fetchTransactions(1);
+    };
+    loadData();
+  }, [fetchWalletBalance, fetchTransactions]);
 
   return {
     wallet,

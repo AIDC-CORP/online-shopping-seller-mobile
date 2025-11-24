@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import apiService from '../../../services/apiService';
+import { StoreService } from '../../../services';
 
 export interface StoreProfile {
   id?: string;
@@ -23,7 +23,7 @@ export const useStore = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await apiService.getStoreProfile();
+    const response = await StoreService.getStoreProfile();
     
     if (response.success && response.data) {
       setStoreProfile(response.data);
@@ -44,7 +44,7 @@ export const useStore = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await apiService.createStoreProfile(storeData);
+    const response = await StoreService.createStoreProfile(storeData);
     
     if (response.success && response.data) {
       setStoreProfile(response.data);
@@ -69,7 +69,7 @@ export const useStore = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await apiService.updateStoreProfile(updates);
+    const response = await StoreService.updateStoreProfile(updates);
     
     if (response.success && response.data) {
       setStoreProfile(response.data);

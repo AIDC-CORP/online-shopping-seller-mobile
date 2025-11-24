@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import catalogService from '../../../services/catalogService';
+import { ProductsService } from '../../../services';
 
 export interface Product {
   id: string;
@@ -29,7 +29,7 @@ export const useProducts = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await catalogService.getProducts(params);
+    const response = await ProductsService.getProducts(params);
     
     if (response.success && response.data) {
       setProducts(response.data);
@@ -52,7 +52,7 @@ export const useProducts = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await catalogService.createProduct(productData);
+    const response = await ProductsService.createProduct(productData);
     
     if (response.success && response.data) {
       // Add new product to list
@@ -81,7 +81,7 @@ export const useProducts = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await catalogService.updateProduct(productId, updates);
+    const response = await ProductsService.updateProduct(productId, updates);
     
     if (response.success && response.data) {
       // Update product in list
@@ -101,7 +101,7 @@ export const useProducts = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await catalogService.deleteProduct(productId);
+    const response = await ProductsService.deleteProduct(productId);
     
     if (response.success) {
       // Remove product from list

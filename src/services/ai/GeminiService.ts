@@ -52,7 +52,7 @@ class GeminiService {
           contents: [{
             parts: [{
               text: `Viết một mô tả ngắn gọn, hấp dẫn cho sản phẩm "${productName}" thuộc danh mục "${category}" cho một cửa hàng online. Mô tả nên khoảng 2-3 câu, tập trung vào lợi ích và đặc điểm nổi bật.`
-            }]
+            }],
           }],
           generationConfig: {
             temperature: 0.7,
