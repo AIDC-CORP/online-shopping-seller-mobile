@@ -36,6 +36,7 @@ const ImportExcel: React.FC<ImportExcelProps> = ({
   onSuccess,
 }) => {
   const [selectedFile, setSelectedFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
+  const [selectedZipFile, setSelectedZipFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
   const [uploading, setUploading] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
 
@@ -54,7 +55,7 @@ const ImportExcel: React.FC<ImportExcelProps> = ({
         
         // Check file size (5MB limit)
         if (file.size && file.size > 5 * 1024 * 1024) {
-          Alert.alert('Lỗi', 'File không được vượt quá 5MB');
+          Alert.alert('Lỗi', 'File Excel không được vượt quá 5MB');
           return;
         }
 
@@ -64,6 +65,30 @@ const ImportExcel: React.FC<ImportExcelProps> = ({
     } catch (error) {
       console.error('[ImportExcel] Failed to pick file:', error);
       Alert.alert('Lỗi', 'Không thể chọn file');
+    }
+  };
+
+  const handlePickZipFile = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/zip', 'application/x-zip-compressed'],
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets[0]) {
+        const file = result.assets[0];
+        
+        // Check file size (50MB limit for ZIP)
+        if (file.size && file.size > 50 * 1024 * 1024) {
+          Alert.alert('Lỗi', 'File ZIP không được vượt quá 50MB');
+          return;
+        }
+
+        setSelectedZipFile(file);
+      }
+    } catch (error) {
+      console.error('[ImportExcel] Failed to pick ZIP file:', error);
+      Alert.alert('Lỗi', 'Không thể chọn file ZIP');
     }
   };
 
@@ -78,12 +103,25 @@ const ImportExcel: React.FC<ImportExcelProps> = ({
 
       // Create FormData
       const formData = new FormData();
+      
+      // Add Excel file
       const fileToUpload: any = {
         uri: selectedFile.uri,
         type: selectedFile.mimeType || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         name: selectedFile.name,
       };
       formData.append('file', fileToUpload);
+
+      // Add ZIP file if selected
+      if (selectedZipFile) {
+        const zipToUpload: any = {
+          uri: selectedZipFile.uri,
+          type: 'application/zip',
+          name: selectedZipFile.name,
+        };
+        formData.append('images_zip', zipToUpload);
+        console.log('[ImportExcel] Uploading with ZIP:', selectedZipFile.name);
+      }
 
       console.log('[ImportExcel] Uploading file:', selectedFile.name);
 
@@ -163,6 +201,7 @@ const ImportExcel: React.FC<ImportExcelProps> = ({
 
   const handleClose = () => {
     setSelectedFile(null);
+    setSelectedZipFile(null);
     setImportResult(null);
     onClose();
   };
@@ -204,8 +243,9 @@ const ImportExcel: React.FC<ImportExcelProps> = ({
             <Text style={styles.instructionText}>
               1. Tải file mẫu Excel{'\n'}
               2. Điền thông tin sản phẩm theo cột{'\n'}
-              3. Lưu file và chọn file để upload{'\n'}
-              4. Nhấn Upload để import sản phẩm
+              3. Đặt tên ảnh trùng với Mã ảnh trong Excel{'\n'}
+              4. Nén tất cả ảnh vào file ZIP (không bắt buộc){'\n'}
+              5. Chọn file Excel và file ZIP để upload
             </Text>
             <TouchableOpacity
               onPress={handleDownloadTemplate}
@@ -279,6 +319,73 @@ const ImportExcel: React.FC<ImportExcelProps> = ({
                 <Text style={{ fontSize: 12, color: '#6b7280', textAlign: 'center' }}>
                   Chỉ hỗ trợ file .xlsx, .xls{'\n'}
                   Kích thước tối đa: 5MB
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* ZIP File Picker */}
+          <View style={styles.card}>
+            <Text style={styles.sectionLabel}>
+              Chọn file ảnh (ZIP) - Không bắt buộc
+            </Text>
+
+            {selectedZipFile ? (
+              <View style={styles.selectedFileContainer}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <View style={{ flex: 1, marginRight: 12 }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: '600',
+                        color: '#059669',
+                        marginBottom: 4,
+                      }}
+                      numberOfLines={1}
+                    >
+                      🗜️ {selectedZipFile.name}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 11,
+                        color: '#10b981',
+                      }}
+                    >
+                      {selectedZipFile.size
+                        ? `${(selectedZipFile.size / 1024 / 1024).toFixed(2)} MB`
+                        : 'Unknown size'}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => setSelectedZipFile(null)}
+                    style={{
+                      padding: 8,
+                      backgroundColor: '#fee2e2',
+                      borderRadius: 8,
+                    }}
+                  >
+                    <Text style={{ color: '#ef4444', fontSize: 18 }}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={handlePickZipFile}
+                style={styles.filePickerButton}
+              >
+                <Text style={{ fontSize: 40, marginBottom: 12 }}>🗜️</Text>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: '#3b82f6', marginBottom: 4 }}>
+                  Chọn file ZIP chứa ảnh
+                </Text>
+                <Text style={{ fontSize: 12, color: '#6b7280', textAlign: 'center' }}>
+                  Đặt tên file ảnh trùng với Mã ảnh{'\n'}
+                  Kích thước tối đa: 50MB
                 </Text>
               </TouchableOpacity>
             )}

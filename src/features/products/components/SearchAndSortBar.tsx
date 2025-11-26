@@ -8,6 +8,9 @@ interface SearchAndSortBarProps {
   onSearchChange: (query: string) => void;
   sortType: SortType;
   onSortChange: (sort: SortType) => void;
+  isSelectionMode: boolean;
+  onToggleSelectionMode: () => void;
+  selectedCount?: number;
 }
 
 const SearchAndSortBar: React.FC<SearchAndSortBarProps> = ({
@@ -15,6 +18,9 @@ const SearchAndSortBar: React.FC<SearchAndSortBarProps> = ({
   onSearchChange,
   sortType,
   onSortChange,
+  isSelectionMode,
+  onToggleSelectionMode,
+  selectedCount = 0,
 }) => {
   const [showSortMenu, setShowSortMenu] = React.useState(false);
 
@@ -27,6 +33,8 @@ const SearchAndSortBar: React.FC<SearchAndSortBarProps> = ({
     { type: 'name' as SortType, label: '🔤 Tên A-Z' },
   ];
 
+  const currentSort = sortOptions.find(o => o.type === sortType);
+
   return (
     <View style={{ 
       flexDirection: 'row', 
@@ -37,7 +45,7 @@ const SearchAndSortBar: React.FC<SearchAndSortBarProps> = ({
       alignItems: 'center',
       backgroundColor: 'white',
     }}>
-      {/* Search Input */}
+      {/* Search Input with Sort Dropdown */}
       <View style={{ 
         flex: 1, 
         flexDirection: 'row', 
@@ -65,13 +73,42 @@ const SearchAndSortBar: React.FC<SearchAndSortBarProps> = ({
             <Text style={{ fontSize: 16, color: '#6b7280' }}>✕</Text>
           </TouchableOpacity>
         )}
+        
+        {/* Sort Button inside search bar */}
+        <View style={{ 
+          height: 24, 
+          width: 1, 
+          backgroundColor: '#d1d5db', 
+          marginHorizontal: 8 
+        }} />
+        <TouchableOpacity
+          onPress={() => setShowSortMenu(!showSortMenu)}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 4,
+            paddingVertical: 4,
+            paddingLeft: 4,
+          }}
+        >
+          <Text style={{ fontSize: 14 }}>⇅</Text>
+          <Text style={{ 
+            fontSize: 12, 
+            fontWeight: '500', 
+            color: sortType !== 'default' ? '#2563eb' : '#6b7280',
+            maxWidth: 80,
+          }} numberOfLines={1}>
+            {sortType !== 'default' ? currentSort?.label.split(' ')[1] : 'Sắp xếp'}
+          </Text>
+          <Text style={{ fontSize: 10, color: '#9ca3af' }}>▼</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Sort Button */}
+      {/* Selection Mode Button */}
       <TouchableOpacity
-        onPress={() => setShowSortMenu(!showSortMenu)}
+        onPress={onToggleSelectionMode}
         style={{
-          backgroundColor: sortType !== 'default' ? '#dbeafe' : '#f3f4f6',
+          backgroundColor: isSelectionMode ? '#dbeafe' : '#f3f4f6',
           paddingHorizontal: 12,
           paddingVertical: 8,
           borderRadius: 8,
@@ -79,15 +116,17 @@ const SearchAndSortBar: React.FC<SearchAndSortBarProps> = ({
           alignItems: 'center',
           gap: 4,
           height: 38,
+          borderWidth: isSelectionMode ? 1 : 0,
+          borderColor: '#3b82f6',
         }}
       >
-        <Text style={{ fontSize: 16 }}>⇅</Text>
+        <Text style={{ fontSize: 16 }}>{isSelectionMode ? '✓' : '☐'}</Text>
         <Text style={{ 
           fontSize: 13, 
           fontWeight: '600', 
-          color: sortType !== 'default' ? '#2563eb' : '#6b7280',
+          color: isSelectionMode ? '#2563eb' : '#6b7280',
         }}>
-          {sortType !== 'default' ? 'ON' : 'Sort'}
+          {isSelectionMode ? (selectedCount > 0 ? `${selectedCount}` : 'Chọn') : 'Chọn'}
         </Text>
       </TouchableOpacity>
 
@@ -96,17 +135,32 @@ const SearchAndSortBar: React.FC<SearchAndSortBarProps> = ({
         <View style={{
           position: 'absolute',
           top: 58,
-          right: 12,
+          right: 80,
           backgroundColor: 'white',
           borderRadius: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 4,
+          shadowOpacity: 0.15,
+          shadowRadius: 6,
+          elevation: 6,
           zIndex: 1000,
           minWidth: 180,
+          borderWidth: 1,
+          borderColor: '#e5e7eb',
         }}>
+          <View style={{
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderBottomWidth: 1,
+            borderBottomColor: '#e5e7eb',
+            backgroundColor: '#f9fafb',
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
+          }}>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: '#374151' }}>
+              Sắp xếp theo
+            </Text>
+          </View>
           {sortOptions.map((option, index) => (
             <TouchableOpacity
               key={option.type}

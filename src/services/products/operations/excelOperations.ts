@@ -34,6 +34,7 @@ export async function importProductsFromExcel(
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        timeout: 120000, // 2 minutes timeout for file upload
       }
     );
 

@@ -65,6 +65,12 @@ const ProductsScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortType, setSortType] = useState<SortType>('default');
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  
+  // Multi-select states
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(new Set());
+  const [showDeleteMultipleConfirm, setShowDeleteMultipleConfirm] = useState(false);
+  const [isDeletingMultiple, setIsDeletingMultiple] = useState(false);
 
   // Fetch products
   const fetchProducts = useCallback(async () => {
@@ -250,6 +256,73 @@ const ProductsScreen: React.FC = () => {
     }
   }, []);
 
+  // Multi-select handlers
+  const handleToggleSelectionMode = useCallback(() => {
+    setIsSelectionMode(prev => !prev);
+    setSelectedProductIds(new Set());
+  }, []);
+
+  const handleToggleProductSelect = useCallback((productId: string) => {
+    setSelectedProductIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(productId)) {
+        newSet.delete(productId);
+      } else {
+        newSet.add(productId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    if (selectedProductIds.size === filteredProducts.length) {
+      // Deselect all
+      setSelectedProductIds(new Set());
+    } else {
+      // Select all filtered products
+      setSelectedProductIds(new Set(filteredProducts.map(p => p.id)));
+    }
+  }, [filteredProducts, selectedProductIds.size]);
+
+  const handleDeleteMultiple = useCallback(async () => {
+    if (selectedProductIds.size === 0) return;
+
+    try {
+      setIsDeletingMultiple(true);
+      const idsToDelete = Array.from(selectedProductIds);
+      
+      // Delete products one by one (or use bulk delete API if available)
+      let successCount = 0;
+      let failCount = 0;
+      
+      for (const id of idsToDelete) {
+        try {
+          await ProductsService.deleteProduct(id);
+          successCount++;
+        } catch {
+          failCount++;
+        }
+      }
+
+      // Update local state
+      setProducts(prev => prev.filter(p => !selectedProductIds.has(p.id)));
+      setSelectedProductIds(new Set());
+      setIsSelectionMode(false);
+      setShowDeleteMultipleConfirm(false);
+
+      if (failCount === 0) {
+        Alert.alert('Thành công', `Đã xóa ${successCount} sản phẩm`);
+      } else {
+        Alert.alert('Hoàn tất', `Xóa thành công ${successCount}/${idsToDelete.length} sản phẩm`);
+      }
+    } catch (error: any) {
+      console.error('[ProductsScreen] Failed to delete multiple products:', error);
+      Alert.alert('Lỗi', error.message || 'Không thể xóa sản phẩm');
+    } finally {
+      setIsDeletingMultiple(false);
+    }
+  }, [selectedProductIds]);
+
   return (
     <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
       {/* Header */}
@@ -283,6 +356,9 @@ const ProductsScreen: React.FC = () => {
           onSearchChange={setSearchQuery}
           sortType={sortType}
           onSortChange={setSortType}
+          isSelectionMode={isSelectionMode}
+          onToggleSelectionMode={handleToggleSelectionMode}
+          selectedCount={selectedProductIds.size}
         />
 
         <ProductStats
@@ -361,6 +437,9 @@ const ProductsScreen: React.FC = () => {
               onPress={() => setEditingProduct(item)}
               onEdit={() => setEditingProduct(item)}
               onDelete={() => setProductToDelete(item)}
+              isSelectionMode={isSelectionMode}
+              isSelected={selectedProductIds.has(item.id)}
+              onToggleSelect={() => handleToggleProductSelect(item.id)}
             />
           )}
           keyExtractor={(item) => item.id}
@@ -368,13 +447,94 @@ const ProductsScreen: React.FC = () => {
         />
       )}
 
-      {/* Floating Action Button */}
-      <View style={{ position: 'absolute', bottom: 24, right: 24, zIndex: 10 }}>
-        <FloatingButton
-          onPress={() => setShowAddMenu(true)}
-          icon={<PlusIcon width={24} height={24} stroke="white" />}
-        />
-      </View>
+      {/* Floating Action Button - Hidden when in selection mode */}
+      {!isSelectionMode && (
+        <View style={{ position: 'absolute', bottom: 24, right: 24, zIndex: 10 }}>
+          <FloatingButton
+            onPress={() => setShowAddMenu(true)}
+            icon={<PlusIcon width={24} height={24} stroke="white" />}
+          />
+        </View>
+      )}
+
+      {/* Selection Action Bar */}
+      {isSelectionMode && (
+        <View style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: 'white',
+          borderTopWidth: 1,
+          borderTopColor: '#e5e7eb',
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          paddingBottom: 24,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          elevation: 8,
+        }}>
+          {/* Select All Button */}
+          <TouchableOpacity
+            onPress={handleSelectAll}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              paddingVertical: 8,
+              paddingHorizontal: 12,
+              backgroundColor: '#f3f4f6',
+              borderRadius: 8,
+            }}
+          >
+            <Text style={{ fontSize: 16 }}>
+              {selectedProductIds.size === filteredProducts.length && filteredProducts.length > 0 ? '☑️' : '☐'}
+            </Text>
+            <Text style={{ fontSize: 13, fontWeight: '600', color: '#374151' }}>
+              Chọn tất cả
+            </Text>
+          </TouchableOpacity>
+
+          {/* Selected Count */}
+          <Text style={{ fontSize: 14, color: '#6b7280', fontWeight: '500' }}>
+            Đã chọn: <Text style={{ color: '#3b82f6', fontWeight: '700' }}>{selectedProductIds.size}</Text>
+          </Text>
+
+          {/* Delete Button */}
+          <TouchableOpacity
+            onPress={() => {
+              if (selectedProductIds.size > 0) {
+                setShowDeleteMultipleConfirm(true);
+              } else {
+                Alert.alert('Thông báo', 'Vui lòng chọn ít nhất 1 sản phẩm');
+              }
+            }}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              paddingVertical: 10,
+              paddingHorizontal: 16,
+              backgroundColor: selectedProductIds.size > 0 ? '#ef4444' : '#e5e7eb',
+              borderRadius: 8,
+            }}
+          >
+            <Text style={{ fontSize: 16 }}>🗑️</Text>
+            <Text style={{ 
+              fontSize: 14, 
+              fontWeight: '700', 
+              color: selectedProductIds.size > 0 ? 'white' : '#9ca3af' 
+            }}>
+              Xóa
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Modals */}
       <AddOptionMenu
@@ -518,6 +678,101 @@ const ProductsScreen: React.FC = () => {
                 <Text style={{ fontSize: 16, fontWeight: '600', color: 'white' }}>
                   Xóa
                 </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Delete Multiple Confirmation Modal */}
+      <Modal
+        visible={showDeleteMultipleConfirm}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowDeleteMultipleConfirm(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 16,
+        }}>
+          <View style={{
+            backgroundColor: 'white',
+            borderRadius: 16,
+            padding: 24,
+            width: '100%',
+            maxWidth: 400,
+          }}>
+            <View style={{
+              width: 64,
+              height: 64,
+              borderRadius: 32,
+              backgroundColor: '#fee2e2',
+              alignItems: 'center',
+              justifyContent: 'center',
+              alignSelf: 'center',
+              marginBottom: 16,
+            }}>
+              <Text style={{ fontSize: 32 }}>🗑️</Text>
+            </View>
+
+            <Text style={{
+              fontSize: 20,
+              fontWeight: 'bold',
+              color: '#1f2937',
+              textAlign: 'center',
+              marginBottom: 8,
+            }}>
+              Xóa {selectedProductIds.size} sản phẩm?
+            </Text>
+
+            <Text style={{
+              fontSize: 14,
+              color: '#6b7280',
+              textAlign: 'center',
+              marginBottom: 24,
+            }}>
+              Hành động này không thể hoàn tác. Tất cả sản phẩm đã chọn sẽ bị xóa vĩnh viễn.
+            </Text>
+
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <TouchableOpacity
+                onPress={() => setShowDeleteMultipleConfirm(false)}
+                disabled={isDeletingMultiple}
+                style={{
+                  flex: 1,
+                  backgroundColor: '#f3f4f6',
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ fontSize: 16, fontWeight: '600', color: '#4b5563' }}>
+                  Hủy
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleDeleteMultiple}
+                disabled={isDeletingMultiple}
+                style={{
+                  flex: 1,
+                  backgroundColor: '#ef4444',
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  opacity: isDeletingMultiple ? 0.7 : 1,
+                }}
+              >
+                {isDeletingMultiple ? (
+                  <ActivityIndicator color="white" size="small" />
+                ) : (
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: 'white' }}>
+                    Xóa tất cả
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>

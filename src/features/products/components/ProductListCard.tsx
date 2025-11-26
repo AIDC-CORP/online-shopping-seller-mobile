@@ -21,6 +21,9 @@ interface ProductListCardProps {
   onPress: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  isSelectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
 }
 
 // Helper function
@@ -37,7 +40,10 @@ const ProductListCard: React.FC<ProductListCardProps> = ({
   item, 
   onPress, 
   onEdit, 
-  onDelete 
+  onDelete,
+  isSelectionMode = false,
+  isSelected = false,
+  onToggleSelect,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -71,9 +77,17 @@ const ProductListCard: React.FC<ProductListCardProps> = ({
 
   const stockStatus = getStockStatus();
 
+  const handlePress = () => {
+    if (isSelectionMode && onToggleSelect) {
+      onToggleSelect();
+    } else {
+      onPress();
+    }
+  };
+
   return (
     <View style={{
-      backgroundColor: 'white',
+      backgroundColor: isSelected ? '#eff6ff' : 'white',
       marginHorizontal: 12,
       marginVertical: 4,
       borderRadius: 8,
@@ -82,10 +96,35 @@ const ProductListCard: React.FC<ProductListCardProps> = ({
       shadowOpacity: 0.08,
       shadowRadius: 2,
       elevation: 2,
+      borderWidth: isSelected ? 2 : 0,
+      borderColor: '#3b82f6',
     }}>
       <View style={{ flexDirection: 'row', padding: 8, alignItems: 'flex-start' }}>
+        {/* Checkbox for Selection Mode */}
+        {isSelectionMode && (
+          <TouchableOpacity 
+            onPress={onToggleSelect}
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 6,
+              borderWidth: 2,
+              borderColor: isSelected ? '#3b82f6' : '#d1d5db',
+              backgroundColor: isSelected ? '#3b82f6' : 'transparent',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: 8,
+              marginTop: 18,
+            }}
+          >
+            {isSelected && (
+              <Text style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>✓</Text>
+            )}
+          </TouchableOpacity>
+        )}
+
         {/* Product Image */}
-        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+        <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
           <Image 
             source={{ uri: item.imageUrl }} 
             style={{ 
@@ -100,7 +139,7 @@ const ProductListCard: React.FC<ProductListCardProps> = ({
 
         {/* Product Info */}
         <TouchableOpacity 
-          onPress={onPress}
+          onPress={handlePress}
           activeOpacity={0.7}
           style={{ flex: 1, marginLeft: 10 }}
         >
@@ -124,12 +163,14 @@ const ProductListCard: React.FC<ProductListCardProps> = ({
               >
                 {item.name}
               </Text>
-              <TouchableOpacity 
-                onPress={() => setShowMenu(!showMenu)}
-                style={{ padding: 2 }}
-              >
-                <Text style={{ fontSize: 18, color: '#6b7280' }}>⋮</Text>
-              </TouchableOpacity>
+              {!isSelectionMode && (
+                <TouchableOpacity 
+                  onPress={() => setShowMenu(!showMenu)}
+                  style={{ padding: 2 }}
+                >
+                  <Text style={{ fontSize: 18, color: '#6b7280' }}>⋮</Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* Quick Actions Menu */}
