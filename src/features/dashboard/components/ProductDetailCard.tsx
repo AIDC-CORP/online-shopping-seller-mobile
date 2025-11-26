@@ -50,7 +50,7 @@ export const ProductDetailCard: React.FC<ProductDetailCardProps> = ({
         <View className="flex-row items-center justify-between p-5 border-b border-gray-100">
           <Text className="text-xl font-bold text-gray-800 flex-1 pr-2">Chi tiết Sản phẩm</Text>
           <TouchableOpacity onPress={onClose} className="p-1">
-            <XCircleIcon className="h-6 w-6" color="#6B7280" />
+            <XCircleIcon width={24} height={24} color="#6B7280" />
           </TouchableOpacity>
         </View>
 
@@ -198,7 +198,7 @@ export const ProductDetailCard: React.FC<ProductDetailCardProps> = ({
             {/* Stock */}
             <View className="flex-1 bg-purple-50 rounded-xl p-4 border border-purple-200">
               <View className="flex-row items-center mb-2">
-                <PackageIcon className="h-4 w-4 mr-1" color="#7c3aed" />
+                <PackageIcon width={16} height={16} color="#7c3aed" />
                 <Text className="text-purple-600 text-xs font-medium">Tồn kho</Text>
               </View>
               <Text className="text-purple-900 text-3xl font-extrabold">{product.stock}</Text>
@@ -208,7 +208,7 @@ export const ProductDetailCard: React.FC<ProductDetailCardProps> = ({
             {/* Sold */}
             <View className="flex-1 bg-green-50 rounded-xl p-4 border border-green-200">
               <View className="flex-row items-center mb-2">
-                <CheckCircleIcon className="h-4 w-4 mr-1" color="#16a34a" />
+                <CheckCircleIcon width={16} height={16} color="#16a34a" />
                 <Text className="text-green-600 text-xs font-medium">Đã bán</Text>
               </View>
               <Text className="text-green-900 text-3xl font-extrabold">{product.sold || 0}</Text>

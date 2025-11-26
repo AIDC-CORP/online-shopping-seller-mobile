@@ -123,9 +123,9 @@ export const OrdersDetailCard: React.FC<OrdersDetailCardProps> = ({
 
   const getIcon = () => {
     switch (type) {
-      case 'total': return <PackageIcon className="h-6 w-6" color="#1d4ed8" />;
-      case 'success': return <CheckCircleIcon className="h-6 w-6" color="#4338ca" />;
-      case 'cancelled': return <XCircleIcon className="h-6 w-6" color="#b91c1c" />;
+      case 'total': return <PackageIcon width={24} height={24} color="#1d4ed8" />;
+      case 'success': return <CheckCircleIcon width={24} height={24} color="#4338ca" />;
+      case 'cancelled': return <XCircleIcon width={24} height={24} color="#b91c1c" />;
     }
   };
 
@@ -165,7 +165,7 @@ export const OrdersDetailCard: React.FC<OrdersDetailCardProps> = ({
             <Text className="text-xl font-bold text-gray-800">{getTitle()}</Text>
           </View>
           <TouchableOpacity onPress={onClose} className="p-1">
-            <XCircleIcon className="h-6 w-6" color="#6B7280" />
+            <XCircleIcon width={24} height={24} color="#6B7280" />
           </TouchableOpacity>
         </View>
 

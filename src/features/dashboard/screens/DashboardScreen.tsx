@@ -106,7 +106,7 @@ const DashboardScreen: React.FC = () => {
                  <StatCard 
                    title="Doanh thu" 
                    value={formatCurrency(stats.revenue).replace(/\s/g, '').replace('₫', ' ₫')} 
-                   icon={<ChartBarIcon className="h-5 w-5" color="#047857" />} 
+                   icon={<ChartBarIcon width={20} height={20} color="#047857" />} 
                    iconBgColor="bg-emerald-200" 
                    iconColor="#047857"
                    onPress={() => setShowRevenueDetail(true)}
@@ -114,7 +114,7 @@ const DashboardScreen: React.FC = () => {
                  <StatCard 
                    title="Thành công" 
                    value={stats.successfulOrders.toString()} 
-                   icon={<CheckCircleIcon className="h-5 w-5" color="#4338ca" />} 
+                   icon={<CheckCircleIcon width={20} height={20} color="#4338ca" />} 
                    iconBgColor="bg-indigo-200" 
                    iconColor="#4338ca"
                    onPress={() => setShowOrdersDetail('success')}
@@ -124,7 +124,7 @@ const DashboardScreen: React.FC = () => {
                 <StatCard 
                   title="Tổng đơn" 
                   value={stats.totalOrders.toString()} 
-                  icon={<PackageIcon className="h-5 w-5" color="#1d4ed8" />} 
+                  icon={<PackageIcon width={20} height={20} color="#1d4ed8" />} 
                   iconBgColor="bg-blue-200" 
                   iconColor="#1d4ed8"
                   onPress={() => setShowOrdersDetail('total')}
@@ -132,7 +132,7 @@ const DashboardScreen: React.FC = () => {
                 <StatCard 
                   title="Đã hủy" 
                   value={stats.cancelledOrders.toString()} 
-                  icon={<XCircleIcon className="h-5 w-5" color="#b91c1c" />} 
+                  icon={<XCircleIcon width={20} height={20} color="#b91c1c" />} 
                   iconBgColor="bg-red-200" 
                   iconColor="#b91c1c"
                   onPress={() => setShowOrdersDetail('cancelled')}

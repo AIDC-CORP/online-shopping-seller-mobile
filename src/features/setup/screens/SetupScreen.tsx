@@ -203,7 +203,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete, isSubmitting = fa
             borderWidth: 3,
             borderColor: 'white'
           }}>
-            <CameraIcon className="h-5 w-5" color="white" />
+            <CameraIcon width={20} height={20} color="white" />
           </View>
         </TouchableOpacity>
         <Text style={{ fontSize: 13, color: '#6b7280', marginTop: 12 }}>
@@ -324,7 +324,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete, isSubmitting = fa
             borderRadius: 8,
             padding: 10
           }}>
-            <CameraIcon className="h-5 w-5" color="white" />
+            <CameraIcon width={20} height={20} color="white" />
           </View>
         </TouchableOpacity>
       </View>
@@ -360,7 +360,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onComplete, isSubmitting = fa
               borderWidth: 2,
               borderColor: 'white'
             }}>
-              <CameraIcon className="h-4 w-4" color="white" />
+              <CameraIcon width={16} height={16} color="white" />
             </View>
           </TouchableOpacity>
           <Text style={{ fontSize: 13, color: '#6b7280', marginLeft: 16, flex: 1 }}>

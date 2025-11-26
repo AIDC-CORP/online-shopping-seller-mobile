@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 
-const PROFILE_URL = process.env.EXPO_PUBLIC_PROFILE_URL || 'http://192.168.1.13:8113';
+const PROFILE_URL = process.env.EXPO_PUBLIC_PROFILE_URL || 'http://192.168.1.4:8113';
 
 export interface StoreSettings {
   currency?: 'VND' | 'Dollar';

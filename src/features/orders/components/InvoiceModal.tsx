@@ -59,7 +59,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({ order, visible, onCl
               <Text style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', marginTop: 4 }}>#{order.id}</Text>
             </View>
             <TouchableOpacity onPress={onClose} style={{ padding: 4 }}>
-              <XCircleIcon className="h-6 w-6" color="white" />
+              <XCircleIcon width={24} height={24} color="white" />
             </TouchableOpacity>
           </View>
 

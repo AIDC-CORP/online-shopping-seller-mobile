@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useOrderDetail } from '../hooks/useOrderDetail';
 import { OrderDetailInfo } from '../components/OrderDetailInfo';
@@ -24,37 +23,37 @@ const OrderDetailScreen: React.FC = () => {
   // Loading state
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.emptyContainer}>
           <ActivityIndicator size="large" color="#10b981" />
           <Text style={styles.loadingText}>Đang tải chi tiết đơn hàng...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   // Error state
   if (error || !order) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>{error || 'Không tìm thấy đơn hàng'}</Text>
           <TouchableOpacity onPress={() => router.replace('/(main)/orders')}>
             <Text style={styles.backLink}>← Quay lại</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace('/(main)/orders')} style={styles.backButton}>
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>📋 Chi tiết đơn hàng</Text>
+        <Text style={styles.headerTitle}>Chi tiết đơn hàng</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -75,7 +74,7 @@ const OrderDetailScreen: React.FC = () => {
         onShip={handleShip}
         onComplete={handleComplete}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -85,21 +84,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
   },
   header: {
-    paddingHorizontal: 20, 
+    paddingHorizontal: 16,
     paddingVertical: 16,
-    minHeight: 80,
-    maxHeight: 80,
-    backgroundColor: '#10b981', 
-    borderBottomLeftRadius: 24, 
-    borderBottomRightRadius: 24, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 4 }, 
-    shadowOpacity: 0.1, 
-    shadowRadius: 8, 
-    elevation: 5, 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'space-between' 
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   backButton: {
     width: 40,
@@ -109,13 +101,13 @@ const styles = StyleSheet.create({
   },
   backIcon: {
     fontSize: 24,
-    color: 'white',
+    color: '#1f2937',
     fontWeight: 'bold',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: 'white',
+    color: '#1f2937',
   },
   scrollView: {
     flex: 1,

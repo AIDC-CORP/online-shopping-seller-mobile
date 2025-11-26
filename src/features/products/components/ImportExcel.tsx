@@ -13,7 +13,7 @@ import {
 import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { XIcon } from '../../../components/icons';
 import { ProductsService } from '../../../services/products';
 
@@ -167,8 +167,11 @@ const ImportExcel: React.FC<ImportExcelProps> = ({
     onClose();
   };
 
+  // Get safe area insets to handle bottom padding properly
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <View style={styles.safeArea}>
       <KeyboardAvoidingView 
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -177,12 +180,12 @@ const ImportExcel: React.FC<ImportExcelProps> = ({
           <View style={styles.container}>
             {/* Header - Fixed */}
             <View style={styles.header}>
-              <View style={{ flex: 1 , paddingBottom: 12}}>
+              <View style={{ flex: 1 }}>
                 <Text style={styles.headerTitle}>📊 Import Excel</Text>
                 <Text style={styles.headerSubtitle}>Thêm hàng loạt từ file Excel</Text>
               </View>
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                <XIcon color="white" />
+                <XIcon color="white" width={24} height={24} />
               </TouchableOpacity>
             </View>
 
@@ -426,26 +429,29 @@ const ImportExcel: React.FC<ImportExcelProps> = ({
             </View>
           )}
         </ScrollView>
+        {/* Bottom spacer for safe area */}
+        <View style={{ height: insets.bottom, backgroundColor: '#f9fafb' }} />
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#10b981',
+    backgroundColor: '#f9fafb',
   },
   container: {
     flex: 1,
     backgroundColor: '#f9fafb',
   },
   header: {
-    paddingHorizontal: 20, 
+    paddingHorizontal: 20,
     paddingVertical: 16,
-    minHeight: 80,
-    maxHeight: 80,
+    paddingTop: Platform.OS === 'ios' ? 50 : 16,
+    minHeight: 110,
+    maxHeight: 120,
     backgroundColor: '#10b981', 
     borderBottomLeftRadius: 24, 
     borderBottomRightRadius: 24, 
@@ -454,6 +460,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1, 
     shadowRadius: 8, 
     elevation: 5, 
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
     flexDirection: 'row', 
     alignItems: 'center', 
     justifyContent: 'space-between' 

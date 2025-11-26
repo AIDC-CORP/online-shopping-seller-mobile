@@ -255,18 +255,20 @@ const ProductsScreen: React.FC = () => {
       {/* Header */}
       <View style={{
         backgroundColor: 'white',
-        borderBottomWidth: 2,
-        borderBottomColor: '#f3f4f6',
-        paddingTop: 40,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb',
+        paddingHorizontal: 16,
+        paddingVertical: 16,
       }}>
         <Text style={{
           fontSize: 20,
           fontWeight: '700',
           color: '#1f2937',
-          paddingHorizontal: 16,
-          paddingVertical: 12,
         }}>
           📦 Sản phẩm
+        </Text>
+        <Text style={{ fontSize: 14, color: '#6b7280', marginTop: 2 }}>
+          Quản lý sản phẩm của bạn
         </Text>
       </View>
 

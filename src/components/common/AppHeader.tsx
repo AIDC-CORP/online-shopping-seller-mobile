@@ -97,7 +97,7 @@ const NotificationModal: React.FC<{
               )}
             </View>
             <TouchableOpacity onPress={onClose}>
-              <XCircleIcon className="h-6 w-6" color="#6b7280" />
+              <XCircleIcon width={24} height={24} color="#6b7280" />
             </TouchableOpacity>
           </View>
 

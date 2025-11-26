@@ -4,7 +4,7 @@
  */
 
 // Base URL cho Catalog Service
-const CATALOG_BASE_URL = process.env.EXPO_PUBLIC_CATALOG_URL || 'http://192.168.1.13:8115';
+const CATALOG_BASE_URL = process.env.EXPO_PUBLIC_CATALOG_URL || 'http://192.168.1.4:8115';
 
 // Endpoints cho Catalog Service
 export const CATALOG_ENDPOINTS = {

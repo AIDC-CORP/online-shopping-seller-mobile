@@ -82,12 +82,12 @@ export const RevenueDetailCard: React.FC<RevenueDetailCardProps> = ({
         <View className="flex-row items-center justify-between p-5 border-b border-gray-100">
           <View className="flex-row items-center space-x-3">
             <View className="bg-emerald-100 p-2.5 rounded-full">
-              <ChartBarIcon className="h-6 w-6" color="#047857" />
+              <ChartBarIcon width={24} height={24} color="#047857" />
             </View>
             <Text className="text-xl font-bold text-gray-800">Chi tiết Doanh thu</Text>
           </View>
           <TouchableOpacity onPress={onClose} className="p-1">
-            <XCircleIcon className="h-6 w-6" color="#6B7280" />
+            <XCircleIcon width={24} height={24} color="#6B7280" />
           </TouchableOpacity>
         </View>
 

@@ -43,7 +43,7 @@ export const RejectReasonModal: React.FC<RejectReasonModalProps> = ({ visible, o
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' }}>
             <Text style={{ fontSize: 18, fontWeight: '700', color: '#1f2937' }}>Lý do từ chối</Text>
             <TouchableOpacity onPress={onClose}>
-              <XCircleIcon className="h-6 w-6" color="#6b7280" />
+              <XCircleIcon width={24} height={24} color="#6b7280" />
             </TouchableOpacity>
           </View>
 

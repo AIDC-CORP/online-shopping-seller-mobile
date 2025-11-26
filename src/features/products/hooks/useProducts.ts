@@ -44,22 +44,39 @@ export const useProducts = () => {
     images?: string[];
     sku?: string;
   }) => {
+    if (!storeProfile?.id) {
+      setError('Store profile not loaded');
+      return { success: false, error: 'Store profile not loaded' };
+    }
+
     setIsLoading(true);
     setError(null);
     
-    const response = await ProductsService.createProduct(productData);
-    
-    if (response.success && response.data) {
+    try {
+      // Map frontend params to backend request format
+      const backendRequest = {
+        product_name: productData.name,
+        description: productData.description,
+        price: productData.price,
+        quantity: productData.stock_quantity,
+        category: productData.category as any || 'GENERAL',
+        image_urls: productData.images,
+        unit: 'PCS' as any,
+        status: 'ACTIVE' as any,
+      };
+      
+      const product = await ProductsService.addProduct(storeProfile.id, backendRequest);
       // Add new product to list
-      setProducts(prev => [response.data, ...prev]);
+      setProducts(prev => [product, ...prev]);
       setIsLoading(false);
-      return { success: true, data: response.data };
-    } else {
-      setError(response.error || 'Failed to create product');
+      return { success: true, data: product };
+    } catch (err: any) {
+      const errorMessage = err.message || 'Failed to create product';
+      setError(errorMessage);
       setIsLoading(false);
-      return { success: false, error: response.error };
+      return { success: false, error: errorMessage };
     }
-  }, []);
+  }, [storeProfile?.id]);
 
   const updateProduct = useCallback(async (
     productId: string,
@@ -68,7 +85,6 @@ export const useProducts = () => {
       description?: string;
       price?: number;
       stock_quantity?: number;
-      category?: string;
       images?: string[];
       is_active?: boolean;
     }
@@ -76,19 +92,19 @@ export const useProducts = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await ProductsService.updateProduct(productId, updates);
-    
-    if (response.success && response.data) {
+    try {
+      const product = await ProductsService.updateProduct(productId, updates);
       // Update product in list
       setProducts(prev => 
-        prev.map(p => p.id === productId ? response.data : p)
+        prev.map(p => p.id === productId ? product : p)
       );
       setIsLoading(false);
-      return { success: true, data: response.data };
-    } else {
-      setError(response.error || 'Failed to update product');
+      return { success: true, data: product };
+    } catch (err: any) {
+      const errorMessage = err.message || 'Failed to update product';
+      setError(errorMessage);
       setIsLoading(false);
-      return { success: false, error: response.error };
+      return { success: false, error: errorMessage };
     }
   }, []);
 
@@ -96,24 +112,24 @@ export const useProducts = () => {
     setIsLoading(true);
     setError(null);
     
-    const response = await ProductsService.deleteProduct(productId);
-    
-    if (response.success) {
+    try {
+      await ProductsService.deleteProduct(productId);
       // Remove product from list
       setProducts(prev => prev.filter(p => p.id !== productId));
       setIsLoading(false);
       return { success: true };
-    } else {
-      setError(response.error || 'Failed to delete product');
+    } catch (err: any) {
+      const errorMessage = err.message || 'Failed to delete product';
+      setError(errorMessage);
       setIsLoading(false);
-      return { success: false, error: response.error };
+      return { success: false, error: errorMessage };
     }
   }, []);
 
   /**
    * Decrease stock quantity for multiple products (when completing an order)
    */
-  const decreaseStock = useCallback(async (items: Array<{ product_id: string; quantity: number; name: string }>) => {
+  const decreaseStock = useCallback(async (items: { product_id: string; quantity: number; name: string }[]) => {
     console.log('[useProducts] decreaseStock called with items:', items);
     
     if (!storeProfile?.id) {

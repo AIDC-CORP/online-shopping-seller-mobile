@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert, Image, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Product } from '../../../common/types';
 import { XIcon, CameraIcon } from '../../../components/icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -196,8 +196,11 @@ const AddProduct: React.FC<AddProductProps> = ({
 
   console.log('[AddProduct] Rendering component');
   
+  // Get safe area insets to handle bottom padding properly
+  const insets = useSafeAreaInsets();
+  
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#10b981' }} edges={['top', 'bottom']}>
+    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
       <KeyboardAvoidingView 
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -207,13 +210,13 @@ const AddProduct: React.FC<AddProductProps> = ({
           {/* Header - Fixed height */}
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.headerTitle }>{isEditMode ? '✏️ Sửa sản phẩm' : '✨ Sản phẩm mới'}</Text>
+              <Text style={styles.headerTitle }>{isEditMode ? 'Sửa sản phẩm' : 'Sản phẩm mới'}</Text>
               <Text style={styles.headerSubtitle}>
                 {isEditMode ? 'Chỉnh sửa thông tin sản phẩm' : 'Điền thông tin sản phẩm của bạn'}
               </Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <XIcon color="white" />
+              <XIcon color="white" width={24} height={24} />
             </TouchableOpacity>
           </View>
 
@@ -238,7 +241,7 @@ const AddProduct: React.FC<AddProductProps> = ({
                 ) : (
                   <View style={styles.emptyImageContainer}>
                     <View style={styles.cameraIconCircle}>
-                      <CameraIcon color="#10b981" />
+                      <CameraIcon color="#10b981" width={36} height={36} />
                     </View>
                     <Text style={styles.uploadTitle}>📸 Tải lên hình ảnh sản phẩm</Text>
                     <Text style={styles.uploadSubtitle}>Chụp ảnh hoặc chọn từ thư viện</Text>
@@ -371,7 +374,7 @@ const AddProduct: React.FC<AddProductProps> = ({
           </ScrollView>
 
           {/* Bottom Bar */}
-          <View style={styles.bottomBar}>
+          <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 16) }]}>
             <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
               <Text style={styles.cancelButtonText}>Hủy</Text>
             </TouchableOpacity>
@@ -384,7 +387,7 @@ const AddProduct: React.FC<AddProductProps> = ({
           </View>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -397,10 +400,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc'
   },
   header: { 
-    paddingHorizontal: 20, 
+    paddingHorizontal: 20,
     paddingVertical: 16,
-    minHeight: 80,
-    maxHeight: 80,
+    paddingTop: Platform.OS === 'ios' ? 50 : 16,
+    minHeight: 110,
+    maxHeight: 120,
     backgroundColor: '#10b981', 
     borderBottomLeftRadius: 24, 
     borderBottomRightRadius: 24, 
@@ -409,9 +413,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1, 
     shadowRadius: 8, 
     elevation: 5, 
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
     flexDirection: 'row', 
     alignItems: 'center', 
-    justifyContent: 'space-between' 
+    justifyContent: 'space-between'
   },
   headerTitle: { 
     fontSize: 24, 
@@ -590,8 +596,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8, 
     elevation: 10,
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    paddingBottom: Platform.OS === 'ios' ? 20 : 16,
+    paddingTop: 16,
     flexDirection: 'row',
     gap: 12
   },

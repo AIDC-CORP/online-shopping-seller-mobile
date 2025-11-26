@@ -236,7 +236,7 @@ const StoreScreen: React.FC = () => {
                     padding: 8,
                     borderRadius: 8
                   }}>
-                    <PencilIcon className="h-5 w-5" color="white" />
+                    <PencilIcon width={20} height={20} color="white" />
                   </View>
                 </IconButton>
               </View>
@@ -311,7 +311,7 @@ const StoreScreen: React.FC = () => {
             <View className="flex-row justify-between items-start mb-2">
               <Text style={{ fontSize: 16, fontWeight: '600', color: '#1f2937' }}>Giới thiệu</Text>
               {/* <IconButton onPress={() => handleEditField('description')}>
-                <PencilIcon className="h-4 w-4" color="#6b7280" />
+                <PencilIcon width={16} height={16} color="#6b7280" />
               </IconButton> */}
             </View>
             <Text style={{ fontSize: 14, color: '#1f2937', lineHeight: 20 }}>

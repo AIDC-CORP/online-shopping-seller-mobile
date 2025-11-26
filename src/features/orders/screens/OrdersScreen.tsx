@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Order, OrderStatus } from '../types';
 import Button from '../../../components/common/button';
@@ -157,15 +156,15 @@ const OrdersScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f8fafc' }} edges={['top']}>
-      {/* Title */}
-      <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={{ fontSize: 24, fontWeight: '800', color: '#1f2937' }}>
-          Đơn hàng
-        </Text>
-        {/* Debug: Reset button */}
+    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+      {/* Header */}
+      <View style={{ backgroundColor: 'white', paddingHorizontal: 16, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#e5e7eb', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View>
+          <Text style={{ fontSize: 20, fontWeight: '700', color: '#1f2937' }}>Đơn hàng</Text>
+          <Text style={{ fontSize: 14, color: '#6b7280', marginTop: 2 }}>Quản lý đơn hàng của bạn</Text>
+        </View>
         <Button onPress={resetLocalOverrides} variant="danger" size="sm">
-          Reset Test
+          Reset
         </Button>
       </View>
 
@@ -173,8 +172,8 @@ const OrdersScreen: React.FC = () => {
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
-        style={{ flexGrow: 0, paddingHorizontal: 20, marginBottom: 16 }}
-        contentContainerStyle={{ gap: 10 }}
+        style={{ flexGrow: 0, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' }}
+        contentContainerStyle={{ gap: 8 }}
       >
         {tabs.map(tab => {
           const count = getOrderCount(tab);
@@ -195,7 +194,7 @@ const OrdersScreen: React.FC = () => {
 
       {/* Orders List */}
       <ScrollView
-        style={{ flex: 1, paddingHorizontal: 20 }}
+        style={{ flex: 1, paddingHorizontal: 16, paddingTop: 12 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={refresh} />
@@ -245,7 +244,7 @@ const OrdersScreen: React.FC = () => {
         visible={showInvoiceModal}
         onClose={() => setShowInvoiceModal(false)}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

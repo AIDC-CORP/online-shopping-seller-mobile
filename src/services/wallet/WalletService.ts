@@ -117,12 +117,32 @@ class WalletService {
       return response.data;
     } catch (error: any) {
       console.error('[WalletService] Failed to credit wallet:', error);
+      console.error('[WalletService] Error response:', error.response?.data);
+      console.error('[WalletService] Error status:', error.response?.status);
+      
       if (error.response?.status === 404) {
         throw new Error('Endpoint chưa được triển khai trên server');
       }
-      throw new Error(
-        error.response?.data?.detail || 'Không thể cộng tiền vào ví'
-      );
+      if (error.response?.status === 401) {
+        throw new Error('Token hết hạn. Vui lòng logout và login lại');
+      }
+      if (error.response?.status === 403) {
+        throw new Error('Không có quyền truy cập. Vui lòng kiểm tra role SELLER');
+      }
+      
+      // Handle validation error (422) with detail array
+      if (error.response?.status === 422 && Array.isArray(error.response?.data?.detail)) {
+        const details = error.response.data.detail
+          .map((d: any) => `${d.loc?.join('.')}: ${d.msg}`)
+          .join(', ');
+        throw new Error(`Validation error: ${details}`);
+      }
+      
+      const errorMessage = error.response?.data?.detail 
+        || error.message 
+        || 'Không thể cộng tiền vào ví';
+      
+      throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
     }
   }
 }

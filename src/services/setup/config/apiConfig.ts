@@ -3,7 +3,7 @@
  * Endpoints cho Store Creation và First-time Onboarding
  */
 
-const PROFILE_BASE_URL = process.env.EXPO_PUBLIC_PROFILE_URL || 'http://192.168.1.13:8113';
+const PROFILE_BASE_URL = process.env.EXPO_PUBLIC_PROFILE_URL || 'http://192.168.1.4:8113';
 
 export const SETUP_ENDPOINTS = {
   // Store Management
