@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from './button';
 import { useRouter } from 'expo-router';
 import SettingsScreen from '../../features/settings/screens/SettingsScreen';
+import { useStore } from '../../features/store/hooks/useStore';
 
 interface AppHeaderProps {
   onLogout: () => void;
@@ -219,6 +220,10 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onLogout }) => {
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const { storeProfile } = useStore();
+
+  // Get store name or fallback to default
+  const displayName = storeProfile?.store_name || 'Cửa hàng của bạn';
 
   // Get unread notification count
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -243,9 +248,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onLogout }) => {
     <>
       <SafeAreaView edges={['top']} className="bg-emerald-500">
         <View className="h-16 flex-row justify-between items-center px-4" style={styles.header}>
-          <View>
+          <View className="flex-1 mr-3">
             <Text className="text-sm font-light text-white/90">Xin chào,</Text>
-            <Text className="text-xl font-bold text-white">Người bán</Text>
+            <Text className="text-xl font-bold text-white" numberOfLines={1}>{displayName}</Text>
           </View>
           
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>

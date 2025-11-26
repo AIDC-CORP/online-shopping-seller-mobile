@@ -8,7 +8,7 @@ import { InvoiceModal, RejectReasonModal, OrderCard } from '../components';
 
 const OrdersScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<OrderStatus>(OrderStatus.New);
-  const { orders, loading, error, refreshing, refresh, acceptOrder, cancelOrder, resetLocalOverrides } = useOrdersContext();
+  const { orders, loading, error, refreshing, refresh, acceptOrder, cancelOrder} = useOrdersContext();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
@@ -163,9 +163,6 @@ const OrdersScreen: React.FC = () => {
           <Text style={{ fontSize: 20, fontWeight: '700', color: '#1f2937' }}>Đơn hàng</Text>
           <Text style={{ fontSize: 14, color: '#6b7280', marginTop: 2 }}>Quản lý đơn hàng của bạn</Text>
         </View>
-        <Button onPress={resetLocalOverrides} variant="danger" size="sm">
-          Reset
-        </Button>
       </View>
 
       {/* Tabs */}
